@@ -36,7 +36,7 @@ add_executable( physer main.cpp ${ANTLR4_SRC_FILES_antlrsygus}
         parsing/to_string_printer.cpp parsing/to_string_printer.h
         exceptions/unsupported_feature.cpp exceptions/unsupported_feature.h exceptions/not_implemented.cpp
             exceptions/not_implemented.h
-        parsing/symbol_table.cpp parsing/symbol_table.h)
+        parsing/SymbolTable.cpp parsing/SymbolTable.h parsing/ast.cpp parsing/ast.h exceptions/IOException.cpp exceptions/IOException.h utils/IOHelpers.h utils/IOHelpers.cpp)
 
 # add required runtime library
 add_dependencies( physer antlr4_shared)
