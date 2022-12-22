@@ -130,10 +130,6 @@ public:
         return visitChildren(ctx);
     }
 
-    virtual std::any visitTerm(SyGuSv21Parser::TermContext *ctx) override {
-        return visitChildren(ctx);
-    }
-
     virtual std::any visitApplicationTerm(SyGuSv21Parser::ApplicationTermContext *ctx) override {
         return visitChildren(ctx);
     }
@@ -147,10 +143,6 @@ public:
     }
 
     virtual std::any visitLetTerm(SyGuSv21Parser::LetTermContext *ctx) override {
-        return visitChildren(ctx);
-    }
-
-    virtual std::any visitBfTerm(SyGuSv21Parser::BfTermContext *ctx) override {
         return visitChildren(ctx);
     }
 

@@ -25,11 +25,13 @@ int main(int argc, const char* argv[])
     SyGuSv21Lexer lexer{&input};
     antlr4::CommonTokenStream tokens(&lexer);
     SyGuSv21Parser parser{&tokens};
-    std::shared_ptr<to_string_printer> printer = std::make_shared<to_string_printer>();
+    //std::shared_ptr<to_string_printer> printer = std::make_shared<to_string_printer>();
     SyGuSv21Parser::ProblemContext* parse_tree = parser.problem();
 
     auto [symbol_table, ast] = symbol_table_ast_builder::build_symbol_table_and_ast(parse_tree);
-
+    AstToString printer;
+    std::string s = printer.get_string(*ast);
+    std::cout << s << std::endl;
     //std::shared_ptr<sygus_smt_rep> rep = sygus_smt_rep_builder::build_sygus_smt_repr(problem);
     return 0;
 }

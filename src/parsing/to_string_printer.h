@@ -9,391 +9,359 @@
 #include <sstream>
 #include "../exceptions/unsupported_feature.h"
 #include "../exceptions/not_implemented.h"
+#include "ast.h"
 
-class to_string_printer : public SyGuSv21BaseVisitor {
+class AstToString : public ast::AstBaseVisitor {
+
+private:
 
     std::stringstream result_stream;
 
+    void push_op_bracket() {
+        result_stream << "(";
+    }
+
+    void push_cl_bracket() {
+        result_stream << ")";
+    }
+
+    void push_space() {
+        result_stream << " ";
+    }
+
 public:
 
-    to_string_printer() = default;
+    AstToString() = default;
 
-    std::any visitSymbol(SyGuSv21Parser::SymbolContext* ctx) override {
-        this->result_stream << ctx->getText();
-        return {};
-    }
+    std::any visitProblem(ast::Problem& problem) override {
 
-    std::any visitNumeral(SyGuSv21Parser::NumeralContext *ctx) override {
-        this->result_stream << ctx->NUMERAL()->getSymbol()->getText();
-        return {};
-    }
+        for(const auto& x: problem.get_commands()) {
 
-    std::any visitDecimal(SyGuSv21Parser::DecimalContext *ctx) override {
-        ctx->numeral(0)->accept(this);
-        this->result_stream << ".";
-        ctx->numeral(1) ->accept(this);
-        return {};
-    }
-
-    std::any visitBoolConstTrue(SyGuSv21Parser::BoolConstTrueContext *ctx) override {
-        this->result_stream << "true";
-        return {};
-    }
-
-    std::any visitBoolConstFalse(SyGuSv21Parser::BoolConstFalseContext *ctx) override {
-        this->result_stream << "false";
-        return {};
-    }
-
-    std::any visitHexConst(SyGuSv21Parser::HexConstContext *ctx) override {
-        this->result_stream << ctx->HEXCONST()->getText();
-        return {};
-    }
-
-    std::any visitBinConst(SyGuSv21Parser::BinConstContext *ctx) override {
-        this->result_stream << ctx->BINCONST()->getText();
-        return {};
-    }
-
-    std::any visitStringConst(SyGuSv21Parser::StringConstContext *ctx) override {
-        this->result_stream << ctx->STRINGCONST()->getText();
-        return {};
-    }
-
-    std::any visitIndexedIdentifier(SyGuSv21Parser::IndexedIdentifierContext *ctx) override {
-        throw unsupported_feature{"Indexed Identifiers are not supported for now."};
-    }
-
-    std::any visitIndex(SyGuSv21Parser::IndexContext *ctx) override {
-        throw unsupported_feature{"Indexes are not supported for now."};
-    }
-
-    std::any visitParametricSort(SyGuSv21Parser::ParametricSortContext *ctx) override {
-        this->result_stream << "(";
-        ctx->identifier()->accept(this);
-        for (auto x : ctx->sort()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitApplicationTerm(SyGuSv21Parser::ApplicationTermContext *ctx) override {
-        this->result_stream << "(";
-        ctx->identifier()->accept(this);
-        for (auto x : ctx->term()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitExistsTerm(SyGuSv21Parser::ExistsTermContext *ctx) override {
-        this->result_stream << "(exists (";
-        for (auto x : ctx->sortedVar()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ") ";
-        ctx->term()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitForallTerm(SyGuSv21Parser::ForallTermContext *ctx) override {
-        this->result_stream << "(forall (";
-        for (auto x : ctx->sortedVar()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ") ";
-        ctx->term()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitLetTerm(SyGuSv21Parser::LetTermContext *ctx) override {
-        this->result_stream << "(let (";
-        for (auto x : ctx->varBinding()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ") ";
-        ctx->term()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitBfApplicationTerm(SyGuSv21Parser::BfApplicationTermContext *ctx) override {
-        this->result_stream << "(";
-        ctx->identifier()->accept(this);
-        for (auto x : ctx->bfTerm()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitSortedVar(SyGuSv21Parser::SortedVarContext *ctx) override {
-        this->result_stream << "(";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->sort()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitVarBinding(SyGuSv21Parser::VarBindingContext *ctx) override {
-        this->result_stream << "(";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->term()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitFeature(SyGuSv21Parser::FeatureContext *ctx) override {
-        this->result_stream << ":";
-        if (ctx->GRAMMARS_FEATURE() != nullptr) {
-            this->result_stream << ":grammars";
-        } else if (ctx->FWD_DECLS_FEATURE() != nullptr) {
-            this->result_stream << ":fwd-decls";
-        } else if (ctx->RECURSION_FEATURE() != nullptr) {
-            this->result_stream << ":recursion";
-        } else if (ctx->ORACLES_FEATURE() != nullptr) {
-            this->result_stream << ":oracles";
-        } else if (ctx->WEIGHTS_FEATURE() != nullptr) {
-            this->result_stream << ":weights";
-        } else {
-            throw unsupported_feature("When printing feature we encountered a non existing feature.");
-        }
-        return {};
-    }
-
-    // Commands
-    std::any visitAssumeCmd(SyGuSv21Parser::AssumeCmdContext *ctx) override {
-        this->result_stream << "(assume ";
-        ctx->term()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitCheckSynthCmd(SyGuSv21Parser::CheckSynthCmdContext *ctx) override {
-        this->result_stream << "(check-synth)";
-        return {};
-    }
-
-    std::any visitConstraintCmd(SyGuSv21Parser::ConstraintCmdContext *ctx) override {
-        this->result_stream << "(constraint ";
-        ctx->term()->accept(this);
-        this->result_stream << ")";
-
-        return {};
-    }
-
-    std::any visitDeclareVarCmd(SyGuSv21Parser::DeclareVarCmdContext *ctx) override {
-        this->result_stream << "(declare-var ";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->sort()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitSetFeatureCmd(SyGuSv21Parser::SetFeatureCmdContext *ctx) override {
-        this->result_stream << "(set-feature ";
-        ctx->feature()->accept(this);
-        this->result_stream << " ";
-        ctx->boolConst()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitSynthFunCmd(SyGuSv21Parser::SynthFunCmdContext *ctx) override {
-        this->result_stream << "(synth-fun ";
-        ctx->symbol()->accept(this);
-        this->result_stream << " (";
-        for (auto x : ctx->sortedVar()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ") ";
-        ctx->sort()->accept(this);
-        this->result_stream << " ";
-        ctx->grammarDef()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitDeclareDatatype(SyGuSv21Parser::DeclareDatatypeContext *ctx) override {
-        this->result_stream << "(declare-datatype ";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->dtDecl()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitDeclareDatatypes(SyGuSv21Parser::DeclareDatatypesContext *ctx) override {
-        throw not_implemented("DeclareDatatypes has not been implemeneted yet.");
-        this->result_stream << "(declare-datatypes ( ";
-        //loop
-        this->result_stream << ") (";
-        //loop
-        this->result_stream << "))";
-        return {};
-    }
-
-    std::any visitDeclareSort(SyGuSv21Parser::DeclareSortContext *ctx) override {
-        this->result_stream << "(declare-sort ";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->numeral()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitDefineFun(SyGuSv21Parser::DefineFunContext *ctx) override {
-        this->result_stream << "(define-fun ";
-        ctx->symbol()->accept(this);
-        this->result_stream << " (";
-        for (auto a : ctx->sortedVar()) {
-            this->result_stream << " ";
-            a->accept(this);
-        }
-        this->result_stream << ") ";
-        ctx->sort()->accept(this);
-        this->result_stream << " ";
-        ctx->term()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitDefineSort(SyGuSv21Parser::DefineSortContext *ctx) override {
-        this->result_stream << "(define-sort ";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->sort()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitSetInfo(SyGuSv21Parser::SetInfoContext *ctx) override {
-        this->result_stream << "(set-info ";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->literal()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitSetLogic(SyGuSv21Parser::SetLogicContext *ctx) override {
-        this->result_stream << "(set-logic ";
-        ctx->symbol()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitSetOption(SyGuSv21Parser::SetOptionContext *ctx) override {
-        this->result_stream << "(set-option ";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->literal()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitSortDecl(SyGuSv21Parser::SortDeclContext *ctx) override {
-        this->result_stream << "(";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->numeral()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitDtDecl(SyGuSv21Parser::DtDeclContext *ctx) override {
-        this->result_stream << "(";
-        for (auto x : ctx->dtConsDecl()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ")";
-        return {};
-    }
-
-     std::any visitDtConsDecl(SyGuSv21Parser::DtConsDeclContext *ctx) override {
-         this->result_stream << "(";
-         ctx->symbol()->accept(this);
-         this->result_stream << " ";
-         for (auto x : ctx->sortedVar()) {
-             this->result_stream << " ";
-             x->accept(this);
-         }
-         this->result_stream << ")";
-         return {};
-    }
-
-    std::any visitGrammarDef(SyGuSv21Parser::GrammarDefContext *ctx) override {
-        this->result_stream << "(";
-        for (auto x : ctx->sortedVar()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ")";
-        this->result_stream << " ";
-        this->result_stream << "(";
-        for (auto x : ctx->groupedRuleList()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitGroupedRuleList(SyGuSv21Parser::GroupedRuleListContext *ctx) override {
-        this->result_stream << "(";
-        ctx->symbol()->accept(this);
-        this->result_stream << " ";
-        ctx->sort()->accept(this);
-        this->result_stream << " (";
-        for (auto x: ctx->gTerm()) {
-            this->result_stream << " ";
-            x->accept(this);
-        }
-        this->result_stream << "))";
-        return {};
-    }
-
-    std::any visitConstantGTerm(SyGuSv21Parser::ConstantGTermContext *ctx) override {
-        this->result_stream << "(Constant ";
-        ctx->sort()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitVariableGTerm(SyGuSv21Parser::VariableGTermContext *ctx) override {
-        this->result_stream << "(Variable ";
-        ctx->sort()->accept(this);
-        this->result_stream << ")";
-        return {};
-    }
-
-    std::any visitProblem(SyGuSv21Parser::ProblemContext *ctx) override {
-        for (auto a : ctx->cmd()) {
-            a->accept(this);
+            x->accept(*this);
             this->result_stream << std::endl;
         }
         return {};
     }
 
-    std::string get_string(SyGuSv21Parser::ProblemContext* ctx) {
-        ctx->accept(this);
+    std::any visitNumeral(ast::Numeral& numeral) override {
+        this->result_stream << numeral.get_value();
+        return {};
+    }
+
+    std::any visitDecimal(ast::Decimal& decimal) override {
+        throw not_implemented("Decimals are not implemented yet.");
+    }
+
+    std::any visitBoolConst(ast::BoolConst& boolConst) override {
+        if (boolConst.get_value()) {
+            this->result_stream << "true";
+        } else {
+            this->result_stream << "false";
+        }
+        return {};
+    }
+
+    std::any visitHexConst(ast::HexConst& hex) override {
+        throw not_implemented("Hex consts are not implemented yet.");
+    }
+
+    std::any visitBinConst(ast::BinConst& bin) override {
+        throw not_implemented("Bin consts are not implemented yet.");
+    }
+
+    std::any visitStringConst(ast::StringConst& s) override {
+        this->result_stream << s.get_string();
+        return {};
+    }
+
+    std::any visitSimpleIdentifier(ast::SimpleIdentifier& identifier) override {
+         this->result_stream << identifier.get_symbol();
+        return {};
+    }
+
+    std::any visitIndexedIdentifier(ast::IndexedIdentifier& context) override {
+        throw not_implemented("Indexed identifiers are not implemented yet.");
+    }
+
+    std::any visitSimpleSort(ast::SimpleSort& sort) override {
+        std::visit([&](auto id) mutable {id.accept(*this);}, sort.get_identifier());
+        return {};
+    }
+
+    std::any visitParametricSort(ast::ParametricSort& sort) override {
+        throw not_implemented("Parametric sorts are not implemented yet.");
+    }
+
+    std::any visitApplicationTerm(ast::ApplicationTerm& application) override {
+        this->push_op_bracket();
+        std::visit([&](auto id) mutable {id.accept(*this);}, application.get_identifier());
+
+        for (const ast::TermPtr& ptr : application.get_arguments()) {
+            this->push_space();
+            ptr->accept(*this);
+        }
+        this->push_cl_bracket();
+        return {};
+    }
+
+
+    std::any visitExistsTerm(ast::ExistsTerm& exists) override {
+        this->push_op_bracket();
+        this->result_stream << "exists";
+        this->push_space();
+        this->push_op_bracket();
+
+        for (const std::shared_ptr<ast::SortedVar>& x: exists.get_vars()) {
+            this->push_space();
+            this->push_op_bracket();
+            std::visit([&](auto& var) mutable {var.accept(*this);}, x->first);
+            this->push_space();
+            std::visit([&](auto& var) mutable {var->accept(*this);}, *x->second);
+            this->push_cl_bracket();
+        }
+        this->push_cl_bracket();
+        this->push_space();
+
+        exists.get_term()->accept(*this);
+
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitForallTerm(ast::ForallTerm& forall) override {
+        this->push_op_bracket();
+        this->result_stream << "forall";
+        this->push_space();
+        this->push_op_bracket();
+
+        for (const std::shared_ptr<ast::SortedVar> &x: forall.get_vars()) {
+            this->push_space();
+            this->push_op_bracket();
+            std::visit([&](auto &var) mutable { var.accept(*this); }, x->first);
+            this->push_space();
+            std::visit([&](auto &var) mutable { var->accept(*this); }, *x->second);
+            this->push_cl_bracket();
+        }
+        this->push_cl_bracket();
+        this->push_space();
+
+        forall.get_term()->accept(*this);
+
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitLetTerm(ast::LetTerm& let) override {
+        this->push_op_bracket();
+        this->result_stream << "let";
+        this->push_space();
+        this->push_op_bracket();
+
+        for (const std::shared_ptr<ast::VarBinding> &x: let.get_var_bindings()) {
+            this->push_space();
+            this->push_op_bracket();
+            std::visit([&](auto &var) mutable { var.accept(*this); }, x->first);
+            this->push_space();
+            x->second->accept(*this);
+            this->push_cl_bracket();
+        }
+        this->push_cl_bracket();
+        this->push_space();
+
+        let.get_term()->accept(*this);
+
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitAssumeCmd(ast::AssumeCmd& assumeCmd) override {
+        this->push_op_bracket();
+        this->result_stream << "assume";
+        this->push_space();
+        assumeCmd.get_term()->accept(*this);
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitCheckSynthCmd(ast::CheckSynthCmd& context) override {
+        this->push_op_bracket();
+        this->result_stream << "check-synth";
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitConstraintCmd(ast::ConstraintCmd& constr) override {
+        this->push_op_bracket();
+        this->result_stream << "assume";
+        this->push_space();
+        constr.get_term()->accept(*this);
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitDeclareVarCmd(ast::DeclareVarCmd& decl) override {
+        this->push_op_bracket();
+        this->result_stream << "declare-var";
+        this->push_space();
+        std::visit([&](auto id) mutable {id.accept(*this);}, decl.get_identifier());
+        this->push_space();
+        std::visit([&](auto &var) mutable {var->accept(*this);}, *decl.get_sort());
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitSynthFunCmd(ast::SynthFunCmd& synthFun) override {
+        this->push_op_bracket();
+        this->result_stream << "synth-fun";
+
+        this->push_space();
+        std::visit([&](auto id) mutable {id.accept(*this);}, synthFun.get_identifier());
+        this->push_space();
+
+        this->push_op_bracket();
+
+        for (std::shared_ptr<ast::SortedVar>& x : synthFun.get_arguments()) {
+            this->push_op_bracket();
+            std::visit([&](auto id) mutable {id.accept(*this);}, x->first);
+            this->push_space();
+            std::visit([&](auto id) mutable {id->accept(*this);}, *x->second);
+            this->push_cl_bracket();
+            
+        }
+
+        this->push_cl_bracket();
+
+        this->push_space();
+        std::visit([&](auto id) mutable {id->accept(*this);}, *synthFun.get_sort());
+        this->push_space();
+
+        this->result_stream << std::endl;
+
+        synthFun.get_grammar()->accept(*this);
+
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitSetFeatureCmd(ast::SetFeatureCmd& context) override {
+        throw not_implemented("SetFeatures has not been implemented yet.");
+    }
+
+    std::any visitDeclareDatatype(ast::DeclareDatatype& declDT) override {
+        throw not_implemented("DeclareDatatype has not been implemented yet.");
+    }
+
+    std::any visitDeclareDatatypes(ast::DeclareDatatypes& context) override {
+        throw not_implemented("DeclareDatatypes has not been implemented yet.");
+    }
+
+    std::any visitDeclareSort(ast::DeclareSort& context) override {
+        throw not_implemented("DeclareSort has not been implemented yet.");
+    }
+
+    std::any visitDefineFun(ast::DefineFun& context) override {
+        throw not_implemented("DefineFun has not been implemented yet.");
+    }
+
+    std::any visitDefineSort(ast::DefineSort& context) override {
+        throw not_implemented("DefineSort has not been implemented yet.");
+    }
+
+    std::any visitSetInfo(ast::SetInfo& context) override {
+        throw not_implemented("SetInfo has not been implemented yet.");
+    }
+
+    std::any visitSetLogic(ast::SetLogic& setLogicCmd) override {
+        this->push_op_bracket();
+        this->result_stream << "set-logic";
+        this->push_space();
+        this->result_stream << setLogicCmd.get_logic();
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitSetOption(ast::SetOption& context) override {
+        throw not_implemented("SetOption has not been implemented yet.");
+    }
+
+    std::any visitSortDecl(ast::SortDecl& context) override {
+        throw not_implemented("SortDecl has not been implemented yet.");
+    }
+
+    std::any visitDtDecl(ast::DtDecl& context) override {
+        throw not_implemented("DtDecl has not been implemented yet.");
+    }
+
+    std::any visitDtConsDecl(ast::DtConsDecl& context) override {
+        throw not_implemented("DtConsDecl has not been implemented yet.");
+    }
+
+    std::any visitGrammarDef(ast::GrammarDef& gdef) override {
+        this->push_op_bracket();
+        for (auto& x: gdef.get_vars()) {
+            this->push_op_bracket();
+            std::visit([&](auto id) mutable { id.accept(*this); }, x->first);
+            this->push_space();
+            std::visit([&](auto id) mutable { id->accept(*this); }, *x->second);
+            this->push_cl_bracket();
+        }
+        this->push_cl_bracket();
+
+        this->push_space();
+
+        this->push_op_bracket();
+        for (std::shared_ptr<ast::GroupedRuleList>& x: gdef.get_rules()) {
+            x->accept(*this);
+        }
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitGroupedRuleList(ast::GroupedRuleList& grouped_r_l) override {
+        this->push_op_bracket();
+        std::visit([&](auto id) mutable { id.accept(*this); },
+                   grouped_r_l.get_identifier());
+
+        this->push_space();
+
+        std::visit([&](auto id) mutable { id->accept(*this); },
+                   *grouped_r_l.get_sort());
+
+        this->push_space();
+
+        this->push_op_bracket();
+        for(ast::TermPtr& x : grouped_r_l.get_terms()) {
+            x->accept(*this);
+            this->push_space();
+        }
+        this->push_cl_bracket();
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitConstantGTerm(ast::ConstantGTerm& constGTerm) override {
+        this->push_op_bracket();
+        this->result_stream << "Constant";
+        this->push_space();
+        std::visit([&](auto& x) mutable{x->accept(*this);}, *constGTerm.get_sort());
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::any visitVariableGTerm(ast::VariableGTerm& variableTerm) override {
+        this->push_op_bracket();
+        this->result_stream << "Variable";
+        this->push_space();
+        std::visit([&](auto& x) mutable{x->accept(*this);}, *variableTerm.get_sort());
+        this->push_cl_bracket();
+        return {};
+    }
+
+    std::string get_string(ast::Problem& problem) {
+        problem.accept(*this);
         return result_stream.str();
     }
+
 };
 
 

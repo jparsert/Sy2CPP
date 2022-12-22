@@ -41,5 +41,4 @@ add_executable( physer main.cpp ${ANTLR4_SRC_FILES_antlrsygus}
 # add required runtime library
 add_dependencies( physer antlr4_shared)
 
-target_link_libraries( physer PRIVATE
-        antlr4_shared z3)
+target_link_libraries( physer PRIVATE antlr4_shared z3)

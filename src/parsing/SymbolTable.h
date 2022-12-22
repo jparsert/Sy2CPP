@@ -22,12 +22,94 @@
 
 
 
-class SymbolTable {
+class FunctionDeclaration {
+
+private:
+    ast::EitherIdentifier id;
+    std::vector<std::shared_ptr<ast::EitherSort>> arguments;
+    std::shared_ptr<ast::EitherSort> sort;
+
 public:
 
-    SymbolTable(){
-        std::unordered_set<ast::EitherIdentifier> sort_map;
+    FunctionDeclaration(ast::EitherIdentifier& iden,
+                        std::initializer_list<std::shared_ptr<ast::EitherSort>> args,
+                        std::shared_ptr<ast::EitherSort>& srt) : id{iden}, arguments{args}, sort{srt} {}
+
+    FunctionDeclaration(ast::EitherIdentifier& iden,
+                        std::vector<std::shared_ptr<ast::EitherSort>>& args,
+                        std::shared_ptr<ast::EitherSort>& srt) : id{iden}, arguments{args}, sort{srt} {}
+
+};
+
+
+class SymbolTable {
+
+private:
+
+    // Mapping identifiers to defined functions
+    std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>> function_map;
+
+    // Mapping identifiers to synth fun commands
+    std::unordered_map<ast::EitherIdentifier, std::shared_ptr<ast::SynthFunCmd>> synth_fun_map;
+
+    // A set containing all present sorts
+    std::unordered_set<ast::SortPtr> all_sorts;
+
+    //
+    std::unordered_map<ast::EitherIdentifier, std::shared_ptr<ast::DeclareVarCmd>> declared_vars;
+
+
+    // Functions
+    static std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>>  default_boolean_functions();
+
+public:
+
+    // adding bool sorts and default boolean functions
+    SymbolTable() : all_sorts{ast::get_simple_sort_from_str("Bool")}, function_map{default_boolean_functions()}
+    {
     }
+
+    bool sort_exists(const ast::SortPtr& ptr) {
+        if (this->all_sorts.contains(ptr)) {
+            return true;
+        }
+        return false;
+    }
+
+    bool identifier_exists(const ast::EitherIdentifier& id) {
+        if (this->function_map.contains(id)) {
+            return true;
+        } else if (this->synth_fun_map.contains(id)) {
+            return true;
+        } else if (this->declared_vars.contains(id)) {
+            return true;
+        }
+        return false;
+    }
+
+    bool symbol_exists(std::string& s) {
+        if (this->sort_exists(ast::get_simple_sort_from_str(s))){
+            return true;
+        }
+        ast::EitherIdentifier id = ast::get_simple_id_from_str(s);
+        if (this->identifier_exists(id)) {
+            return true;
+        }
+        return false;
+    }
+
+    bool add_synth_fun_cmd(std::shared_ptr<ast::SynthFunCmd>& cmd) {
+        ast::EitherIdentifier id(cmd->get_identifier());
+        auto [_, val] = this->synth_fun_map.insert({id, cmd});
+        return val;
+    }
+
+    bool add_function_declaration(ast::EitherIdentifier id,
+                                  std::vector<ast::SortPtr> arguments,
+                                  std::shared_ptr<ast::EitherSort> sort);
+
+    bool add_declared_var(std::shared_ptr<ast::DeclareVarCmd>& decl);
+
 };
 
 class symbol_table_ast_builder: public SyGuSv21BaseVisitor {
@@ -56,7 +138,7 @@ public:
     std::any visitNumeral(SyGuSv21Parser::NumeralContext *ctx) override {
         auto str = ctx->NUMERAL()->getSymbol()->getText();
         auto val = std::strtol(str.c_str(), nullptr, 10);
-        return std::make_shared<ast::Numeral>(val);
+        return std::static_pointer_cast<ast::Literal>(std::make_shared<ast::Numeral>(val));
 
     }
 
@@ -65,11 +147,11 @@ public:
     }
 
     std::any visitBoolConstTrue(SyGuSv21Parser::BoolConstTrueContext *ctx) override {
-        return std::make_shared<ast::BoolConst>(true);
+        return  std::static_pointer_cast<ast::Literal>(std::make_shared<ast::BoolConst>(true));
     }
 
     std::any visitBoolConstFalse(SyGuSv21Parser::BoolConstFalseContext *ctx) override {
-        return std::make_shared<ast::BoolConst>(false);
+        return  std::static_pointer_cast<ast::Literal>(std::make_shared<ast::BoolConst>(false));
     }
 
     std::any visitHexConst(SyGuSv21Parser::HexConstContext *ctx) override {
@@ -82,13 +164,12 @@ public:
 
     std::any visitStringConst(SyGuSv21Parser::StringConstContext *ctx) override {
         if (ctx->EMPTYSTRING() != nullptr) {
-            return std::make_shared<ast::StringConst>("");
+            return std::static_pointer_cast<ast::Literal>(std::make_shared<ast::StringConst>(""));
         } else  if (ctx->STRINGCONST() != nullptr) {
-            return std::make_shared<ast::StringConst>(ctx->STRINGCONST()->getText());
+            return std::static_pointer_cast<ast::Literal>(std::make_shared<ast::StringConst>(ctx->STRINGCONST()->getText()));
         } else {
             throw unsupported_feature("Strong Const is neither constant nor empty.");
         }
-
     }
 
     std::any visitIndex(SyGuSv21Parser::IndexContext *ctx) override {
@@ -98,66 +179,91 @@ public:
     std::any visitSimpleSort(SyGuSv21Parser::SimpleSortContext *ctx) override {
         auto id = std::any_cast<ast::EitherIdentifier>(ctx->identifier()->accept(this));
         std::shared_ptr<ast::SimpleSort> simple_sort = std::make_shared<ast::SimpleSort>(id);
-        return ast::EitherSort(simple_sort);
+        return std::make_shared<ast::EitherSort>(simple_sort);
     }
 
     std::any visitParametricSort(SyGuSv21Parser::ParametricSortContext *ctx) override {
         throw not_implemented("Parametric Sorts are not supported yet.");
     }
 
+    std::any visitIdentifierTerm(SyGuSv21Parser::IdentifierTermContext *ctx) override {
+        auto x = std::any_cast<ast::EitherIdentifier>(ctx->identifier()->accept(this));
+        auto shared_ptr = std::make_shared<ast::IdentifierTerm>(x);
+        return std::static_pointer_cast<ast::Term>(shared_ptr);
+    }
+
+    std::any visitLiteralTerm(SyGuSv21Parser::LiteralTermContext *ctx) override {
+        auto x = std::any_cast<std::shared_ptr<ast::Literal>>(ctx->literal()->accept(this));
+        return std::static_pointer_cast<ast::Term>(x);
+    }
+
     std::any visitApplicationTerm(SyGuSv21Parser::ApplicationTermContext *ctx) override {
         auto id = std::any_cast<ast::EitherIdentifier>(ctx->identifier()->accept(this));
-        std::vector<ast::TermPtr> args{ctx->term().size()};
+        std::vector<ast::TermPtr> args{};
         for (auto x : ctx->term()) {
+            auto res = x->accept(this);
             auto term = std::any_cast<ast::TermPtr>(x->accept(this));
-            args.push_back(term);
+            args.emplace_back(term);
         }
-        auto app = std::make_shared<ast::ApplicationTerm>(id, args);
+        auto app = std::static_pointer_cast<ast::Term>(std::make_shared<ast::ApplicationTerm>(id, args));
         return app;
     }
 
     std::any visitExistsTerm(SyGuSv21Parser::ExistsTermContext *ctx) override {
-        std::vector<std::shared_ptr<ast::SortedVar>> vars{ctx->sortedVar().size()};
+        std::vector<std::shared_ptr<ast::SortedVar>> vars{};
         for (auto x : ctx->sortedVar()) {
             auto sorted_var = std::any_cast<std::shared_ptr<ast::SortedVar>>(x->accept(this));
-            vars.push_back(sorted_var);
+            vars.emplace_back(sorted_var);
         }
         auto subterm = std::any_cast<ast::TermPtr>(ctx->term()->accept(this));
-        auto  x = std::make_shared<ast::ExistsTerm>(vars, subterm);
+        auto  x = std::static_pointer_cast<ast::Term>(std::make_shared<ast::ExistsTerm>(vars, subterm));
         return x;
     }
 
     std::any visitForallTerm(SyGuSv21Parser::ForallTermContext *ctx) override {
-        std::vector<std::shared_ptr<ast::SortedVar>> vars{ctx->sortedVar().size()};
+        std::vector<std::shared_ptr<ast::SortedVar>> vars{};
         for (auto x : ctx->sortedVar()) {
             auto sorted_var = std::any_cast<std::shared_ptr<ast::SortedVar>>(x->accept(this));
-            vars.push_back(sorted_var);
+            vars.emplace_back(sorted_var);
         }
         auto subterm = std::any_cast<ast::TermPtr>(ctx->term()->accept(this));
-        auto  x = std::make_shared<ast::ForallTerm>(vars, subterm);
+        auto  x = std::static_pointer_cast<ast::Term>(std::make_shared<ast::ForallTerm>(vars, subterm));
         return x;
     }
 
     std::any visitLetTerm(SyGuSv21Parser::LetTermContext *ctx) override {
-        std::vector<std::shared_ptr<ast::VarBinding>> bindings{ctx->varBinding().size()};
+        std::vector<std::shared_ptr<ast::VarBinding>> bindings{};
         for (auto x : ctx->varBinding()) {
             auto res = std::any_cast<std::shared_ptr<ast::VarBinding>>(x);
             bindings.push_back(res);
         }
         auto subterm = std::any_cast<ast::TermPtr>(ctx->term()->accept(this));
-        auto  x = std::make_shared<ast::LetTerm>(bindings, subterm);
+        auto  x = std::static_pointer_cast<ast::Term>(std::make_shared<ast::LetTerm>(bindings, subterm));
         return x;
+    }
+
+    std::any visitBfIdentifierTerm(SyGuSv21Parser::BfIdentifierTermContext *ctx) override {
+        auto x = std::any_cast<ast::EitherIdentifier>(ctx->identifier()->accept(this));
+        auto shared_ptr = std::make_shared<ast::IdentifierTerm>(x);
+        return std::static_pointer_cast<ast::Term>(shared_ptr);
+    }
+
+    std::any visitBfLiteralTerm(SyGuSv21Parser::BfLiteralTermContext* ctx) override{
+        auto x = std::any_cast<std::shared_ptr<ast::Literal>>(ctx->literal()->accept(this));
+        return std::static_pointer_cast<ast::Term>(x);
     }
 
     std::any visitBfApplicationTerm(SyGuSv21Parser::BfApplicationTermContext *ctx) override {
         auto id = std::any_cast<ast::EitherIdentifier>(ctx->identifier()->accept(this));
-        std::vector<ast::TermPtr> args{ctx->bfTerm().size()};
+        std::vector<ast::TermPtr> args{};
         for (auto x : ctx->bfTerm()) {
+            std::any res = x->accept(this);
+
             auto term = std::any_cast<ast::TermPtr>(x->accept(this));
             args.push_back(term);
         }
 
-        auto app = std::make_shared<ast::ApplicationTerm>(id, args);
+        auto app = std::static_pointer_cast<ast::Term>(std::make_shared<ast::ApplicationTerm>(id, args));
         return app;
     }
 
@@ -194,38 +300,40 @@ public:
     std::any visitSetFeatureCmd(SyGuSv21Parser::SetFeatureCmdContext *ctx) override {
         auto ft = std::any_cast<ast::Feature>(ctx->feature()->accept(this));
         auto val = std::any_cast<std::shared_ptr<ast::BoolConst>>(ctx->boolConst()->accept(this));
-        return std::make_shared<ast::SetFeatureCmd>(ft, val->get_value());
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::SetFeatureCmd>(ft, val->get_value()));
     }
 
     std::any visitCheckSynthCmd(SyGuSv21Parser::CheckSynthCmdContext *ctx) override {
-        return std::make_shared<ast::CheckSynthCmd>();
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::CheckSynthCmd>());
     }
 
     std::any visitConstraintCmd(SyGuSv21Parser::ConstraintCmdContext *ctx) override {
-        auto term = std::any_cast<ast::TermPtr>(ctx->accept(this));
-        return std::make_shared<ast::ConstraintCmd>(term);
+        auto term = std::any_cast<ast::TermPtr>(ctx->term()->accept(this));
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::ConstraintCmd>(term));
     }
 
     // TODO add to symbol Table
     std::any visitDeclareVarCmd(SyGuSv21Parser::DeclareVarCmdContext *ctx) override {
         ast::EitherIdentifier id(ast::SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->sort()->accept(this));
-        return std::make_shared<ast::DeclareVarCmd>(id, sort);
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::DeclareVarCmd>(id, sort));
     }
 
     // TODO add to symbol Table
     std::any visitSynthFunCmd(SyGuSv21Parser::SynthFunCmdContext *ctx) override {
         ast::EitherIdentifier id(ast::SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
-        auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->sort()->accept(this));
-        std::vector<std::shared_ptr<ast::SortedVar>> arguments;
+        auto x = ctx->sort()->accept(this);
+        auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(x);
 
-        std::transform(ctx->sortedVar().begin(), ctx->sortedVar().end(), std::back_inserter(arguments),
-                       [&](SyGuSv21Parser::SortedVarContext* ctx){
-                            return std::any_cast<std::shared_ptr<ast::SortedVar>>(ctx->accept(this));
-        });
+        std::vector<std::shared_ptr<ast::SortedVar>> arguments;
+        for (SyGuSv21Parser::SortedVarContext* s_var : ctx->sortedVar()) {
+            std::any res = s_var->accept(this);
+            auto ptr = std::any_cast<std::shared_ptr<ast::SortedVar>>(res);
+            arguments.push_back(ptr);
+        }
 
         auto grammar = std::any_cast<std::shared_ptr<ast::GrammarDef>>(ctx->grammarDef()->accept(this));
-        return std::make_shared<ast::SynthFunCmd>(id, arguments, sort, grammar);
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::SynthFunCmd>(id, arguments, sort, grammar));
     }
 
     std::any visitDeclareDatatype(SyGuSv21Parser::DeclareDatatypeContext *ctx) override {
@@ -240,43 +348,43 @@ public:
     std::any visitDeclareSort(SyGuSv21Parser::DeclareSortContext *ctx) override {
         ast::EitherIdentifier id(ast::SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto num = std::any_cast<std::shared_ptr<ast::Numeral>>(ctx->numeral()->accept(this)) ;
-        return std::make_shared<ast::DeclareSort>(id, num) ;
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::DeclareSort>(id, num)) ;
     }
 
     // TODO add to symbol Table
     std::any visitDefineFun(SyGuSv21Parser::DefineFunContext *ctx) override {
         ast::EitherIdentifier id(ast::SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->sort()->accept(this));
-        std::vector<ast::SortedVar> args;
+        std::vector<std::shared_ptr<ast::SortedVar>> args;
         for(auto x: ctx->sortedVar()) {
-            args.push_back(std::any_cast<ast::SortedVar>(x->accept(this)));
+            args.push_back(std::any_cast<std::shared_ptr<ast::SortedVar>>(x->accept(this)));
         }
         auto term = std::any_cast<ast::TermPtr>(ctx->term()->accept(this));
-        return std::make_shared<ast::DefineFun>(id, args, sort, term);
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::DefineFun>(id, args, sort, term));
     }
 
     // TODO add to symbol Table
     std::any visitDefineSort(SyGuSv21Parser::DefineSortContext *ctx) override {
         ast::EitherIdentifier id(ast::SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->accept(this));
-        return std::make_shared<ast::DefineSort>(id, sort);
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::DefineSort>(id, sort));
     }
 
     std::any visitSetInfo(SyGuSv21Parser::SetInfoContext *ctx) override {
         std::string keyword = ctx->symbol()->SYMBOL()->getText();
         auto lit = std::any_cast<std::shared_ptr<ast::Literal>>(ctx->literal()->accept(this));
-        return std::make_shared<ast::SetInfo>(keyword, lit);
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::SetInfo>(keyword, lit));
     }
 
     std::any visitSetLogic(SyGuSv21Parser::SetLogicContext *ctx) override {
         std::string s = ctx->symbol()->SYMBOL()->getText();
-        return std::make_shared<ast::SetLogic>(s);
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::SetLogic>(s));
     }
 
     std::any visitSetOption(SyGuSv21Parser::SetOptionContext *ctx) override {
         std::string keyword = ctx->symbol()->SYMBOL()->getText();
         auto lit = std::any_cast<std::shared_ptr<ast::Literal>>(ctx->literal()->accept(this));
-        return std::make_shared<ast::SetOption>(keyword, lit);
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::SetOption>(keyword, lit));
     }
 
     std::any visitSortDecl(SyGuSv21Parser::SortDeclContext *ctx) override {
@@ -306,31 +414,38 @@ public:
 
     std::any visitGroupedRuleList(SyGuSv21Parser::GroupedRuleListContext *ctx) override {
         ast::EitherIdentifier id(ast::SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
-        auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->accept(this));
+        auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->sort()->accept(this));
 
-        std::vector<ast::TermPtr> terms{ctx->gTerm().size()};
+        std::vector<ast::TermPtr> terms{};
         for (auto x : ctx->gTerm()) {
-            terms.push_back(std::any_cast<ast::TermPtr>(x->accept(this)));
+            auto res = x->accept(this);
+            auto ptr = std::any_cast<ast::TermPtr>(res);
+            terms.emplace_back(ptr);
         }
         return std::make_shared<ast::GroupedRuleList>(id, sort, terms);
     }
 
     std::any visitConstantGTerm(SyGuSv21Parser::ConstantGTermContext *ctx) override {
-        auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->accept(this));
-        return std::make_shared<ast::ConstantGTerm>(sort);
+        auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->sort()->accept(this));
+        return std::static_pointer_cast<ast::Term>(std::make_shared<ast::ConstantGTerm>(sort));
     }
 
     std::any visitVariableGTerm(SyGuSv21Parser::VariableGTermContext *ctx) override {
-        auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->accept(this));
-        return std::make_shared<ast::VariableGTerm>(sort);
+        auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->sort()->accept(this));
+        return std::static_pointer_cast<ast::Term>(std::make_shared<ast::VariableGTerm>(sort));
     }
 
     std::any visitProblem(SyGuSv21Parser::ProblemContext *ctx) override {
-        return {};
+        for(SyGuSv21Parser::CmdContext* x: ctx->cmd()) {
+            std::any ret = x->accept(this);
+            auto cmd = std::any_cast<std::shared_ptr<ast::Command>>(ret);
+            this->problem->add_command(cmd);
+        }
+        return this->problem;
     }
 
     std::any visitAssumeCmd(SyGuSv21Parser::AssumeCmdContext* ctx) override {
-        return std::make_shared<ast::AssumeCmd>(std::any_cast<std::shared_ptr<ast::Term>>(ctx->term()->accept(this)));
+        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::AssumeCmd>(std::any_cast<std::shared_ptr<ast::Term>>(ctx->term()->accept(this))));
     }
 
     static

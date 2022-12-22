@@ -14,11 +14,11 @@
 #include <functional>
 #include <string>
 #include <unordered_set>
+#include <any>
+#include <memory>
 
-#include "SyGuSv21BaseVisitor.h"
 #include "../exceptions/not_implemented.h"
 #include "../exceptions/unsupported_feature.h"
-
 
 
 namespace ast {
@@ -27,12 +27,13 @@ namespace ast {
 
     class AstNode {
     public:
-        virtual std::any accept(std::shared_ptr<AstVisitor> visitor) = 0;
+        virtual std::any accept(AstVisitor& visitor) = 0;
 
     };
 
     class SimpleIdentifier;
     class IndexedIdentifier;
+    class IdentifierTerm;
     class Problem;
     class Literal;
     class Numeral;
@@ -47,7 +48,6 @@ namespace ast {
     class ExistsTerm;
     class ForallTerm;
     class LetTerm;
-    class BfApplicationTerm;
     class AssumeCmd;
     class CheckSynthCmd;
     class ConstraintCmd;
@@ -69,104 +69,87 @@ namespace ast {
     class GroupedRuleList;
     class ConstantGTerm;
     class VariableGTerm;
-    class BfGTerm;
 
     class  AstVisitor {
     public:
 
-        /**
-         * Visit parse trees produced by SyGuSv21Parser.
-         */
-        virtual std::any visitProblem(std::shared_ptr<Problem> problem) = 0;
+        virtual std::any visitProblem(Problem& problem) = 0;
 
-        virtual std::any visitLiteral(std::shared_ptr<Literal> lit) = 0;
+        //virtual std::any visitLiteral(std::shared_ptr<Literal> lit) = 0;
 
-        virtual std::any visitNumeral(std::shared_ptr<Numeral> numeral) = 0;
+        virtual std::any visitNumeral(Numeral& numeral) = 0;
 
-        virtual std::any visitDecimal(std::shared_ptr<Decimal> decimal) = 0;
+        virtual std::any visitDecimal(Decimal& decimal) = 0;
 
-        virtual std::any visitBoolConst(std::shared_ptr<BoolConst> boolConst) = 0;
+        virtual std::any visitBoolConst(BoolConst& boolConst) = 0;
 
-        virtual std::any visitHexConst(std::shared_ptr<HexConst> hex) = 0;
+        virtual std::any visitHexConst(HexConst& hex) = 0;
 
-        virtual std::any visitBinConst(std::shared_ptr<BinConst> bin) = 0;
+        virtual std::any visitBinConst(BinConst& bin) = 0;
 
-        virtual std::any visitStringConst(std::shared_ptr<StringConst> s) = 0;
+        virtual std::any visitStringConst(StringConst& s) = 0;
 
-        virtual std::any visitSimpleIdentifier(std::shared_ptr<SimpleIdentifier> context) = 0;
+        virtual std::any visitSimpleIdentifier(SimpleIdentifier& identifier) = 0;
 
-        virtual std::any visitIndexedIdentifier(std::shared_ptr<IndexedIdentifier> context) = 0;
+        virtual std::any visitIndexedIdentifier(IndexedIdentifier& indexedIdentifier) = 0;
 
-        virtual std::any visitSimpleSort(std::shared_ptr<SimpleSort> sort) = 0;
+        virtual std::any visitIdentifierTerm(IdentifierTerm& term) = 0;
 
-        virtual std::any visitParametricSort(std::shared_ptr<ParametricSort> sort) = 0;
+        virtual std::any visitSimpleSort(SimpleSort& sort) = 0;
 
-        //virtual std::any visitTerm(std::shared_ptr<ApplicationTerm> application) = 0;
+        virtual std::any visitParametricSort(ParametricSort& sort) = 0;
 
-        virtual std::any visitApplicationTerm(std::shared_ptr<ApplicationTerm> application) = 0;
+        virtual std::any visitApplicationTerm(ApplicationTerm& application) = 0;
 
-        virtual std::any visitExistsTerm(std::shared_ptr<ExistsTerm> exists) = 0;
+        virtual std::any visitExistsTerm(ExistsTerm& exists) = 0;
 
-        virtual std::any visitForallTerm(std::shared_ptr<ForallTerm> forall) = 0;
+        virtual std::any visitForallTerm(ForallTerm& forall) = 0;
 
-        virtual std::any visitLetTerm(std::shared_ptr<LetTerm> let) = 0;
+        virtual std::any visitLetTerm(LetTerm& let) = 0;
 
-        //virtual std::any visitBfTerm(SyGuSv21Parser::BfTermContext *context) = 0;
+        virtual std::any visitAssumeCmd(AssumeCmd& assumeCmd) = 0;
 
-        virtual std::any visitBfApplicationTerm(std::shared_ptr<BfApplicationTerm> bfApp) = 0;
+        virtual std::any visitCheckSynthCmd(CheckSynthCmd& context) = 0;
 
-        //virtual std::any visitFeature(SyGuSv21Parser::FeatureContext *context) = 0;
+        virtual std::any visitConstraintCmd(ConstraintCmd& context) = 0;
 
-        //virtual std::any visitCmd(SyGuSv21Parser::CmdContext *context) = 0;
+        virtual std::any visitDeclareVarCmd(DeclareVarCmd& context) = 0;
 
-        virtual std::any visitAssumeCmd(std::shared_ptr<AssumeCmd> assumeCmd) = 0;
+        virtual std::any visitSetFeatureCmd(SetFeatureCmd& context) = 0;
 
-        virtual std::any visitCheckSynthCmd(std::shared_ptr<CheckSynthCmd> context) = 0;
-
-        virtual std::any visitConstraintCmd(std::shared_ptr<ConstraintCmd> context) = 0;
-
-        virtual std::any visitDeclareVarCmd(std::shared_ptr<DeclareVarCmd> context) = 0;
-
-        virtual std::any visitSetFeatureCmd(std::shared_ptr<SetFeatureCmd> context) = 0;
-
-        virtual std::any visitSynthFunCmd(std::shared_ptr<SynthFunCmd> synthFun) = 0;
+        virtual std::any visitSynthFunCmd(SynthFunCmd& synthFun) = 0;
 
         //virtual std::any visitSmtCmd(std::shared_ptr<SmtCmd> smtCmd) = 0;
 
-        virtual std::any visitDeclareDatatype(std::shared_ptr<DeclareDatatype> declDT) = 0;
+        virtual std::any visitDeclareDatatype(DeclareDatatype& declDT) = 0;
 
-        virtual std::any visitDeclareDatatypes(std::shared_ptr<DeclareDatatypes> context) = 0;
+        virtual std::any visitDeclareDatatypes(DeclareDatatypes& context) = 0;
 
-        virtual std::any visitDeclareSort(std::shared_ptr<DeclareSort> context) = 0;
+        virtual std::any visitDeclareSort(DeclareSort& context) = 0;
 
-        virtual std::any visitDefineFun(std::shared_ptr<DefineFun> context) = 0;
+        virtual std::any visitDefineFun(DefineFun& context) = 0;
 
-        virtual std::any visitDefineSort(std::shared_ptr<DefineSort> context) = 0;
+        virtual std::any visitDefineSort(DefineSort& context) = 0;
 
-        virtual std::any visitSetInfo(std::shared_ptr<SetInfo> context) = 0;
+        virtual std::any visitSetInfo(SetInfo& context) = 0;
 
-        virtual std::any visitSetLogic(std::shared_ptr<SetLogic> context) = 0;
+        virtual std::any visitSetLogic(SetLogic& context) = 0;
 
-        virtual std::any visitSetOption(std::shared_ptr<SetOption> context) = 0;
+        virtual std::any visitSetOption(SetOption& context) = 0;
 
-        virtual std::any visitSortDecl(std::shared_ptr<SortDecl> context) = 0;
+        virtual std::any visitSortDecl(SortDecl& context) = 0;
 
-        virtual std::any visitDtDecl(std::shared_ptr<DtDecl> context) = 0;
+        virtual std::any visitDtDecl(DtDecl& context) = 0;
 
-        virtual std::any visitDtConsDecl(std::shared_ptr<DtConsDecl> context) = 0;
+        virtual std::any visitDtConsDecl(DtConsDecl& context) = 0;
 
-        virtual std::any visitGrammarDef(std::shared_ptr<GrammarDef> context) = 0;
+        virtual std::any visitGrammarDef(GrammarDef& context) = 0;
 
-        virtual std::any visitGroupedRuleList(std::shared_ptr<GroupedRuleList> context) = 0;
+        virtual std::any visitGroupedRuleList(GroupedRuleList& context) = 0;
 
-        virtual std::any visitConstantGTerm(std::shared_ptr<ConstantGTerm> context) = 0;
+        virtual std::any visitConstantGTerm(ConstantGTerm& context) = 0;
 
-        virtual std::any visitVariableGTerm(std::shared_ptr<VariableGTerm> context) = 0;
-
-        virtual std::any visitBfGTerm(std::shared_ptr<BfGTerm> context) = 0;
-
-        //virtual std::any visitSymbol(std::shared_ptr<Symbol> context) = 0;
-
+        virtual std::any visitVariableGTerm(VariableGTerm& context) = 0;
 
     };
 
@@ -190,31 +173,31 @@ namespace ast {
     using TermPtr = std::shared_ptr<ast::Term>;
 
 
-    class Literal : public AstNode {
+    class Literal : public Term {
 
     };
 
     // Identifier
-    class identifier : public Term {
+    class Identifier : public AstNode {
     public:
         [[nodiscard]] virtual std::size_t get_hash() const = 0;
     };
 
-    class SimpleIdentifier : public identifier {
+    class SimpleIdentifier : public Identifier {
         std::string symbol;
     public:
 
         explicit SimpleIdentifier(std::string symb): symbol{std::move(symb)} {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitSimpleIdentifier(std::shared_ptr<SimpleIdentifier>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitSimpleIdentifier(*this);
         }
 
-        std::string get_symbol() {
+        [[nodiscard]] std::string get_symbol() const {
             return this->symbol;
         }
 
-        bool operator==(SimpleIdentifier& other) {
+        bool operator==(const SimpleIdentifier& other) const {
             return this->symbol == other.get_symbol();
         }
 
@@ -223,7 +206,7 @@ namespace ast {
         }
     };
 
-    class IndexedIdentifier : public identifier {
+    class IndexedIdentifier : public Identifier {
     public:
 
         explicit IndexedIdentifier() {
@@ -234,11 +217,11 @@ namespace ast {
             throw not_implemented("Indexed identifiers are not supported yet.");
         }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitIndexedIdentifier(std::shared_ptr<IndexedIdentifier>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitIndexedIdentifier(*this);
         }
 
-        bool operator==(IndexedIdentifier& other) {
+        bool operator==(const IndexedIdentifier& other) const {
             throw unsupported_feature("We do not support indexed identifiers yet.");
         }
 
@@ -250,7 +233,33 @@ namespace ast {
 
     using EitherIdentifier = std::variant<ast::SimpleIdentifier, ast::IndexedIdentifier>;
 
+    inline EitherIdentifier get_simple_id_from_str(std::string& s) {
+        return EitherIdentifier{SimpleIdentifier{s}} ;
+    }
 
+    inline EitherIdentifier get_simple_id_from_str(std::string&& s) {
+        return EitherIdentifier{SimpleIdentifier{s}} ;
+    }
+
+    class IdentifierTerm : public Term {
+
+        EitherIdentifier identifier;
+
+    public:
+
+        IdentifierTerm(EitherIdentifier& id) : identifier{id} {
+
+        }
+
+        EitherIdentifier get_identifier() {
+            return identifier;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitIdentifierTerm(*this);
+        }
+
+    };
 
     class Problem : public AstNode {
     private:
@@ -262,9 +271,14 @@ namespace ast {
             this->commands.push_back(cmd);
         }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitProblem(std::shared_ptr<Problem>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitProblem(*this);
         }
+
+        std::vector<std::shared_ptr<Command>>& get_commands() {
+            return this->commands;
+        }
+
     };
 
     class Numeral : public  Literal {
@@ -274,16 +288,21 @@ namespace ast {
 
     public:
         explicit Numeral(long v) : val{v} {}
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitNumeral(std::shared_ptr<Numeral>(this));
+
+        [[nodiscard]] long get_value() const {
+            return this->val;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitNumeral(*this);
         }
     };
 
     class Decimal : public  Literal {
     public:
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDecimal(std::shared_ptr<Decimal>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDecimal(*this);
         }
     };
 
@@ -295,24 +314,24 @@ namespace ast {
 
         explicit BoolConst(bool x): val{x}{}
 
-        bool get_value() const {
+        [[nodiscard]] bool get_value() const {
             return this->val;
         }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitBoolConst(std::shared_ptr<BoolConst>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitBoolConst(*this);
         }
     };
 
     class HexConst : public  Literal {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitHexConst(std::shared_ptr<HexConst>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitHexConst(*this);
         }
     };
 
     class BinConst : public  Literal {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitBinConst(std::shared_ptr<BinConst>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitBinConst(*this);
         }
     };
 
@@ -324,9 +343,12 @@ namespace ast {
 
         explicit StringConst(std::string s): str{std::move(s)} {}
 
+        [[nodiscard]] std::string get_string() const {
+            return str;
+        }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitStringConst(std::shared_ptr<StringConst>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitStringConst(*this);
         }
     };
 
@@ -340,25 +362,39 @@ namespace ast {
 
     public:
         explicit SimpleSort(EitherIdentifier& id): identifier(id) {}
+        explicit SimpleSort(EitherIdentifier&& id): identifier(id) {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitSimpleSort(std::shared_ptr<SimpleSort>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitSimpleSort(*this);
         }
+
+        [[nodiscard]] EitherIdentifier get_identifier() const {
+            return identifier;
+        }
+
     };
 
     class ParametricSort : public  Sort {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitParametricSort(std::shared_ptr<ParametricSort>(this));
+    public:
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitParametricSort(*this);
         }
     };
 
     using EitherSort = std::variant<std::shared_ptr<ast::SimpleSort>, std::shared_ptr<ast::ParametricSort>>;
+    using SortPtr = std::shared_ptr<EitherSort>;
+    inline std::shared_ptr<EitherSort> get_simple_sort_from_str(std::string& s) {
+        return std::make_shared<EitherSort>(std::make_shared<ast::SimpleSort>(get_simple_id_from_str("Bool")));
+    }
 
+    inline std::shared_ptr<EitherSort> get_simple_sort_from_str(std::string&& s) {
+        return std::make_shared<EitherSort>(std::make_shared<ast::SimpleSort>(get_simple_id_from_str("Bool")));
+    }
 
     class ApplicationTerm : public  Term {
     private:
-        std::variant<SimpleIdentifier, IndexedIdentifier> id;
-        std::vector<std::shared_ptr<Term>> arguments;
+        EitherIdentifier id;
+        std::vector<TermPtr> arguments;
 
     public:
 
@@ -368,8 +404,16 @@ namespace ast {
         arguments{args}
         { }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitApplicationTerm(std::shared_ptr<ApplicationTerm>(this));
+        [[nodiscard]] EitherIdentifier get_identifier() const {
+            return this->id;
+        }
+
+        std::vector<TermPtr>& get_arguments() {
+            return this->arguments;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitApplicationTerm(*this);
         }
     };
 
@@ -386,8 +430,16 @@ namespace ast {
                             std::shared_ptr<Term>& t): vars{v}, subterm(t)
                             { }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitExistsTerm(std::shared_ptr<ExistsTerm>(this));
+        [[nodiscard]] std::vector<std::shared_ptr<SortedVar>> get_vars() const {
+            return this->vars;
+        }
+
+        [[nodiscard]] TermPtr get_term() const {
+            return this->subterm;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitExistsTerm(*this);
         }
     };
 
@@ -402,8 +454,16 @@ namespace ast {
                             std::shared_ptr<Term>& t): vars{v}, subterm(t)
         { }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitForallTerm(std::shared_ptr<ForallTerm>(this));
+        [[nodiscard]] std::vector<std::shared_ptr<SortedVar>> get_vars() const {
+            return this->vars;
+        }
+
+        [[nodiscard]] TermPtr get_term() const {
+            return this->subterm;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitForallTerm(*this);
         }
     };
 
@@ -419,26 +479,38 @@ namespace ast {
         LetTerm(std::vector<std::shared_ptr<VarBinding>>& bdgs, std::shared_ptr<Term>& t): bindings{bdgs}, subterm(t)
         { }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitLetTerm(std::shared_ptr<LetTerm>(this));
+        [[nodiscard]] std::vector<std::shared_ptr<VarBinding>> get_var_bindings() const {
+            return this->bindings;
+        }
+
+        [[nodiscard]] TermPtr get_term() const {
+            return this->subterm;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitLetTerm(*this);
         }
     };
 
     class AssumeCmd : public  Command {
     private:
-        std::shared_ptr<Term> term;
+        TermPtr term;
 
     public:
         explicit AssumeCmd(std::shared_ptr<Term> t) : term{std::move(t)} {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitAssumeCmd(std::shared_ptr<AssumeCmd>(this));
+        [[nodiscard]] TermPtr get_term() const {
+            return term;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitAssumeCmd(*this);
         }
     };
 
     class CheckSynthCmd : public  Command {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitCheckSynthCmd(std::shared_ptr<CheckSynthCmd>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitCheckSynthCmd(*this);
         }
     };
 
@@ -452,15 +524,18 @@ namespace ast {
 
         }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitConstraintCmd(std::shared_ptr<ConstraintCmd>(this));
+        [[nodiscard]] TermPtr get_term() const {
+            return term;
+        }
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitConstraintCmd(*this);
         }
     };
 
     class DeclareVarCmd : public  Command {
     private:
         EitherIdentifier id;
-        std::shared_ptr<EitherSort> sort;
+        SortPtr sort;
 
     public:
 
@@ -468,9 +543,19 @@ namespace ast {
 
         }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDeclareVarCmd(std::shared_ptr<DeclareVarCmd>(this));
+        [[nodiscard]] EitherIdentifier get_identifier() const {
+            return this->id;
         }
+
+        [[nodiscard]] SortPtr get_sort() const {
+            return this->sort;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDeclareVarCmd(*this);
+        }
+
+
     };
 
     class SetFeatureCmd : public  Command {
@@ -484,8 +569,8 @@ namespace ast {
 
         SetFeatureCmd(Feature f, bool v): feature{f}, value{v} {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitSetFeatureCmd(std::shared_ptr<SetFeatureCmd>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitSetFeatureCmd(*this);
         }
     };
 
@@ -496,7 +581,7 @@ namespace ast {
 
         std::vector<std::shared_ptr<SortedVar>> arguments;
 
-        std::shared_ptr<EitherSort> sort;
+        SortPtr sort;
 
         std::shared_ptr<GrammarDef> grammar;
 
@@ -507,20 +592,37 @@ namespace ast {
                     sort{srt}, grammar{grmmr}{
         }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitSynthFunCmd(std::shared_ptr<SynthFunCmd>(this));
+        [[nodiscard]] EitherIdentifier get_identifier() const {
+            return this->id;
         }
+
+        [[nodiscard]] std::vector<std::shared_ptr<SortedVar>> get_arguments() const {
+            return this->arguments;
+        }
+
+        [[nodiscard]] SortPtr get_sort() const {
+            return this->sort;
+        }
+
+        [[nodiscard]] std::shared_ptr<GrammarDef> get_grammar() const {
+            return this->grammar;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitSynthFunCmd(*this);
+        }
+
     };
 
     class DeclareDatatype : public  Command {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDeclareDatatype(std::shared_ptr<DeclareDatatype>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDeclareDatatype(*this);
         }
     };
 
     class DeclareDatatypes : public  Command {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDeclareDatatypes(std::shared_ptr<DeclareDatatypes>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDeclareDatatypes(*this);
         }
     };
 
@@ -535,8 +637,8 @@ namespace ast {
 
         DeclareSort(EitherIdentifier iden, std::shared_ptr<Numeral>& num) : id{std::move(iden)}, numeral{num}{}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDeclareSort(std::shared_ptr<DeclareSort>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDeclareSort(*this);
         }
     };
 
@@ -545,18 +647,21 @@ namespace ast {
     private:
         EitherIdentifier id;
 
-        std::vector<ast::SortedVar> arguments;
+        std::vector<std::shared_ptr<ast::SortedVar>> arguments;
 
         std::shared_ptr<EitherSort> sort;
 
         TermPtr term;
 
     public:
-        DefineFun(EitherIdentifier iden, std::vector<ast::SortedVar>& args, std::shared_ptr<EitherSort>& srt, TermPtr& tm): id{std::move(iden)},
-        arguments{args}, sort{srt}, term{tm} {}
+        DefineFun(EitherIdentifier& iden,
+                  std::vector<std::shared_ptr<ast::SortedVar>>& args,
+                  std::shared_ptr<EitherSort>& srt,
+                  TermPtr& tm):
+                  id{iden}, arguments{args}, sort{srt}, term{tm} {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDefineFun(std::shared_ptr<DefineFun>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDefineFun(*this);
         }
     };
 
@@ -570,8 +675,8 @@ namespace ast {
 
         DefineSort(EitherIdentifier iden, std::shared_ptr<EitherSort>& srt): id{std::move(iden)}, sort{srt} {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDefineSort(std::shared_ptr<DefineSort>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDefineSort(*this);
         }
     };
 
@@ -588,8 +693,8 @@ namespace ast {
 
         }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitSetInfo(std::shared_ptr<SetInfo>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitSetInfo(*this);
         }
     };
 
@@ -601,8 +706,12 @@ namespace ast {
     public:
         explicit SetLogic(std::string& str) : logic{str} {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitSetLogic(std::shared_ptr<SetLogic>(this));
+        [[nodiscard]] std::string get_logic() const {
+            return logic;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitSetLogic(*this);
         }
     };
 
@@ -617,26 +726,26 @@ namespace ast {
         SetOption(std::string& kw, std::shared_ptr<Literal>& lit): keyword{kw}, literal{lit} {
 
         }
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitSetOption(std::shared_ptr<SetOption>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitSetOption(*this);
         }
     };
 
     class SortDecl : public  AstNode {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitSortDecl(std::shared_ptr<SortDecl>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitSortDecl(*this);
         }
     };
 
     class DtDecl : public  AstNode {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDtDecl(std::shared_ptr<DtDecl>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDtDecl(*this);
         }
     };
 
     class DtConsDecl : public  AstNode {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitDtConsDecl(std::shared_ptr<DtConsDecl>(this));
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitDtConsDecl(*this);
         }
     };
 
@@ -644,7 +753,7 @@ namespace ast {
     private:
         EitherIdentifier id;
 
-        std::shared_ptr<EitherSort> sort;
+        SortPtr sort;
 
         std::vector<TermPtr> terms;
 
@@ -653,8 +762,20 @@ namespace ast {
         GroupedRuleList(EitherIdentifier iden, std::shared_ptr<EitherSort>& srt, std::vector<TermPtr>& trm):
         id{std::move(iden)}, sort{srt}, terms{trm} {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitGroupedRuleList(std::shared_ptr<GroupedRuleList>(this));
+        [[nodiscard]] EitherIdentifier get_identifier() const {
+            return id;
+        }
+
+        [[nodiscard]] SortPtr get_sort() const {
+            return sort;
+        }
+
+        [[nodiscard]] std::vector<TermPtr> get_terms() const {
+            return terms;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitGroupedRuleList(*this);
         }
     };
 
@@ -665,48 +786,69 @@ namespace ast {
 
     public:
         GrammarDef(std::vector<std::shared_ptr<ast::SortedVar>>& var,
-                   std::vector<std::shared_ptr<GroupedRuleList>>& rule) : vars{var}, rules{rule}{}
+                   std::vector<std::shared_ptr<GroupedRuleList>>& rule) : vars{var}, rules{rule}
+                   {}
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitGrammarDef(std::shared_ptr<GrammarDef>(this));
+
+        [[nodiscard]] std::vector<std::shared_ptr<ast::SortedVar>> get_vars() const {
+            return this->vars;
+        }
+
+        [[nodiscard]] std::vector<std::shared_ptr<GroupedRuleList>> get_rules() const {
+            return this->rules;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitGrammarDef(*this);
         }
     };
 
 
-    class ConstantGTerm : public  AstNode {
+    class ConstantGTerm : public  Term {
     private:
-        std::shared_ptr<ast::EitherSort> sort;
+        SortPtr sort;
     public:
 
-        explicit ConstantGTerm(std::shared_ptr<ast::EitherSort>& srt): sort{srt} {
+        explicit ConstantGTerm(SortPtr& srt): sort{srt} {
 
         }
 
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitConstantGTerm(std::shared_ptr<ConstantGTerm>(this));
+        [[nodiscard]] SortPtr get_sort() const {
+            return this->sort;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitConstantGTerm(*this);
         }
     };
 
-    class VariableGTerm : public  AstNode {
+    class VariableGTerm : public  Term {
     private:
-        std::shared_ptr<ast::EitherSort> sort;
+        SortPtr sort;
     public:
 
-        explicit VariableGTerm(std::shared_ptr<ast::EitherSort>& srt): sort{srt} {
+        explicit VariableGTerm(SortPtr& srt): sort{srt} {
 
         }
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitVariableGTerm(std::shared_ptr<VariableGTerm>(this));
+
+        [[nodiscard]] SortPtr get_sort() const {
+            return this->sort;
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+            return visitor.visitVariableGTerm(*this);
         }
     };
 
-    class BfGTerm : public  AstNode {
-        std::any accept(std::shared_ptr<AstVisitor> visitor) override {
-            return visitor->visitBfGTerm(std::shared_ptr<BfGTerm>(this));
+
+    class AstBaseVisitor : public AstVisitor {
+    public:
+
+        std::any visitIdentifierTerm(IdentifierTerm& term) override {
+            return std::visit([&](auto id) mutable {return id.accept(*this);}, term.get_identifier());
         }
+
     };
-
-
 
 } // namespace ast
 
