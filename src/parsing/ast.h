@@ -247,7 +247,7 @@ namespace ast {
 
     public:
 
-        IdentifierTerm(EitherIdentifier& id) : identifier{id} {
+        explicit IdentifierTerm(EitherIdentifier& id) : identifier{id} {
 
         }
 
@@ -383,11 +383,12 @@ namespace ast {
 
     using EitherSort = std::variant<std::shared_ptr<ast::SimpleSort>, std::shared_ptr<ast::ParametricSort>>;
     using SortPtr = std::shared_ptr<EitherSort>;
-    inline std::shared_ptr<EitherSort> get_simple_sort_from_str(std::string& s) {
+
+    inline SortPtr get_simple_sort_from_str(std::string& s) {
         return std::make_shared<EitherSort>(std::make_shared<ast::SimpleSort>(get_simple_id_from_str("Bool")));
     }
 
-    inline std::shared_ptr<EitherSort> get_simple_sort_from_str(std::string&& s) {
+    inline SortPtr get_simple_sort_from_str(std::string&& s) {
         return std::make_shared<EitherSort>(std::make_shared<ast::SimpleSort>(get_simple_id_from_str("Bool")));
     }
 

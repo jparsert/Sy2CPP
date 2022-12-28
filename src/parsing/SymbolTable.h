@@ -55,19 +55,14 @@ private:
     // A set containing all present sorts
     std::unordered_set<ast::SortPtr> all_sorts;
 
-    //
     std::unordered_map<ast::EitherIdentifier, std::shared_ptr<ast::DeclareVarCmd>> declared_vars;
 
-
-    // Functions
-    static std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>>  default_boolean_functions();
 
 public:
 
     // adding bool sorts and default boolean functions
     SymbolTable() : all_sorts{ast::get_simple_sort_from_str("Bool")}, function_map{default_boolean_functions()}
-    {
-    }
+    {  }
 
     bool sort_exists(const ast::SortPtr& ptr) {
         if (this->all_sorts.contains(ptr)) {
@@ -108,7 +103,23 @@ public:
                                   std::vector<ast::SortPtr> arguments,
                                   std::shared_ptr<ast::EitherSort> sort);
 
+    bool add_function_declaration(const ast::EitherIdentifier& id,
+                                  std::shared_ptr<FunctionDeclaration>& fd);
+
     bool add_declared_var(std::shared_ptr<ast::DeclareVarCmd>& decl);
+
+    ast::SortPtr resolve_sort_by_string(std::string &s);
+    ast::SortPtr resolve_sort_by_string(std::string &&s);
+
+    //adding sort
+    bool add_sort(const ast::SortPtr& srt) {
+        auto [_, flag] = this->all_sorts.insert(srt);
+        return flag;
+    }
+
+    // Functions
+    static std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>>  default_boolean_functions();
+    static std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>>  default_lia_functions();
 
 };
 
@@ -378,6 +389,13 @@ public:
 
     std::any visitSetLogic(SyGuSv21Parser::SetLogicContext *ctx) override {
         std::string s = ctx->symbol()->SYMBOL()->getText();
+        if (s.find("LIA") != std::string::npos) {   // We havea a LIA substring
+            this->table->add_sort(ast::get_simple_sort_from_str("Int"));
+            for (std::pair<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>> x : SymbolTable::default_lia_functions()) {
+                this->table->add_function_declaration(x.first, x.second);
+            }
+        }
+
         return std::static_pointer_cast<ast::Command>(std::make_shared<ast::SetLogic>(s));
     }
 
