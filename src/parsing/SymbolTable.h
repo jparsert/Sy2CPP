@@ -20,28 +20,6 @@
 
 #include "ast.h"
 
-
-
-class FunctionDeclaration {
-
-private:
-    ast::EitherIdentifier id;
-    std::vector<std::shared_ptr<ast::EitherSort>> arguments;
-    std::shared_ptr<ast::EitherSort> sort;
-
-public:
-
-    FunctionDeclaration(ast::EitherIdentifier& iden,
-                        std::initializer_list<std::shared_ptr<ast::EitherSort>> args,
-                        std::shared_ptr<ast::EitherSort>& srt) : id{iden}, arguments{args}, sort{srt} {}
-
-    FunctionDeclaration(ast::EitherIdentifier& iden,
-                        std::vector<std::shared_ptr<ast::EitherSort>>& args,
-                        std::shared_ptr<ast::EitherSort>& srt) : id{iden}, arguments{args}, sort{srt} {}
-
-};
-
-
 class SymbolTable {
 
 private:
