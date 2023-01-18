@@ -29,6 +29,22 @@ private:
         result_stream << " ";
     }
 
+    void push_identifier(ast::EitherIdentifier&& id) {
+        std::visit([&](auto id) mutable {id.accept(*this);}, id);
+    }
+
+    void push_identifier(ast::EitherIdentifier& id) {
+        std::visit([&](auto id) mutable {id.accept(*this);}, id);
+    }
+
+    void push_sort(ast::EitherSort& sort) {
+        std::visit([&](auto eitheSort) mutable {eitheSort->accept(*this);}, sort);
+    }
+
+    void push_sort(ast::EitherSort&& sort) {
+        std::visit([&](auto eitheSort) mutable {eitheSort->accept(*this);}, sort);
+    }
+
 public:
 
     AstToString() = default;
@@ -114,7 +130,7 @@ public:
         for (const std::shared_ptr<ast::SortedVar>& x: exists.get_vars()) {
             this->push_space();
             this->push_op_bracket();
-            std::visit([&](auto& var) mutable {var.accept(*this);}, x->first);
+            this->result_stream << x->first;
             this->push_space();
             std::visit([&](auto& var) mutable {var->accept(*this);}, *x->second);
             this->push_cl_bracket();
@@ -137,7 +153,7 @@ public:
         for (const std::shared_ptr<ast::SortedVar> &x: forall.get_vars()) {
             this->push_space();
             this->push_op_bracket();
-            std::visit([&](auto &var) mutable { var.accept(*this); }, x->first);
+            this->result_stream << x->first;
             this->push_space();
             std::visit([&](auto &var) mutable { var->accept(*this); }, *x->second);
             this->push_cl_bracket();
@@ -222,7 +238,7 @@ public:
 
         for (std::shared_ptr<ast::SortedVar>& x : synthFun.get_arguments()) {
             this->push_op_bracket();
-            std::visit([&](auto id) mutable {id.accept(*this);}, x->first);
+            this->result_stream << x->first;
             this->push_space();
             std::visit([&](auto id) mutable {id->accept(*this);}, *x->second);
             this->push_cl_bracket();
@@ -243,8 +259,36 @@ public:
         return {};
     }
 
-    std::any visitSetFeatureCmd(ast::SetFeatureCmd& context) override {
-        throw not_implemented("SetFeatures has not been implemented yet.");
+    std::any visitSetFeatureCmd(ast::SetFeatureCmd& cmd) override {
+        this->push_op_bracket();
+        this->result_stream << "set-feature";
+        this->push_space();
+        switch (cmd.get_feature()) {
+            case ast::Feature::GRAMMARS:
+                this->result_stream << ":grammars";
+                break;
+            case ast::Feature::FWD_DECLS:
+                this->result_stream << ":fwd-decls";
+                break;
+            case ast::Feature::RECURSION:
+                this->result_stream << ":recursion";
+                break;
+            case ast::Feature::ORACLES:
+                this->result_stream << ":oracles";
+                break;
+            case ast::Feature::WEIGHTS:
+                this->result_stream << ":weights";
+                break;
+        }
+
+        this->push_space();
+        if (cmd.get_value()) {
+            this->result_stream << "true";
+        } else {
+            this->result_stream << "false";
+        }
+        this->push_cl_bracket();
+        return {};
     }
 
     std::any visitDeclareDatatype(ast::DeclareDatatype& declDT) override {
@@ -255,20 +299,73 @@ public:
         throw not_implemented("DeclareDatatypes has not been implemented yet.");
     }
 
-    std::any visitDeclareSort(ast::DeclareSort& context) override {
-        throw not_implemented("DeclareSort has not been implemented yet.");
+    std::any visitDeclareSort(ast::DeclareSort& cmd) override {
+        this->push_op_bracket();
+
+        this->result_stream << "declare-sort";
+        this->push_space();
+
+        std::visit([&](auto id) mutable {id.accept(*this);}, cmd.get_identifier());
+        this->push_space();
+        cmd.get_numeral()->accept(*this);
+
+        this->push_cl_bracket();
+        return {};
     }
 
-    std::any visitDefineFun(ast::DefineFun& context) override {
-        throw not_implemented("DefineFun has not been implemented yet.");
+    std::any visitDefineFun(ast::DefineFunCmd& cmd) override {
+        this->push_op_bracket();
+        this->result_stream << "define-fun";
+        this->push_space();
+        this->push_identifier(cmd.get_identifier());
+        this->push_space();
+
+        this->push_op_bracket();
+        for (std::shared_ptr<ast::SortedVar>& x : cmd.get_arguments()) {
+            this->push_op_bracket();
+            this->result_stream << x->first;
+            this->push_space();
+            this->push_sort(*x->second);
+            this->push_cl_bracket();
+        }
+        this->push_cl_bracket();
+
+        this->push_space();
+        this->push_sort(*cmd.get_sort());
+        this->push_space();
+
+        cmd.get_term()->accept(*this);
+
+        this->push_cl_bracket();
+        return {};
     }
 
-    std::any visitDefineSort(ast::DefineSort& context) override {
-        throw not_implemented("DefineSort has not been implemented yet.");
+    std::any visitDefineSort(ast::DefineSort& cmd) override {
+        this->push_op_bracket();
+        this->result_stream << "define-sort";
+        this->push_space();
+
+        this->push_identifier(cmd.get_identifier());
+        this->push_space();
+
+        this->push_sort(*cmd.get_sort());
+        this->push_cl_bracket();
+        return {};
     }
 
-    std::any visitSetInfo(ast::SetInfo& context) override {
-        throw not_implemented("SetInfo has not been implemented yet.");
+    std::any visitSetInfo(ast::SetInfo& cmd) override {
+        this->push_op_bracket();
+
+        this->result_stream << "set-info";
+        this->push_space();
+
+        this->result_stream << ":" << cmd.get_keyword();
+        this->push_space();
+
+        cmd.get_literal()->accept(*this);
+
+        this->push_cl_bracket();
+        return {};
     }
 
     std::any visitSetLogic(ast::SetLogic& setLogicCmd) override {
@@ -280,19 +377,30 @@ public:
         return {};
     }
 
-    std::any visitSetOption(ast::SetOption& context) override {
-        throw not_implemented("SetOption has not been implemented yet.");
+    std::any visitSetOption(ast::SetOption& cmd) override {
+        this->push_op_bracket();
+
+        this->result_stream << "set-option";
+        this->push_space();
+
+        this->result_stream << ":" << cmd.get_keyword();
+        this->push_space();
+
+        cmd.get_literal()->accept(*this);
+
+        this->push_cl_bracket();
+        return {};
     }
 
-    std::any visitSortDecl(ast::SortDecl& context) override {
+    std::any visitSortDecl(ast::SortDecl& decl) override {
         throw not_implemented("SortDecl has not been implemented yet.");
     }
 
-    std::any visitDtDecl(ast::DtDecl& context) override {
+    std::any visitDtDecl(ast::DtDecl& decl) override {
         throw not_implemented("DtDecl has not been implemented yet.");
     }
 
-    std::any visitDtConsDecl(ast::DtConsDecl& context) override {
+    std::any visitDtConsDecl(ast::DtConsDecl& dtconsdecl) override {
         throw not_implemented("DtConsDecl has not been implemented yet.");
     }
 
@@ -300,7 +408,7 @@ public:
         this->push_op_bracket();
         for (auto& x: gdef.get_vars()) {
             this->push_op_bracket();
-            std::visit([&](auto id) mutable { id.accept(*this); }, x->first);
+            this->result_stream << x->first;
             this->push_space();
             std::visit([&](auto id) mutable { id->accept(*this); }, *x->second);
             this->push_cl_bracket();
@@ -308,10 +416,12 @@ public:
         this->push_cl_bracket();
 
         this->push_space();
+        this->result_stream << std::endl;
 
         this->push_op_bracket();
         for (std::shared_ptr<ast::GroupedRuleList>& x: gdef.get_rules()) {
             x->accept(*this);
+            this->result_stream << std::endl;
         }
         this->push_cl_bracket();
         return {};

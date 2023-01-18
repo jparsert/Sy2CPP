@@ -61,7 +61,7 @@ namespace ast {
     class DeclareDatatype;
     class DeclareDatatypes;
     class DeclareSort;
-    class DefineFun;
+    class DefineFunCmd;
     class DefineSort;
     class SetInfo;
     class SetLogic;
@@ -131,7 +131,7 @@ namespace ast {
 
         virtual std::any visitDeclareSort(DeclareSort& context) = 0;
 
-        virtual std::any visitDefineFun(DefineFun& context) = 0;
+        virtual std::any visitDefineFun(DefineFunCmd& context) = 0;
 
         virtual std::any visitDefineSort(DefineSort& context) = 0;
 
@@ -372,6 +372,10 @@ namespace ast {
             return visitor.visitSimpleSort(*this);
         }
 
+        bool operator==(const SimpleSort& other) const {
+            return this->get_identifier() == other.get_identifier();
+        }
+
         [[nodiscard]] EitherIdentifier get_identifier() const {
             return identifier;
         }
@@ -383,6 +387,11 @@ namespace ast {
         std::any accept(AstVisitor& visitor) override {
             return visitor.visitParametricSort(*this);
         }
+
+        bool operator==(const ParametricSort& other) const {
+            throw not_implemented("Parametic Sorts equality is not implemented");
+        }
+
     };
 
     using EitherSort = std::variant<std::shared_ptr<ast::SimpleSort>, std::shared_ptr<ast::ParametricSort>>;
@@ -422,7 +431,7 @@ namespace ast {
         }
     };
 
-    using SortedVar = std::pair<ast::EitherIdentifier, std::shared_ptr<ast::EitherSort>>;
+    using SortedVar = std::pair<std::string, std::shared_ptr<ast::EitherSort>>;
 
     class ExistsTerm : public  Term {
     private:
@@ -574,6 +583,14 @@ namespace ast {
 
         SetFeatureCmd(Feature f, bool v): feature{f}, value{v} {}
 
+        Feature get_feature() {
+            return feature;
+        }
+
+        bool get_value() {
+            return value;
+        }
+
         std::any accept(AstVisitor& visitor) override {
             return visitor.visitSetFeatureCmd(*this);
         }
@@ -642,12 +659,20 @@ namespace ast {
 
         DeclareSort(EitherIdentifier iden, std::shared_ptr<Numeral>& num) : id{std::move(iden)}, numeral{num}{}
 
+        EitherIdentifier get_identifier() {
+            return this->id;
+        }
+
+        std::shared_ptr<Numeral> get_numeral() {
+            return this->numeral;
+        }
+
         std::any accept(AstVisitor& visitor) override {
             return visitor.visitDeclareSort(*this);
         }
     };
 
-    class DefineFun : public  Command {
+    class DefineFunCmd : public  Command {
 
     private:
         EitherIdentifier id;
@@ -659,26 +684,52 @@ namespace ast {
         TermPtr term;
 
     public:
-        DefineFun(EitherIdentifier& iden,
-                  std::vector<std::shared_ptr<ast::SortedVar>>& args,
-                  std::shared_ptr<EitherSort>& srt,
-                  TermPtr& tm):
+        DefineFunCmd(EitherIdentifier& iden,
+                     std::vector<std::shared_ptr<ast::SortedVar>>& args,
+                     std::shared_ptr<EitherSort>& srt,
+                     TermPtr& tm):
                   id{iden}, arguments{args}, sort{srt}, term{tm} {}
 
         std::any accept(AstVisitor& visitor) override {
             return visitor.visitDefineFun(*this);
         }
+
+        [[nodiscard]] EitherIdentifier get_identifier() const {
+            return this->id;
+        }
+
+        [[nodiscard]] std::vector<std::shared_ptr<SortedVar>> get_arguments() const {
+            return this->arguments;
+        }
+
+        [[nodiscard]] SortPtr get_sort() const {
+            return this->sort;
+        }
+
+        TermPtr get_term() const {
+            return this->term;
+        }
+
     };
 
     class DefineSort : public  Command {
     private:
         EitherIdentifier id;
 
-        std::shared_ptr<EitherSort> sort;
+        SortPtr sort;
 
     public:
 
         DefineSort(EitherIdentifier iden, std::shared_ptr<EitherSort>& srt): id{std::move(iden)}, sort{srt} {}
+
+
+        EitherIdentifier get_identifier() {
+            return this->id;
+        }
+
+        SortPtr get_sort() {
+            return this->sort;
+        }
 
         std::any accept(AstVisitor& visitor) override {
             return visitor.visitDefineSort(*this);
@@ -696,6 +747,14 @@ namespace ast {
 
         SetInfo(std::string& kw, std::shared_ptr<Literal>& lit): keyword{kw}, literal{lit} {
 
+        }
+
+        std::string get_keyword() {
+            return keyword;
+        }
+
+        std::shared_ptr<Literal> get_literal() {
+            return literal;
         }
 
         std::any accept(AstVisitor& visitor) override {
@@ -731,6 +790,15 @@ namespace ast {
         SetOption(std::string& kw, std::shared_ptr<Literal>& lit): keyword{kw}, literal{lit} {
 
         }
+
+        std::string get_keyword() {
+            return keyword;
+        }
+
+        std::shared_ptr<Literal> get_literal() {
+            return literal;
+        }
+
         std::any accept(AstVisitor& visitor) override {
             return visitor.visitSetOption(*this);
         }
@@ -873,25 +941,5 @@ namespace  std {
         }
     };
 }
-
-
-class FunctionDeclaration {
-
-private:
-    ast::EitherIdentifier id;
-    std::vector<std::shared_ptr<ast::EitherSort>> arguments;
-    std::shared_ptr<ast::EitherSort> sort;
-
-public:
-
-    FunctionDeclaration(ast::EitherIdentifier& iden,
-                        std::initializer_list<std::shared_ptr<ast::EitherSort>> args,
-                        std::shared_ptr<ast::EitherSort>& srt) : id{iden}, arguments{args}, sort{srt} {}
-
-    FunctionDeclaration(ast::EitherIdentifier& iden,
-                        std::vector<std::shared_ptr<ast::EitherSort>>& args,
-                        std::shared_ptr<ast::EitherSort>& srt) : id{iden}, arguments{args}, sort{srt} {}
-
-};
 
 #endif //PHYSER_AST_H

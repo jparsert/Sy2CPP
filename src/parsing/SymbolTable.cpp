@@ -5,92 +5,6 @@
 #include "SymbolTable.h"
 #include "../exceptions/UnknownSymbol.h"
 
-std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>> SymbolTable::default_boolean_functions()
-{
-    std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>> funs;
-
-    ast::SortPtr bool_sort = ast::get_simple_sort_from_str("Bool");
-
-    std::initializer_list<std::shared_ptr<ast::EitherSort>> arg_lst{bool_sort};
-    std::initializer_list<std::shared_ptr<ast::EitherSort>> arg_lst2{bool_sort, bool_sort};
-    //std::initializer_list<std::shared_ptr<ast::EitherSort>> arg_lst3{bool_sort, bool_sort, bool_sort};
-
-    // Add NOT operator
-    ast::EitherIdentifier notId = ast::get_simple_id_from_str("not");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(notId, arg_lst, bool_sort )});
-
-    // Add AND operator
-    ast::EitherIdentifier andOp = ast::get_simple_id_from_str("and");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(andOp, arg_lst2, bool_sort )})     ;
-
-    // Add OR operator
-    ast::EitherIdentifier orOp = ast::get_simple_id_from_str("and");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(orOp, arg_lst2, bool_sort )})     ;
-
-    // Add XOR operator
-    ast::EitherIdentifier xorOp = ast::get_simple_id_from_str("xor");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(xorOp, arg_lst2, bool_sort )})     ;
-
-    // Add IMPLICATION operator
-    ast::EitherIdentifier impl = ast::get_simple_id_from_str("=>");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(impl, arg_lst2, bool_sort )})     ;
-
-    return funs;
-}
-
-bool SymbolTable::add_function_declaration(ast::EitherIdentifier id, std::vector<ast::SortPtr> arguments,
-                                           std::shared_ptr<ast::EitherSort> sort) {
-    auto decl = std::make_shared<FunctionDeclaration>(id, arguments, sort);
-    auto [_, val] = function_map.insert({id, decl});
-    return val;
-}
-
-bool SymbolTable::add_function_declaration(const ast::EitherIdentifier& id, std::shared_ptr<FunctionDeclaration> &fd) {
-    auto [_, val] = function_map.insert({id, fd});
-    return val;
-}
-
-bool SymbolTable::add_declared_var(std::shared_ptr<ast::DeclareVarCmd> &decl) {
-    auto [_, val] = declared_vars.insert({decl->get_identifier(), decl});
-    return val;
-}
-
-std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>> SymbolTable::default_lia_functions() {
-
-    std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>> funs;
-
-    ast::SortPtr int_sort = ast::get_simple_sort_from_str("Int");
-
-    std::initializer_list<std::shared_ptr<ast::EitherSort>> arg_lst{int_sort};
-    std::initializer_list<std::shared_ptr<ast::EitherSort>> arg_lst2{int_sort, int_sort};
-    //std::initializer_list<std::shared_ptr<ast::EitherSort>> arg_lst3{bool_sort, bool_sort, bool_sort};
-
-    // Add NOT operator
-    ast::EitherIdentifier notId = ast::get_simple_id_from_str("-");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(notId, arg_lst, int_sort)});
-
-    // Add AND operator
-    ast::EitherIdentifier andOp = ast::get_simple_id_from_str("+");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(andOp, arg_lst2, int_sort )})     ;
-
-    // Add OR operator
-    ast::EitherIdentifier orOp = ast::get_simple_id_from_str("*");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(orOp, arg_lst2, int_sort )})     ;
-
-    // Add XOR operator
-    ast::EitherIdentifier xorOp = ast::get_simple_id_from_str("div");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(xorOp, arg_lst2, int_sort )})     ;
-
-    // Add IMPLICATION operator
-    ast::EitherIdentifier impl = ast::get_simple_id_from_str("mod");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(impl, arg_lst2, int_sort )})     ;
-
-    // Add IMPLICATION operator
-    ast::EitherIdentifier abs = ast::get_simple_id_from_str("abs");
-    funs.insert({notId, std::make_shared<FunctionDeclaration>(abs, arg_lst, int_sort )})     ;
-
-    return funs;
-}
 
 ast::SortPtr SymbolTable::resolve_sort_by_string(std::string &s) {
     auto x = all_sorts.find(ast::get_simple_sort_from_str(s));
@@ -108,5 +22,58 @@ ast::SortPtr SymbolTable::resolve_sort_by_string(std::string&& s) {
     } else {
         throw UnknownSymbol("Could not find sort " + s + " in symbol table.");
     }
+}
+
+bool SymbolTable::add_declared_var(std::shared_ptr<ast::DeclareVarCmd> &decl) {
+    return false;
+}
+
+bool SymbolTable::add_user_defined_fun(std::shared_ptr<ast::DefineFunCmd> &cmd) {
+    ast::EitherIdentifier id(cmd->get_identifier());
+    std::vector<std::shared_ptr<ast::SortedVar>> rg = cmd->get_arguments();
+    std::vector<ast::SortPtr> arg_sorts;
+    std::transform(rg.begin(), rg.end(), std::back_inserter(arg_sorts),
+                   [](std::shared_ptr<ast::SortedVar>& x) {return x->second;});
+    ast::SortPtr range_sort = cmd->get_sort();
+
+    auto [_, val] = this->user_defined_funs
+            .insert({id,std::make_shared<FunctionDescriptor>(id, arg_sorts, range_sort, false)});
+    return val;
+}
+
+bool SymbolTable::add_synth_fun(std::shared_ptr<ast::SynthFunCmd> &cmd) {
+    ast::EitherIdentifier id(cmd->get_identifier());
+    std::vector<std::shared_ptr<ast::SortedVar>> rg = cmd->get_arguments();
+    std::vector<ast::SortPtr> arg_sorts;
+    std::transform(rg.begin(),rg.end(), std::back_inserter(arg_sorts),
+                   [](std::shared_ptr<ast::SortedVar>& x) {return x->second;});
+    ast::SortPtr range_sort = cmd->get_sort();
+
+    auto [_, val] = this->synth_fun_funs
+            .insert({id,std::make_shared<FunctionDescriptor>(id, arg_sorts, range_sort, false)});
+    return val;
+}
+
+std::optional<FunDescrPtr>
+SymbolTable::lookup_or_resolve_function(ast::EitherIdentifier &identifier, std::vector<ast::SortPtr>& arg_sorts) {
+    for (auto& res : this->resolvers) {
+        std::optional<FunDescrPtr> descr = res->lookup_or_resolve_function(identifier, arg_sorts);
+        if(descr) {
+            return descr;
+        }
+    }
+
+    // lookup function in user defined funs
+    auto el = this->user_defined_funs.find(identifier);
+    if (el != this->user_defined_funs.end()) {
+        return std::make_optional<FunDescrPtr>(el->second);
+    }
+
+    // lookup function in user defined funs
+    el = this->synth_fun_funs.find(identifier);
+    if (el != this->synth_fun_funs.end()) {
+        return std::make_optional<FunDescrPtr>(el->second);
+    }
+    return std::nullopt;
 }
 

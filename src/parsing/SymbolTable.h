@@ -19,16 +19,22 @@
 #include "../exceptions/unsupported_feature.h"
 
 #include "ast.h"
+#include "resolvers.h"
 
 class SymbolTable {
 
 private:
 
-    // Mapping identifiers to defined functions
-    std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>> function_map;
+    // Mapping identifiers to theory functions
+    std::unordered_map<ast::EitherIdentifier, FunDescrPtr> user_defined_funs;
 
-    // Mapping identifiers to synth fun commands
-    std::unordered_map<ast::EitherIdentifier, std::shared_ptr<ast::SynthFunCmd>> synth_fun_map;
+    // Mapping identifiers to Synthesis functions
+    std::unordered_map<ast::EitherIdentifier, FunDescrPtr> synth_fun_funs;
+
+    // We will need to add Data type functions Constructor/Selector and Tester
+
+    // Theory Resolvers
+    std::vector<std::shared_ptr<AbstractResolver>> resolvers;
 
     // A set containing all present sorts
     std::unordered_set<ast::SortPtr> all_sorts;
@@ -39,8 +45,13 @@ private:
 public:
 
     // adding bool sorts and default boolean functions
-    SymbolTable() : all_sorts{ast::get_simple_sort_from_str("Bool")}, function_map{default_boolean_functions()}
-    {  }
+    SymbolTable() {
+        this->add_resolver(std::make_shared<CoreResolver>());
+    }
+
+    void add_resolver(const std::shared_ptr<AbstractResolver>& ptr) {
+        resolvers.push_back(ptr);
+    }
 
     bool sort_exists(const ast::SortPtr& ptr) {
         if (this->all_sorts.contains(ptr)) {
@@ -50,9 +61,9 @@ public:
     }
 
     bool identifier_exists(const ast::EitherIdentifier& id) {
-        if (this->function_map.contains(id)) {
+        if (this->user_defined_funs.contains(id)) {
             return true;
-        } else if (this->synth_fun_map.contains(id)) {
+        } else if (this->synth_fun_funs.contains(id)) {
             return true;
         } else if (this->declared_vars.contains(id)) {
             return true;
@@ -71,18 +82,11 @@ public:
         return false;
     }
 
-    bool add_synth_fun_cmd(std::shared_ptr<ast::SynthFunCmd>& cmd) {
-        ast::EitherIdentifier id(cmd->get_identifier());
-        auto [_, val] = this->synth_fun_map.insert({id, cmd});
-        return val;
-    }
+    bool add_synth_fun(std::shared_ptr<ast::SynthFunCmd>& cmd);
+    bool add_user_defined_fun(std::shared_ptr<ast::DefineFunCmd>& defineFunCmd);
 
-    bool add_function_declaration(ast::EitherIdentifier id,
-                                  std::vector<ast::SortPtr> arguments,
-                                  std::shared_ptr<ast::EitherSort> sort);
-
-    bool add_function_declaration(const ast::EitherIdentifier& id,
-                                  std::shared_ptr<FunctionDeclaration>& fd);
+    std::optional<FunDescrPtr> lookup_or_resolve_function(ast::EitherIdentifier &identifier,
+                                                        std::vector<ast::SortPtr>& arg_sorts);
 
     bool add_declared_var(std::shared_ptr<ast::DeclareVarCmd>& decl);
 
@@ -94,10 +98,6 @@ public:
         auto [_, flag] = this->all_sorts.insert(srt);
         return flag;
     }
-
-    // Functions
-    static std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>>  default_boolean_functions();
-    static std::unordered_map<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>>  default_lia_functions();
 
 };
 
@@ -259,8 +259,7 @@ public:
     std::any visitSortedVar(SyGuSv21Parser::SortedVarContext *ctx) override {
         std::string symbol = ctx->symbol()->getText();
         auto sort = std::any_cast<std::shared_ptr<ast::EitherSort>>(ctx->sort()->accept(this));
-        ast::EitherIdentifier id = ast::EitherIdentifier(ast::SimpleIdentifier{symbol});
-        return std::make_shared<ast::SortedVar>(id, sort);
+        return std::make_shared<ast::SortedVar>(symbol, sort);
     }
 
     std::any visitVarBinding(SyGuSv21Parser::VarBindingContext *ctx) override {
@@ -322,7 +321,10 @@ public:
         }
 
         auto grammar = std::any_cast<std::shared_ptr<ast::GrammarDef>>(ctx->grammarDef()->accept(this));
-        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::SynthFunCmd>(id, arguments, sort, grammar));
+        auto cmdPtr = std::make_shared<ast::SynthFunCmd>(id, arguments, sort, grammar);
+
+        this->table->add_synth_fun(cmdPtr);
+        return std::static_pointer_cast<ast::Command>(cmdPtr);
     }
 
     std::any visitDeclareDatatype(SyGuSv21Parser::DeclareDatatypeContext *ctx) override {
@@ -349,7 +351,10 @@ public:
             args.push_back(std::any_cast<std::shared_ptr<ast::SortedVar>>(x->accept(this)));
         }
         auto term = std::any_cast<ast::TermPtr>(ctx->term()->accept(this));
-        return std::static_pointer_cast<ast::Command>(std::make_shared<ast::DefineFun>(id, args, sort, term));
+
+        auto defCmd = std::make_shared<ast::DefineFunCmd>(id, args, sort, term);
+        this->table->add_user_defined_fun(defCmd);
+        return std::static_pointer_cast<ast::Command>(defCmd);
     }
 
     // TODO add to symbol Table
@@ -368,10 +373,7 @@ public:
     std::any visitSetLogic(SyGuSv21Parser::SetLogicContext *ctx) override {
         std::string s = ctx->symbol()->SYMBOL()->getText();
         if (s.find("LIA") != std::string::npos) {   // We havea a LIA substring
-            this->table->add_sort(ast::get_simple_sort_from_str("Int"));
-            for (std::pair<ast::EitherIdentifier, std::shared_ptr<FunctionDeclaration>> x : SymbolTable::default_lia_functions()) {
-                this->table->add_function_declaration(x.first, x.second);
-            }
+            this->table->add_resolver(std::make_shared<LIAResolver>());
         }
 
         return std::static_pointer_cast<ast::Command>(std::make_shared<ast::SetLogic>(s));

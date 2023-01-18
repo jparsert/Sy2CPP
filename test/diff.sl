@@ -7,6 +7,9 @@
     (y_int Int (x y y_const_int (- y_int) (+ y_int y_int) (- y_int y_int) (* y_const_int y_int) (* y_int y_const_int) (div y_int y_const_int) (mod y_int y_const_int) (abs y_int) (ite y_bool y_int y_int)))
     (y_const_int Int (1 2 3 4 5 6 7 8 9 10 11 12))
     (y_const_bool Bool (true false))))
+
+(define-fun foo ((a Int) (b Int)) Int (+ a b))
+
 (declare-var x Int)
 (declare-var y Int)
 (constraint (= true false))
