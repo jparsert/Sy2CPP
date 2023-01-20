@@ -13,8 +13,6 @@
 class unsupported_feature : std::exception {
 
     std::string msg;
-
-
 public:
 
     explicit unsupported_feature(std::string m): msg{std::move(m)}{}

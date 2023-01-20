@@ -4,6 +4,7 @@
 
 
 #include <optional>
+#include <utility>
 #include "ast.h"
 #include "../utils/general_utility.h"
 
@@ -14,9 +15,9 @@
 class FunctionDescriptor {
 
 private:
-    ast::EitherIdentifier id;
-    std::vector<ast::SortPtr> argument_sorts;
-    ast::SortPtr range_sort;
+    EitherIdentifier id;
+    std::vector<EitherSort> argument_sorts;
+    EitherSort range_sort;
 
     bool chainable;
 
@@ -24,89 +25,117 @@ private:
 
 public:
 
-    FunctionDescriptor(ast::EitherIdentifier& iden,
-                        std::initializer_list<ast::SortPtr>& args,
-                        ast::SortPtr& range,
-                        bool _chainable) : id{iden}, argument_sorts{args}, range_sort{range}, chainable{_chainable} {}
+    FunctionDescriptor(EitherIdentifier  iden,
+                        const std::initializer_list<EitherSort>& args,
+                        EitherSort& range,
+                        bool _chainable) : id{std::move(iden)}, argument_sorts{args}, range_sort{range}, chainable{_chainable} {}
 
-    FunctionDescriptor(ast::EitherIdentifier& iden,
-                        std::vector<ast::SortPtr>& args,
-                        ast::SortPtr& range,
-                        bool _chainable) : id{iden}, argument_sorts{args}, range_sort{range}, chainable{_chainable} {}
+    FunctionDescriptor(EitherIdentifier  iden,
+                        const std::vector<EitherSort>& args,
+                        EitherSort  range,
+                        bool _chainable) : id{std::move(iden)}, argument_sorts{args}, range_sort{std::move(range)}, chainable{_chainable} {}
 
-    ast::SortPtr get_range_sort();
-    ast::EitherIdentifier get_identifier();
-    std::vector<ast::SortPtr> get_argument_sorts();
+    [[nodiscard]] EitherSort get_range_sort() const;
+    [[nodiscard]] EitherIdentifier get_identifier() const;
+    [[nodiscard]] std::vector<EitherSort> get_argument_sorts() const;
     [[nodiscard]] bool is_chainable() const {return this->chainable;}
 
 };
-
-using FunDescrPtr = std::shared_ptr<FunctionDescriptor>;
-
 
 class AbstractResolver {
 
 public:
 
-    virtual std::optional<FunDescrPtr>
-            lookup_or_resolve_function(ast::EitherIdentifier& identifier, std::vector<ast::SortPtr> arg_sorts) = 0;
+    [[nodiscard]] virtual std::optional<FunctionDescriptor>
+    lookup_or_resolve_function(
+            const EitherIdentifier& identifier,
+            const std::vector<EitherSort>& arg_sorts) const = 0;
+
+    [[nodiscard]] virtual std::optional<EitherSort> lookup_sort(const EitherSort& sort) const = 0;
 
 };
 
 class CoreResolver : public AbstractResolver {
 private:
 
-    std::unordered_multimap<ast::EitherIdentifier, FunDescrPtr> functions;
+    std::unordered_multimap<EitherIdentifier, FunctionDescriptor> functions;
 
-    static std::optional<FunDescrPtr>
-    resolve_special_functions(ast::EitherIdentifier& identifier, std::vector<ast::SortPtr>& arg_sorts);
+    static std::optional<FunctionDescriptor>
+    resolve_special_functions(const EitherIdentifier& identifier, const std::vector<EitherSort>& arg_sorts);
 
 public:
 
     CoreResolver();
 
-    static ast::SortPtr get_bool_sort() {
-        return ast::get_simple_sort_from_str("Bool");
+    static EitherSort get_bool_sort() {
+        return get_simple_sort_from_str("Bool");
     }
 
-    std::optional<FunDescrPtr>
-    lookup_or_resolve_function(ast::EitherIdentifier& identifier, std::vector<ast::SortPtr> arg_sorts) override;
+    std::optional<FunctionDescriptor>
+    lookup_or_resolve_function(const EitherIdentifier& identifier, const std::vector<EitherSort>& arg_sorts) const override;
 
+    std::optional<EitherSort> lookup_sort(const EitherSort& sort) const override;
 };
 
 
 class LIAResolver : public AbstractResolver {
 private:
 
-    std::unordered_multimap<ast::EitherIdentifier, FunDescrPtr> functions;
+    std::unordered_multimap<EitherIdentifier, FunctionDescriptor> functions;
 
-    static std::optional<FunDescrPtr>
-    resolve_special_functions(ast::EitherIdentifier& identifier, std::vector<ast::SortPtr>& arg_sorts);
+    static std::optional<FunctionDescriptor>
+    resolve_special_functions(const EitherIdentifier& identifier, const std::vector<EitherSort>& arg_sorts);
 
 public:
 
     LIAResolver();
 
-    static ast::SortPtr get_int_sort() {
-        return ast::get_simple_sort_from_str("Int");
+    static EitherSort get_int_sort() {
+        return get_simple_sort_from_str("Int");
     }
 
-    std::optional<FunDescrPtr>
-    lookup_or_resolve_function(ast::EitherIdentifier& identifier, std::vector<ast::SortPtr> arg_sorts) override;
+    std::optional<FunctionDescriptor>
+    lookup_or_resolve_function(const EitherIdentifier& identifier, const std::vector<EitherSort>& arg_sorts) const override;
+
+    std::optional<EitherSort> lookup_sort(const EitherSort& sort) const override;
 
 
+};
+
+
+enum class BinderKind {
+    QUANTIFIER,
+    LET,
+    FUNCTION_ARGUMENT,
+    SYNTH_FUN_ARGUMENT,
+    DECLARE_VAR,
+    GRAMMAR_NON_TERMINAL,
 };
 
 
 class SymbolDescriptor {
 
 private:
-    std::string symbol;
-    ast::SortPtr symbol_sort;
+    EitherIdentifier symbol;
+    EitherSort symbol_sort;
+    BinderKind binder;
+
+public:
+
+    SymbolDescriptor(EitherIdentifier  symb, EitherSort  sort, const BinderKind bind):
+        symbol{std::move(symb)}, symbol_sort{std::move(sort)}, binder{bind} {}
+
+    SymbolDescriptor(const EitherIdentifier&& symb, const EitherSort&& sort, const BinderKind bind):
+            symbol{symb}, symbol_sort{sort}, binder{bind} {}
+
+
+    [[nodiscard]] const EitherIdentifier& get_identifier() const;
+    [[nodiscard]] const EitherSort &get_symbol_sort() const;
+    [[nodiscard]] BinderKind get_binder() const;
 
 };
 
-using SymbDescrPtr = std::shared_ptr<SymbolDescriptor>;
+
 
 
 #endif //PHYSER_RESOLVERS_H

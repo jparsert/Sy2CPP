@@ -27,5 +27,17 @@ bool all_shared_ptr_elements_equal(std::vector<std::shared_ptr<T>> vec) {
     return all_of(vec.begin(), vec.end(), [&] (std::shared_ptr<T>& i) {return *i == *vec[0];});
 }
 
+template<typename T>
+bool all_elements_equal(std::vector<T> vec) {
+    if (vec.empty()) {
+        return true;
+    }
+
+    return all_of( vec.begin(),
+                   vec.end(),
+                   [&](const T& value){
+                       return value == *(vec.begin());
+                   });
+}
 
 #endif //PHYSER_GENERAL_UTILITY_H
