@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(physer)
+project(Sy2CPP)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -25,20 +25,18 @@ antlr4_generate(
 # add directories for generated include files
 include_directories( ${PROJECT_BINARY_DIR} ${ANTLR4_INCLUDE_DIR} ${ANTLR4_INCLUDE_DIR_antlrsygus} )
 
-
 # z3
 find_package(Z3 REQUIRED)
 
 
-# add generated source files
-add_executable( physer main.cpp ${ANTLR4_SRC_FILES_antlrsygus}
-        verification/sygus_smt_rep.cpp verification/sygus_smt_rep.h
+# for the executable used for testing etc.
+add_executable(Sy2CPP main.cpp ${ANTLR4_SRC_FILES_antlrsygus}
         parsing/to_string_printer.cpp parsing/to_string_printer.h
         exceptions/unsupported_feature.cpp exceptions/unsupported_feature.h exceptions/not_implemented.cpp
             exceptions/not_implemented.h
-        parsing/SymbolTable.cpp parsing/SymbolTable.h parsing/ast.cpp parsing/ast.h exceptions/IOException.cpp exceptions/IOException.h utils/IOHelpers.h utils/IOHelpers.cpp exceptions/UnknownSymbol.cpp exceptions/UnknownSymbol.h parsing/resolvers.cpp parsing/resolvers.h exceptions/wrong_arguments.cpp exceptions/wrong_arguments.h utils/general_utility.cpp utils/general_utility.h typing.cpp typing.h exceptions/typing_error.cpp exceptions/typing_error.h)
+        SymbolTable.cpp SymbolTable.h ast.cpp ast.h exceptions/IOException.cpp exceptions/IOException.h utils/IOHelpers.h utils/IOHelpers.cpp exceptions/UnknownSymbol.cpp exceptions/UnknownSymbol.h resolvers.cpp resolvers.h exceptions/wrong_arguments.cpp exceptions/wrong_arguments.h utils/general_utility.cpp utils/general_utility.h typing.cpp typing.h exceptions/typing_error.cpp exceptions/typing_error.h)
 
 # add required runtime library
-add_dependencies( physer antlr4_shared)
+add_dependencies(Sy2CPP antlr4_shared)
+target_link_libraries(Sy2CPP PRIVATE antlr4_shared z3)
 
-target_link_libraries( physer PRIVATE antlr4_shared z3)

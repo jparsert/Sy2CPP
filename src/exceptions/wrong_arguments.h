@@ -8,15 +8,18 @@
 #include <exception>
 #include <string>
 
-class WrongArguments : std::exception {
 
-    std::string msg;
+namespace Sy2CPP {
 
-public:
+    class WrongArguments : std::exception {
 
-    explicit WrongArguments(std::string m): msg{std::move(m)}{}
+        std::string msg;
 
-};
+    public:
 
+        explicit WrongArguments(std::string m) : msg{std::move(m)} {}
+
+    };
+}
 
 #endif //PHYSER_WRONG_ARGUMENTS_H

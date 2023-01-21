@@ -8,15 +8,16 @@
 #include <exception>
 #include <string>
 
+namespace Sy2CPP {
 
-class IOException : std::exception {
-private:
-    std::string msg;
+    class IOException : std::exception {
+    private:
+        std::string msg;
 
-public:
-    explicit IOException(std::string s): msg{std::move(s)} {}
+    public:
+        explicit IOException(std::string s) : msg{std::move(s)} {}
 
-};
-
+    };
+}
 
 #endif //PHYSER_IOEXCEPTION_H

@@ -9,14 +9,16 @@
 #include <exception>
 #include <string>
 
-class UnknownSymbol : public std::exception {
+namespace Sy2CPP {
 
-        private:
+    class UnknownSymbol : public std::exception {
+
+    private:
         std::string msg;
 
-        public:
-        explicit UnknownSymbol(std::string s): msg{std::move(s)} {}
+    public:
+        explicit UnknownSymbol(std::string s) : msg{std::move(s)} {}
 
-};
-
+    };
+}
 #endif //PHYSER_UNKNOWNSYMBOL_H

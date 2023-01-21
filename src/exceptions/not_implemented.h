@@ -9,15 +9,17 @@
 #include <string>
 #include <utility>
 
-class not_implemented : std::exception {
+namespace Sy2CPP {
 
-    std::string msg;
+    class not_implemented : std::exception {
 
-public:
+        std::string msg;
 
-    explicit not_implemented(std::string m): msg{std::move(m)}{}
+    public:
 
-};
+        explicit not_implemented(std::string m) : msg{std::move(m)} {}
 
+    };
+}
 
 #endif //PHYSER_NOT_IMPLEMENTED_H

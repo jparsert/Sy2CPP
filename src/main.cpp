@@ -3,9 +3,8 @@
 #include "antlr4-runtime/antlr4-runtime.h"
 #include <SyGuSv21Lexer.h>
 #include <SyGuSv21Parser.h>
-#include "verification/sygus_smt_rep.h"
 #include "parsing/to_string_printer.h"
-#include "parsing/SymbolTable.h"
+#include "SymbolTable.h"
 #include "../exceptions/IOException.h"
 
 using namespace std;

@@ -9,15 +9,16 @@
 #include <string>
 #include <utility>
 
+namespace Sy2CPP {
 
-class unsupported_feature : std::exception {
+    class unsupported_feature : std::exception {
 
-    std::string msg;
-public:
+        std::string msg;
+    public:
 
-    explicit unsupported_feature(std::string m): msg{std::move(m)}{}
+        explicit unsupported_feature(std::string m) : msg{std::move(m)} {}
 
-};
-
+    };
+}
 
 #endif //PHYSER_UNSUPPORTED_FEATURE_H

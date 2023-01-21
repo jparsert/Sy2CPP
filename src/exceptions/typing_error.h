@@ -8,14 +8,15 @@
 #include <exception>
 #include <string>
 
+namespace Sy2CPP {
 
-class TypingError : public std::exception{
-    std::string msg;
+    class TypingError : public std::exception {
+        std::string msg;
 
-public:
-    explicit TypingError(std::string m): msg{std::move(m)}{}
+    public:
+        explicit TypingError(std::string m) : msg{std::move(m)} {}
 
-};
+    };
 
-
+}
 #endif //PHYSER_TYPING_ERROR_H
