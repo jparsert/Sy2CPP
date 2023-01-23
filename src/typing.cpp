@@ -27,10 +27,17 @@ namespace Sy2CPP {
         auto opt = table.resolve_symbol_descriptor(term.get_identifier());
         if (opt.has_value()) {
             return opt->get_symbol_sort();
-        } else {
-            throw TypingError("Could not infer type of identifier: " +
-                              to_string(term.get_identifier())); //TODO string of identifier
         }
+
+        // Constant
+        auto cnst = table.lookup_or_resolve_function(term.get_identifier(),{});
+        if (cnst.has_value()) {
+            return cnst->get_range_sort();
+        }
+
+        throw TypingError("Could not infer type of identifier: " +
+                        to_string(term.get_identifier())); //TODO string of identifier
+
     }
 
     std::any TypeInference::visitApplicationTerm(ApplicationTerm &application) {
@@ -106,7 +113,7 @@ namespace Sy2CPP {
         return std::any_cast<EitherSort>(term->accept(*this));
     }
 
-    EitherSort TypeInference::infer_and_check_type(symbol_table &table, Term *term) {
+    EitherSort TypeInference::infer_and_check_type(SymbolTable &table, Term *term) {
         TypeInference ti(table);
         return std::any_cast<EitherSort>(term->accept(ti));
     }

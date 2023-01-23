@@ -37,7 +37,7 @@ set(sources
         ${CMAKE_SOURCE_DIR}/general_utility.cpp
         ${CMAKE_SOURCE_DIR}/typing.cpp
         ${CMAKE_SOURCE_DIR}/exceptions.cpp
-        )
+        ${CMAKE_SOURCE_DIR}/symbol_table_ast_builder.cpp)
 
 set(headers
         ${CMAKE_SOURCE_DIR}/parsing/AstPrinter.h
@@ -47,7 +47,8 @@ set(headers
         ${CMAKE_SOURCE_DIR}/general_utility.h
         ${CMAKE_SOURCE_DIR}/typing.h
         ${CMAKE_SOURCE_DIR}/exceptions.h
-        )
+        ${CMAKE_SOURCE_DIR}/symbol_table_ast_builder.h
+        ${CMAKE_SOURCE_DIR}/Sy2CPP.h)
 
 
 # for the executable used for testing etc.

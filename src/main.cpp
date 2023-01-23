@@ -6,31 +6,33 @@
 #include "parsing/AstPrinter.h"
 #include "symbol_table.h"
 #include "exceptions.h"
+#include "symbol_table_ast_builder.h"
+#include "Sy2CPP.h"
+#include <filesystem>
 
 using namespace std;
-
 
 
 int main(int argc, const char* argv[])
 {
     //SyGuSv21Parser::ProblemContext* problem = get_parse_tree("./test/diff.sl");
-    std::string path = "./test/diff.sl";
-    ifstream stream;
-    stream.open(path);
-    if (!stream) {
-        throw Sy2CPP::IOException("File " + path + " could not be opened.");
-    }
-    antlr4::ANTLRInputStream input{stream};
-    SyGuSv21Lexer lexer{&input};
-    antlr4::CommonTokenStream tokens(&lexer);
-    SyGuSv21Parser parser{&tokens};
-    //std::shared_ptr<to_string_printer> printer = std::make_shared<to_string_printer>();
-    SyGuSv21Parser::ProblemContext* parse_tree = parser.problem();
 
-    auto [symbol_table, ast] = Sy2CPP::SymbolTableAstBuilder::build_symbol_table_and_ast(parse_tree);
-    Sy2CPP::AstToString printer;
-    std::string s = printer.get_string(*ast);
-    std::cout << s << std::endl;
+    std::string path = "../cleaned_sygus_benchmarks/LIA_INV/";
+    int i = 0;
+    for (const auto & entry : filesystem::directory_iterator(path)) {
+        if (! entry.path().string().ends_with(".sl")) {
+            continue;
+        }
+        std::cout << entry.path() << std::endl;
+        auto [symbol_table, ast] = Sy2CPP::get_symbol_table_and_ast_from_file(entry.path().string());
+        Sy2CPP::AstToString printer;
+        std::string s = printer.get_string(*ast);
+        std::cout << s << std::endl;
+        ++i;
+    }
+
+    std::cout << "Ran on " << i <<" files" << std::endl;
+
     //std::shared_ptr<sygus_smt_rep> rep = sygus_smt_rep_builder::build_sygus_smt_repr(problem);
     return 0;
 }

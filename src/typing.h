@@ -9,18 +9,18 @@
 #include "symbol_table.h"
 #include "resolvers.h"
 #include "exceptions.h"
-
+#include "symbol_table_ast_builder.h"
 
 namespace Sy2CPP {
 
     class TypeInference : public TermVisitor {
     private:
 
-        symbol_table &table;
+        SymbolTable &table;
 
     public:
 
-        explicit TypeInference(symbol_table &symbol_tab) : table{symbol_tab} {
+        explicit TypeInference(SymbolTable &symbol_tab) : table{symbol_tab} {
 
         }
 
@@ -56,7 +56,7 @@ namespace Sy2CPP {
 
         EitherSort get_sort(Term *term);
 
-        static EitherSort infer_and_check_type(symbol_table &table, Term *term);
+        static EitherSort infer_and_check_type(SymbolTable &table, Term *term);
 
     };
 
