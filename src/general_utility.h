@@ -40,4 +40,22 @@ bool all_elements_equal(std::vector<T> vec) {
                    });
 }
 
+
+
+// Hash function and constants taken from
+// https://stackoverflow.com/questions/20511347/a-good-hash-function-for-a-vector/72073933#72073933
+template<typename T>
+std::size_t hash_vector(const std::vector<T>& vec) {
+    std::size_t seed = vec.size();
+    for(const auto& el : vec) {
+        size_t x = std::hash<T>{}(el);
+        x = ((x >> 16) ^ x) * 0x45d9f3b;
+        x = ((x >> 16) ^ x) * 0x45d9f3b;
+        x = (x >> 16) ^ x;
+        seed ^= x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+    return seed;
+}
+
+
 #endif //PHYSER_GENERAL_UTILITY_H

@@ -13,12 +13,24 @@
 
 namespace Sy2CPP {
 
+
+    enum class FunctionKind {
+        THEORY,
+        SYNTH_FUN,
+        USER_DEFINED,
+        // Constructor, selector, uninterpreted, etc.
+    };
+
     class FunctionDescriptor {
 
     private:
         EitherIdentifier id;
         std::vector<EitherSort> argument_sorts;
         EitherSort range_sort;
+
+        FunctionKind function_kind;
+
+    private:
 
         bool chainable;
 
@@ -29,14 +41,16 @@ namespace Sy2CPP {
         FunctionDescriptor(EitherIdentifier iden,
                            const std::initializer_list<EitherSort> &args,
                            EitherSort &range,
+                           const FunctionKind& kind,
                            bool _chainable) : id{std::move(iden)}, argument_sorts{args}, range_sort{range},
-                                              chainable{_chainable} {}
+                                              function_kind{kind}, chainable{_chainable} {}
 
         FunctionDescriptor(EitherIdentifier iden,
                            const std::vector<EitherSort> &args,
                            EitherSort range,
+                           const FunctionKind& kind,
                            bool _chainable) : id{std::move(iden)}, argument_sorts{args}, range_sort{std::move(range)},
-                                              chainable{_chainable} {}
+                                              function_kind{kind}, chainable{_chainable} {}
 
         [[nodiscard]] EitherSort get_range_sort() const;
 
@@ -45,6 +59,39 @@ namespace Sy2CPP {
         [[nodiscard]] std::vector<EitherSort> get_argument_sorts() const;
 
         [[nodiscard]] bool is_chainable() const { return this->chainable; }
+
+        [[nodiscard]] FunctionKind get_function_kind() const;
+
+        void set_function_kind(FunctionKind functionKind);
+
+    };
+
+
+    enum class SortKind {
+        PRIMITIVE,
+        UNINTERPRETED,
+        USER_DEFINED    // Also known as Alias
+    };
+
+    class SortDescriptor {
+    private:
+
+        EitherSort sort;
+        SortKind sort_kind;
+
+    public:
+
+        SortDescriptor(EitherSort  srt,
+                       const SortKind& sortKind): sort{std::move(srt)}, sort_kind{sortKind}
+                       {}
+
+        [[nodiscard]] const EitherSort &get_sort() const;
+
+        void set_sort(const EitherSort &srt);
+
+        [[nodiscard]] SortKind get_sort_kind() const;
+
+        void set_sort_kind(SortKind sortKind);
 
     };
 
@@ -57,7 +104,8 @@ namespace Sy2CPP {
                 const EitherIdentifier &identifier,
                 const std::vector<EitherSort> &arg_sorts) const = 0;
 
-        [[nodiscard]] virtual std::optional<EitherSort> lookup_sort(const EitherSort &sort) const = 0;
+        [[nodiscard]] virtual std::optional<SortDescriptor>
+        lookup_or_resolve_sort(const EitherSort &sort) const = 0;
 
     };
 
@@ -81,7 +129,7 @@ namespace Sy2CPP {
         lookup_or_resolve_function(const EitherIdentifier &identifier,
                                    const std::vector<EitherSort> &arg_sorts) const override;
 
-        std::optional<EitherSort> lookup_sort(const EitherSort &sort) const override;
+        std::optional<SortDescriptor> lookup_or_resolve_sort(const EitherSort &sort) const override;
     };
 
 
@@ -105,7 +153,7 @@ namespace Sy2CPP {
         lookup_or_resolve_function(const EitherIdentifier &identifier,
                                    const std::vector<EitherSort> &arg_sorts) const override;
 
-        std::optional<EitherSort> lookup_sort(const EitherSort &sort) const override;
+        std::optional<SortDescriptor> lookup_or_resolve_sort(const EitherSort &sort) const override;
 
 
     };

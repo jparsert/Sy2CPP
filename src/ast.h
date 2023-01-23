@@ -17,7 +17,7 @@
 #include <any>
 #include <memory>
 #include "exceptions.h"
-
+#include "general_utility.h"
 namespace Sy2CPP {
 
     class AstVisitor;
@@ -210,107 +210,107 @@ namespace Sy2CPP {
 
 
         std::any visitProblem(Problem &problem) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitSimpleIdentifier(SimpleIdentifier &identifier) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitIndexedIdentifier(IndexedIdentifier &indexedIdentifier) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitSimpleSort(SimpleSort &sort) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitParametricSort(ParametricSort &sort) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitAssumeCmd(AssumeCmd &assumeCmd) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitCheckSynthCmd(CheckSynthCmd &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitConstraintCmd(ConstraintCmd &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitDeclareVarCmd(DeclareVarCmd &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitSetFeatureCmd(SetFeatureCmd &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitSynthFunCmd(SynthFunCmd &synthFun) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitDeclareDatatype(DeclareDatatype &declDT) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitDeclareDatatypes(DeclareDatatypes &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitDeclareSort(DeclareSort &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitDefineFun(DefineFunCmd &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitDefineSort(DefineSort &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitSetInfo(SetInfo &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitSetLogic(SetLogic &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitSetOption(SetOption &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitSortDecl(SortDecl &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitDtDecl(DtDecl &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitDtConsDecl(DtConsDecl &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitGrammarDef(GrammarDef &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitGroupedRuleList(GroupedRuleList &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitConstantGTerm(ConstantGTerm &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
         std::any visitVariableGTerm(VariableGTerm &context) override {
-            throw not_implemented("Wrong AstNode in Term visitor");
+            throw NotImplemented("Wrong AstNode in Term visitor");
         }
     };
 
@@ -342,127 +342,6 @@ namespace Sy2CPP {
     using LiteralPtr = std::shared_ptr<Literal>;
 
 
-    // Identifier
-    class Identifier : public AstNode {
-    public:
-        [[nodiscard]] virtual std::size_t get_hash() const = 0;
-    };
-
-    class SimpleIdentifier : public Identifier {
-        std::string symbol;
-    public:
-
-        explicit SimpleIdentifier(std::string symb) : symbol{std::move(symb)} {}
-
-        std::any accept(AstVisitor &visitor) override {
-            return visitor.visitSimpleIdentifier(*this);
-        }
-
-        [[nodiscard]] std::string get_symbol() const {
-            return this->symbol;
-        }
-
-        bool operator==(const SimpleIdentifier &other) const {
-            return this->symbol == other.get_symbol();
-        }
-
-        bool operator!=(const SimpleIdentifier &other) const {
-            return !(this->symbol == other.get_symbol());
-        }
-
-        [[nodiscard]] std::size_t get_hash() const override {
-            return std::hash<std::string>()(this->symbol);
-        }
-
-        explicit operator std::string() const {
-            return symbol;
-        }
-    };
-
-    class IndexedIdentifier : public Identifier {
-    public:
-
-        explicit IndexedIdentifier() {
-            throw not_implemented("Indexed identifiers are not supported yet.");
-        }
-
-        explicit IndexedIdentifier(const std::string &symbol) {
-            throw not_implemented("Indexed identifiers are not supported yet.");
-        }
-
-        std::any accept(AstVisitor &visitor) override {
-            return visitor.visitIndexedIdentifier(*this);
-        }
-
-        bool operator==(const IndexedIdentifier &other) const {
-            throw unsupported_feature("We do not support indexed identifiers yet.");
-        }
-
-        bool operator!=(const IndexedIdentifier &other) const {
-            throw unsupported_feature("We do not support indexed identifiers yet.");
-        }
-
-        [[nodiscard]] std::size_t get_hash() const override {
-            throw unsupported_feature("We do not support indexed identifiers yet.");
-        }
-
-        explicit operator std::string() const {
-            throw unsupported_feature("We do not support indexed identifiers yet.");
-        }
-    };
-
-    using EitherIdentifier = std::variant<SimpleIdentifier, IndexedIdentifier>;
-
-    std::string to_string(const EitherIdentifier &ident);
-
-    inline EitherIdentifier get_simple_id_from_str(std::string &s) {
-        return EitherIdentifier{SimpleIdentifier{s}};
-    }
-
-    inline EitherIdentifier get_simple_id_from_str(std::string &&s) {
-        return EitherIdentifier{SimpleIdentifier{s}};
-    }
-
-    class IdentifierTerm : public Term {
-
-        EitherIdentifier identifier;
-
-    public:
-
-        explicit IdentifierTerm(EitherIdentifier &id) : identifier{id} {
-
-        }
-
-        EitherIdentifier get_identifier() {
-            return identifier;
-        }
-
-        std::any accept(AstVisitor &visitor) override {
-            return visitor.visitIdentifierTerm(*this);
-        }
-
-    };
-
-    class Problem : public AstNode {
-    private:
-        std::vector<ComandPtr> commands;
-
-    public:
-
-        void add_command(ComandPtr &cmd) {
-            this->commands.push_back(cmd);
-        }
-
-        std::any accept(AstVisitor &visitor) override {
-            return visitor.visitProblem(*this);
-        }
-
-        std::vector<ComandPtr> &get_commands() {
-            return this->commands;
-        }
-
-    };
-
     class Numeral : public Literal {
 
     private:
@@ -475,10 +354,24 @@ namespace Sy2CPP {
             return this->val;
         }
 
+        bool operator==(const Numeral &num) const {
+            return val == num.get_value();
+        }
+
+        explicit operator std::string() const {
+            return std::to_string(val);
+        }
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitNumeral(*this);
         }
     };
+
+}
+
+
+
+namespace Sy2CPP {
 
     class Decimal : public Literal {
     public:
@@ -534,10 +427,194 @@ namespace Sy2CPP {
         }
     };
 
+
+    // Identifier
+    class Identifier : public AstNode {
+    public:
+        [[nodiscard]] virtual std::size_t get_hash() const = 0;
+    };
+
+    class SimpleIdentifier : public Identifier {
+        std::string symbol;
+    public:
+
+        explicit SimpleIdentifier(std::string symb) : symbol{std::move(symb)} {}
+
+
+        std::any accept(AstVisitor &visitor) override {
+            return visitor.visitSimpleIdentifier(*this);
+        }
+
+        [[nodiscard]] std::string get_symbol() const {
+            return this->symbol;
+        }
+
+        bool operator==(const SimpleIdentifier &other) const {
+            return this->symbol == other.get_symbol();
+        }
+
+        bool operator!=(const SimpleIdentifier &other) const {
+            return !(this->symbol == other.get_symbol());
+        }
+
+        [[nodiscard]] std::size_t get_hash() const override {
+            return std::hash<std::string>()(this->symbol);
+        }
+
+        explicit operator std::string() const {
+            return symbol;
+        }
+    };
+
+    template<class... Ts>
+    struct overload : Ts ... {
+        using Ts::operator()...;
+    };
+
+}
+
+namespace std {
+
+
+    template<>
+    struct hash<Sy2CPP::Numeral> {
+        std::size_t operator()(const Sy2CPP::Numeral& num) {
+            return num.get_value();
+        }
+    };
+
+    template<>
+    struct hash<Sy2CPP::SimpleIdentifier> {
+        std::size_t operator()(const Sy2CPP::SimpleIdentifier &id) {
+            return id.get_hash();
+        }
+    };
+
+}
+
+
+namespace Sy2CPP {
+
+    using Index = std::variant<Numeral, SimpleIdentifier>;
+
+    class IndexedIdentifier : public Identifier {
+        SimpleIdentifier symbol;
+        std::vector<Index> indices;
+
+    public:
+
+        explicit IndexedIdentifier(SimpleIdentifier &symb, const std::vector<Index> &index_)
+                : symbol(symb), indices(index_) {
+            if (indices.empty()) {
+                throw WrongArguments("Indexed Identifier requires 1 or more arguments.");
+            }
+        }
+
+        bool operator==(const IndexedIdentifier &other) const {
+            return symbol == other.symbol and (indices == other.indices);
+        }
+
+        bool operator!=(const IndexedIdentifier &other) const {
+            return not(*this == other);
+        }
+
+        [[nodiscard]] std::size_t get_hash() const override {
+            size_t res_hash = symbol.get_hash();
+            size_t lst_hash = hash_vector<Index>(indices);
+            return res_hash^lst_hash; // TODO use a better (non-commutative) combine hash function
+        }
+
+        explicit operator std::string() const {
+            std::string res = "(_ " +  (std::string)symbol + " ";
+            for (const auto& e : indices) {
+                res += std::visit([&](const auto& index) mutable { return (std::string) index ; }, e);
+            }
+            res += ")";
+            return res;
+
+        }
+
+        std::any accept(AstVisitor &visitor) override {
+            return visitor.visitIndexedIdentifier(*this);
+        }
+
+    };
+
+}
+
+
+// We create hashing functions in the std namespace so that containers like unordered set
+namespace  std {
+
+    template<>
+    struct hash<Sy2CPP::IndexedIdentifier> {
+        std::size_t operator()(const Sy2CPP::IndexedIdentifier &id) {
+            return id.get_hash();
+        }
+    };
+}
+
+
+namespace Sy2CPP {
+
+    using EitherIdentifier = std::variant<SimpleIdentifier, IndexedIdentifier>;
+
+    std::string to_string(const EitherIdentifier &ident);
+
+    inline EitherIdentifier get_simple_id_from_str(std::string &s) {
+        return EitherIdentifier{SimpleIdentifier{s}};
+    }
+
+    inline EitherIdentifier get_simple_id_from_str(std::string &&s) {
+        return EitherIdentifier{SimpleIdentifier{s}};
+    }
+
+    class IdentifierTerm : public Term {
+
+        EitherIdentifier identifier;
+
+    public:
+
+        explicit IdentifierTerm(EitherIdentifier &id) : identifier{id} {
+
+        }
+
+        EitherIdentifier get_identifier() {
+            return identifier;
+        }
+
+        std::any accept(AstVisitor &visitor) override {
+            return visitor.visitIdentifierTerm(*this);
+        }
+
+    };
+
+    class Problem : public AstNode {
+    private:
+        std::vector<ComandPtr> commands;
+
+    public:
+
+        void add_command(ComandPtr &cmd) {
+            this->commands.push_back(cmd);
+        }
+
+        std::any accept(AstVisitor &visitor) override {
+            return visitor.visitProblem(*this);
+        }
+
+        std::vector<ComandPtr> &get_commands() {
+            return this->commands;
+        }
+
+    };
+
+
     class Sort : public AstNode {
 
     public:
         [[nodiscard]] virtual std::size_t get_hash() const = 0;
+
     };
 
     class SimpleSort : public Sort {
@@ -565,6 +642,10 @@ namespace Sy2CPP {
             return identifier;
         }
 
+        explicit operator std::string() const {
+            return to_string(identifier);
+        }
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitSimpleSort(*this);
         }
@@ -585,7 +666,7 @@ namespace Sy2CPP {
                 identifier{id}, parameters{params} {}
 
         [[nodiscard]] std::size_t get_hash() const override {
-            throw not_implemented("Parametic Sorts hash is not implemented");
+            throw NotImplemented("Parametic Sorts hash is not implemented");
 
         }
 
@@ -597,11 +678,36 @@ namespace Sy2CPP {
             return !(identifier == other.identifier and parameters == other.parameters);
         }
 
+        explicit operator std::string() const {
+            throw NotImplemented("Parametric sort string operator has not been implemented.");
+        }
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitParametricSort(*this);
         }
     };
 
+}
+
+namespace std {
+    template<>
+    struct hash<Sy2CPP::SimpleSort> {
+        std::size_t operator()(const Sy2CPP::SimpleSort &sort) {
+            return sort.get_hash();
+        }
+    };
+
+    template<>
+    struct hash<Sy2CPP::ParametricSort> {
+        std::size_t operator()(const Sy2CPP::ParametricSort &sort) {
+            return sort.get_hash();
+        }
+    };
+}
+
+namespace Sy2CPP{
+
+    std::string to_string(const EitherSort &ident);
 
     inline EitherSort get_simple_sort_from_str(std::string &s) {
         return {SimpleSort(get_simple_id_from_str(s))};
@@ -1129,39 +1235,6 @@ namespace Sy2CPP {
 
 }
 
-using namespace Sy2CPP;
-
-// We create hashing functions in the std namespace so that containers like unordered set
-namespace  std {
-
-    template<>
-    struct hash<SimpleIdentifier> {
-        std::size_t operator()(const SimpleIdentifier &id) {
-            return id.get_hash();
-        }
-    };
-
-    template<>
-    struct hash<IndexedIdentifier> {
-        std::size_t operator()(const IndexedIdentifier &id) {
-            return id.get_hash();
-        }
-    };
-
-    template<>
-    struct hash<SimpleSort> {
-        std::size_t operator()(const SimpleSort &sort) {
-            return sort.get_hash();
-        }
-    };
-
-    template<>
-    struct hash<ParametricSort> {
-        std::size_t operator()(const ParametricSort &sort) {
-            return sort.get_hash();
-        }
-    };
-}
 
 
 #endif //PHYSER_AST_H

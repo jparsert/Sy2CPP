@@ -16,7 +16,7 @@ namespace Sy2CPP {
     }
 
     std::any TypeInference::visitDecimal(Decimal &decimal) {
-        throw not_implemented("Typing for decimals is not implemented.");
+        throw NotImplemented("Typing for decimals is not implemented.");
     }
 
     std::any TypeInference::visitBoolConst(BoolConst &boolConst) {

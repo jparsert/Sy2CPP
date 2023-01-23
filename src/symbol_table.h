@@ -40,8 +40,8 @@ namespace Sy2CPP {
         // A set containing all present sorts
         std::vector<SymbolDescriptor> symbol_stack;
 
-        //set of all sorts
-        std::unordered_set<EitherSort> sorts;
+        //map for defined sorts (note that declared sorts are not here)
+        std::unordered_map<EitherSort, SortDescriptor> sorts;
 
     public:
 
@@ -61,7 +61,7 @@ namespace Sy2CPP {
         std::optional<FunctionDescriptor> lookup_or_resolve_function(const EitherIdentifier &identifier,
                                                                      const std::vector<EitherSort> &arg_sorts) const;
 
-        std::optional<EitherSort> lookup_sort(const EitherSort &sort) const;
+        std::optional<SortDescriptor> lookup_sort(const EitherSort &sort) const;
 
         void push_symbol_stack(const SymbolDescriptor &descr);
 
@@ -104,18 +104,18 @@ namespace Sy2CPP {
         std::any visitBoolConstFalse(SyGuSv21Parser::BoolConstFalseContext *ctx) override;
 
         std::any visitHexConst(SyGuSv21Parser::HexConstContext *ctx) override {
-            throw not_implemented("Decimal constants are not supported yet.");
+            throw NotImplemented("Decimal constants are not supported yet.");
         }
 
         std::any visitBinConst(SyGuSv21Parser::BinConstContext *ctx) override {
-            throw not_implemented("Decimal constants are not supported yet.");
+            throw NotImplemented("Decimal constants are not supported yet.");
         }
 
         std::any visitStringConst(SyGuSv21Parser::StringConstContext *ctx) override;
 
-        std::any visitIndex(SyGuSv21Parser::IndexContext *ctx) override {
-            throw not_implemented("Indexes are not supported yet.");
-        }
+        std::any visitNumeralIndex(SyGuSv21Parser::NumeralIndexContext *ctx) override;
+
+        std::any visitSymbolIndex(SyGuSv21Parser::SymbolIndexContext *ctx) override;
 
         std::any visitSimpleSort(SyGuSv21Parser::SimpleSortContext *ctx) override;
 
@@ -158,11 +158,11 @@ namespace Sy2CPP {
         std::any visitDefineFun(SyGuSv21Parser::DefineFunContext *ctx) override;
 
         std::any visitDeclareDatatype(SyGuSv21Parser::DeclareDatatypeContext *ctx) override {
-            throw not_implemented("DeclareDatatypes are not implemented yet.");
+            throw NotImplemented("DeclareDatatypes are not implemented yet.");
         }
 
         std::any visitDeclareDatatypes(SyGuSv21Parser::DeclareDatatypesContext *ctx) override {
-            throw not_implemented("DeclareDatatypes are not implemented yet.");
+            throw NotImplemented("DeclareDatatypes are not implemented yet.");
         }
 
         // TODO add to symbol Table
@@ -178,15 +178,15 @@ namespace Sy2CPP {
         std::any visitSetOption(SyGuSv21Parser::SetOptionContext *ctx) override;
 
         std::any visitSortDecl(SyGuSv21Parser::SortDeclContext *ctx) override {
-            throw not_implemented("DeclareDatatypes are not implemented yet.");
+            throw NotImplemented("DeclareDatatypes are not implemented yet.");
         }
 
         std::any visitDtDecl(SyGuSv21Parser::DtDeclContext *ctx) override {
-            throw not_implemented("DeclareDatatypes are not implemented yet.");
+            throw NotImplemented("DeclareDatatypes are not implemented yet.");
         }
 
         std::any visitDtConsDecl(SyGuSv21Parser::DtConsDeclContext *ctx) override {
-            throw not_implemented("DeclareDatatypes are not implemented yet.");
+            throw NotImplemented("DeclareDatatypes are not implemented yet.");
         }
 
         std::any visitGrammarDef(SyGuSv21Parser::GrammarDefContext *ctx) override;

@@ -16,7 +16,9 @@ namespace Sy2CPP {
                        [](SortedVar &x) { return x.second; });
         EitherSort range_sort = cmd.get_sort();
 
-        auto [_, val] = this->user_defined_funs.emplace(id, FunctionDescriptor(id, arg_sorts, range_sort, false));
+        auto [_, val] = this->user_defined_funs
+                .emplace(id, FunctionDescriptor(id, arg_sorts, range_sort,
+                                                FunctionKind::USER_DEFINED, false));
         return val;
     }
 
@@ -26,7 +28,9 @@ namespace Sy2CPP {
         std::transform(arguments.begin(), arguments.end(), std::back_inserter(arg_sorts),
                        [](const SortedVar &x) { return x.second; });
 
-        auto [_, val] = this->synth_fun_funs.emplace(id, FunctionDescriptor(id, arg_sorts, range_sort, false));
+        auto [_, val] = this->synth_fun_funs
+                .emplace(id, FunctionDescriptor(id, arg_sorts, range_sort,
+                                                FunctionKind::SYNTH_FUN, false));
         return val;
     }
 
@@ -54,17 +58,19 @@ namespace Sy2CPP {
         return std::nullopt;
     }
 
-    std::optional<EitherSort> symbol_table::lookup_sort(const EitherSort &sort) const {
+    std::optional<SortDescriptor> symbol_table::lookup_sort(const EitherSort &sort) const {
         for (auto &res: this->resolvers) {
-            std::optional<EitherSort> descr = res->lookup_sort(sort);
+            std::optional<SortDescriptor> descr = res->lookup_or_resolve_sort(sort);
             if (descr) {
                 return descr;
             }
         }
 
-        if (this->sorts.contains(sort)) {
-            return std::make_optional<EitherSort>(sort);
+        auto el = this->sorts.find(sort);
+        if (el != this->sorts.end()) {
+            return std::make_optional<SortDescriptor>(el->second);
         }
+
         return std::nullopt;
     }
 
@@ -116,7 +122,7 @@ namespace Sy2CPP {
         } else if (ctx->STRINGCONST() != nullptr) {
             return std::static_pointer_cast<Literal>(std::make_shared<StringConst>(ctx->STRINGCONST()->getText()));
         } else {
-            throw unsupported_feature("Strong Const is neither constant nor empty.");
+            throw UnsupportedFeature("Strong Const is neither constant nor empty.");
         }
     }
 
@@ -175,7 +181,8 @@ namespace Sy2CPP {
 
         auto subterm = std::any_cast<TermPtr>(ctx->term()->accept(this));
 
-        if (TypeInference::infer_and_check_type(*this->table, subterm.get()) != CoreResolver::get_bool_sort()) {
+        if (TypeInference::infer_and_check_type(*this->table,
+                                                subterm.get()) != CoreResolver::get_bool_sort()) {
             throw TypingError("Subterm of quantifier does not match Bool sort.");
         }
 
@@ -210,7 +217,8 @@ namespace Sy2CPP {
             auto res = std::any_cast<VarBinding>(x->accept(this));
             bindings.push_back(res);
             EitherSort var_type = TypeInference::infer_and_check_type(*this->table, res.second.get());
-            this->table->push_symbol_stack(SymbolDescriptor(res.first, var_type, BinderKind::LET));
+            this->table->push_symbol_stack(SymbolDescriptor(res.first, var_type,
+                                                            BinderKind::LET));
         }
 
         auto subterm = std::any_cast<TermPtr>(ctx->term()->accept(this));
@@ -239,7 +247,6 @@ namespace Sy2CPP {
 
         std::vector<TermPtr> args{};
         for (auto x: ctx->term()) {
-            auto res = x->accept(this);
             auto term = std::any_cast<TermPtr>(x->accept(this));
             args.emplace_back(term);
         }
@@ -257,7 +264,8 @@ namespace Sy2CPP {
             std::any res = s_var->accept(this);
             auto ptr = std::any_cast<SortedVar>(res);
             arguments.push_back(ptr);
-            this->table->push_symbol_stack(SymbolDescriptor(ptr.first, ptr.second, BinderKind::SYNTH_FUN_ARGUMENT));
+            this->table->push_symbol_stack(SymbolDescriptor(ptr.first, ptr.second,
+                                                            BinderKind::SYNTH_FUN_ARGUMENT));
         }
 
         //adding new function to symbol table
@@ -267,13 +275,16 @@ namespace Sy2CPP {
 
         this->table->pop_symbol_stack(arguments.size());
 
-        return std::static_pointer_cast<Command>(std::make_shared<SynthFunCmd>(id, arguments, sort, grammar));
+        return std::static_pointer_cast<Command>(std::make_shared<SynthFunCmd>(id, arguments, sort,
+                                                                               grammar));
     }
 
     std::any SymbolTableAstBuilder::visitGrammarDef(SyGuSv21Parser::GrammarDefContext *ctx) {
         std::vector<SortedVar> non_terminals;
         for (auto x: ctx->sortedVar()) {
             auto s_var = std::any_cast<SortedVar>(x->accept(this));
+
+
             non_terminals.push_back(s_var);
             this->table->push_symbol_stack(
                     SymbolDescriptor(s_var.first, s_var.second, BinderKind::GRAMMAR_NON_TERMINAL));
@@ -319,7 +330,7 @@ namespace Sy2CPP {
         } else if (ctx->WEIGHTS_FEATURE() != nullptr) {
             return Feature::WEIGHTS;
         } else {
-            throw unsupported_feature("Feature string not in supported features.");
+            throw UnsupportedFeature("Feature string not in supported features.");
         }
     }
 
@@ -333,10 +344,11 @@ namespace Sy2CPP {
     }
 
     std::any SymbolTableAstBuilder::visitDeclareSort(SyGuSv21Parser::DeclareSortContext *ctx) {
-        EitherIdentifier id(SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
-        auto num = std::any_cast<LiteralPtr>(ctx->numeral()->accept(this));
-        std::shared_ptr<Numeral> numeral = std::static_pointer_cast<Numeral>(num);
-        return std::static_pointer_cast<Command>(std::make_shared<DeclareSort>(id, *numeral));
+        throw UnsupportedFeature("Uninterpreted sorts are not supported yet.");
+        //EitherIdentifier id(SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
+        //auto num = std::any_cast<LiteralPtr>(ctx->numeral()->accept(this));
+        //std::shared_ptr<Numeral> numeral = std::static_pointer_cast<Numeral>(num);
+        //return std::static_pointer_cast<Command>(std::make_shared<DeclareSort>(id, *numeral));
     }
 
     std::any SymbolTableAstBuilder::visitDeclareVarCmd(SyGuSv21Parser::DeclareVarCmdContext *ctx) {
@@ -351,7 +363,8 @@ namespace Sy2CPP {
 
     std::any SymbolTableAstBuilder::visitSetFeatureCmd(SyGuSv21Parser::SetFeatureCmdContext *ctx) {
         auto ft = std::any_cast<Feature>(ctx->feature()->accept(this));
-        auto val = std::any_cast<std::shared_ptr<BoolConst>>(ctx->boolConst()->accept(this));
+        auto val = std::any_cast<std::shared_ptr<BoolConst>>(
+                ctx->boolConst()->accept(this));
         return std::static_pointer_cast<Command>(std::make_shared<SetFeatureCmd>(ft, val->get_value()));
     }
 
@@ -363,19 +376,29 @@ namespace Sy2CPP {
 
     std::any SymbolTableAstBuilder::visitSimpleSort(SyGuSv21Parser::SimpleSortContext *ctx) {
         auto id = std::any_cast<EitherIdentifier>(ctx->identifier()->accept(this));
-        return EitherSort(SimpleSort(id));
+        EitherSort sort{SimpleSort(id)};
+        auto sort_opt = table->lookup_sort(sort);
+        if(!sort_opt) {
+            throw UnknownSymbol("Symbol " + to_string(id) + " unknown.");
+        }
+        return sort;
     }
 
     std::any SymbolTableAstBuilder::visitParametricSort(SyGuSv21Parser::ParametricSortContext *ctx) {
-        throw not_implemented("Parametric Sorts are not supported yet.");
+        throw NotImplemented("Parametric Sorts are not supported yet.");
     }
 
     std::any SymbolTableAstBuilder::visitIndexedIdentifier(SyGuSv21Parser::IndexedIdentifierContext *ctx) {
-        throw not_implemented("IndexedIdentifiers are not supported yet.");
+        SimpleIdentifier id(ctx->symbol()->SYMBOL()->getText());
+        std::vector<Index> indices;
+        for(auto index: ctx->index()){
+            indices.push_back(std::any_cast<Index>(index->accept(this)));
+        }
+        return EitherIdentifier(IndexedIdentifier(id, indices));
     }
 
     std::any SymbolTableAstBuilder::visitDecimal(SyGuSv21Parser::DecimalContext *ctx) {
-        throw not_implemented("Decimal constants are not supported yet.");
+        throw NotImplemented("Decimal constants are not supported yet.");
     }
 
     std::any SymbolTableAstBuilder::visitBoolConstTrue(SyGuSv21Parser::BoolConstTrueContext *ctx) {
@@ -460,7 +483,18 @@ namespace Sy2CPP {
 
     std::any SymbolTableAstBuilder::visitAssumeCmd(SyGuSv21Parser::AssumeCmdContext *ctx) {
         return std::static_pointer_cast<Command>(
-                std::make_shared<AssumeCmd>(std::any_cast<std::shared_ptr<Term>>(ctx->term()->accept(this))));
+                std::make_shared<AssumeCmd>(std::any_cast<std::shared_ptr<Term>>(
+                        ctx->term()->accept(this))));
+    }
+
+    std::any SymbolTableAstBuilder::visitNumeralIndex(SyGuSv21Parser::NumeralIndexContext *ctx)  {
+        auto lit = std::any_cast<std::shared_ptr<Literal>>(ctx->numeral()->accept(this));
+        auto num_ptr = std::static_pointer_cast<Numeral>(lit);
+        return Index(*num_ptr);
+    }
+
+    std::any SymbolTableAstBuilder::visitSymbolIndex(SyGuSv21Parser::SymbolIndexContext *ctx) {
+        return Index(SimpleIdentifier(ctx->getText()));
     }
 
 }

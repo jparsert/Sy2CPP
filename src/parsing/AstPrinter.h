@@ -50,17 +50,17 @@ namespace Sy2CPP {
         }
 
         std::any visitDecimal(Decimal &decimal) override {
-            throw not_implemented("Decimals are not implemented yet.");
+            throw NotImplemented("Decimals are not implemented yet.");
         }
 
         std::any visitBoolConst(BoolConst &boolConst) override;
 
         std::any visitHexConst(HexConst &hex) override {
-            throw not_implemented("Hex consts are not implemented yet.");
+            throw NotImplemented("Hex consts are not implemented yet.");
         }
 
         std::any visitBinConst(BinConst &bin) override {
-            throw not_implemented("Bin consts are not implemented yet.");
+            throw NotImplemented("Bin consts are not implemented yet.");
         }
 
         std::any visitStringConst(StringConst &s) override {
@@ -68,19 +68,14 @@ namespace Sy2CPP {
             return {};
         }
 
-        std::any visitSimpleIdentifier(SimpleIdentifier &identifier) override {
-            this->result_stream << identifier.get_symbol();
-            return {};
-        }
+        std::any visitSimpleIdentifier(SimpleIdentifier &identifier) override;
 
-        std::any visitIndexedIdentifier(IndexedIdentifier &context) override {
-            throw not_implemented("Indexed identifiers are not implemented yet.");
-        }
+        std::any visitIndexedIdentifier(IndexedIdentifier &context) override;
 
         std::any visitSimpleSort(SimpleSort &sort) override;
 
         std::any visitParametricSort(ParametricSort &sort) override {
-            throw not_implemented("Parametric sorts are not implemented yet.");
+            throw NotImplemented("Parametric sorts are not implemented yet.");
         }
 
         std::any visitApplicationTerm(ApplicationTerm &application) override;
@@ -104,11 +99,11 @@ namespace Sy2CPP {
         std::any visitSetFeatureCmd(SetFeatureCmd &cmd) override;
 
         std::any visitDeclareDatatype(DeclareDatatype &declDT) override {
-            throw not_implemented("DeclareDatatype has not been implemented yet.");
+            throw NotImplemented("DeclareDatatype has not been implemented yet.");
         }
 
         std::any visitDeclareDatatypes(DeclareDatatypes &context) override {
-            throw not_implemented("DeclareDatatypes has not been implemented yet.");
+            throw NotImplemented("DeclareDatatypes has not been implemented yet.");
         }
 
         std::any visitDeclareSort(DeclareSort &cmd) override;
@@ -124,15 +119,15 @@ namespace Sy2CPP {
         std::any visitSetOption(SetOption &cmd) override;
 
         std::any visitSortDecl(SortDecl &decl) override {
-            throw not_implemented("SortDecl has not been implemented yet.");
+            throw NotImplemented("SortDecl has not been implemented yet.");
         }
 
         std::any visitDtDecl(DtDecl &decl) override {
-            throw not_implemented("DtDecl has not been implemented yet.");
+            throw NotImplemented("DtDecl has not been implemented yet.");
         }
 
         std::any visitDtConsDecl(DtConsDecl &dtconsdecl) override {
-            throw not_implemented("DtConsDecl has not been implemented yet.");
+            throw NotImplemented("DtConsDecl has not been implemented yet.");
         }
 
         std::any visitGrammarDef(GrammarDef &gdef) override;

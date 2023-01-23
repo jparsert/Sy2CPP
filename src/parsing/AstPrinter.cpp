@@ -396,4 +396,14 @@ namespace Sy2CPP {
         std::visit([&](auto id) mutable { id.accept(*this); }, sort.get_identifier());
         return {};
     }
+
+    std::any AstToString::visitIndexedIdentifier(IndexedIdentifier &idx_id) {
+        this->result_stream << (std::string) idx_id;
+        return {};
+    }
+
+    std::any AstToString::visitSimpleIdentifier(SimpleIdentifier &identifier) {
+        this->result_stream << (std::string) identifier;
+        return {};
+    }
 }

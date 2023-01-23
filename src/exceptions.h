@@ -21,13 +21,13 @@ namespace Sy2CPP {
     };
 
 
-    class not_implemented : std::exception {
+    class NotImplemented : std::exception {
 
         std::string msg;
 
     public:
 
-        explicit not_implemented(std::string m) : msg{std::move(m)} {}
+        explicit NotImplemented(std::string m) : msg{std::move(m)} {}
 
     };
 
@@ -49,12 +49,12 @@ namespace Sy2CPP {
 
     };
 
-    class unsupported_feature : std::exception {
+    class UnsupportedFeature : std::exception {
 
         std::string msg;
     public:
 
-        explicit unsupported_feature(std::string m) : msg{std::move(m)} {}
+        explicit UnsupportedFeature(std::string m) : msg{std::move(m)} {}
 
     };
 

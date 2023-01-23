@@ -31,16 +31,16 @@ namespace Sy2CPP {
         std::any visitBoolConst(BoolConst &boolConst) override;
 
         std::any visitHexConst(HexConst &hex) override {
-            throw not_implemented("Typing for hex consts is not implemented.");
+            throw NotImplemented("Typing for hex consts is not implemented.");
         }
 
         std::any visitBinConst(BinConst &bin) override {
-            throw not_implemented("Typing for bin consts is not implemented.");
+            throw NotImplemented("Typing for bin consts is not implemented.");
 
         }
 
         std::any visitStringConst(StringConst &s) override {
-            throw not_implemented("Typing for string consts is not implemented.");
+            throw NotImplemented("Typing for string consts is not implemented.");
 
         }
 
