@@ -2,13 +2,13 @@
 // Created by julian on 15.12.22.
 //
 #include <ranges>
-#include "SymbolTable.h"
-#include "exceptions/UnknownSymbol.h"
+#include "symbol_table.h"
+#include "exceptions.h"
 #include "typing.h"
 
 namespace Sy2CPP {
 
-    bool SymbolTable::add_user_defined_fun(DefineFunCmd &cmd) {
+    bool symbol_table::add_user_defined_fun(DefineFunCmd &cmd) {
         EitherIdentifier id(cmd.get_identifier());
         std::vector<SortedVar> &rg = cmd.get_arguments();
         std::vector<EitherSort> arg_sorts;
@@ -20,8 +20,8 @@ namespace Sy2CPP {
         return val;
     }
 
-    bool SymbolTable::add_synth_fun(const EitherIdentifier &id, const std::vector<SortedVar> &arguments,
-                                    const EitherSort &range_sort) {
+    bool symbol_table::add_synth_fun(const EitherIdentifier &id, const std::vector<SortedVar> &arguments,
+                                     const EitherSort &range_sort) {
         std::vector<EitherSort> arg_sorts;
         std::transform(arguments.begin(), arguments.end(), std::back_inserter(arg_sorts),
                        [](const SortedVar &x) { return x.second; });
@@ -31,8 +31,8 @@ namespace Sy2CPP {
     }
 
     std::optional<FunctionDescriptor>
-    SymbolTable::lookup_or_resolve_function(const EitherIdentifier &identifier,
-                                            const std::vector<EitherSort> &arg_sorts) const {
+    symbol_table::lookup_or_resolve_function(const EitherIdentifier &identifier,
+                                             const std::vector<EitherSort> &arg_sorts) const {
         for (auto &res: this->resolvers) {
             std::optional<FunctionDescriptor> descr = res->lookup_or_resolve_function(identifier, arg_sorts);
             if (descr) {
@@ -54,7 +54,7 @@ namespace Sy2CPP {
         return std::nullopt;
     }
 
-    std::optional<EitherSort> SymbolTable::lookup_sort(const EitherSort &sort) const {
+    std::optional<EitherSort> symbol_table::lookup_sort(const EitherSort &sort) const {
         for (auto &res: this->resolvers) {
             std::optional<EitherSort> descr = res->lookup_sort(sort);
             if (descr) {
@@ -68,11 +68,11 @@ namespace Sy2CPP {
         return std::nullopt;
     }
 
-    void SymbolTable::add_resolver(const std::shared_ptr<AbstractResolver> &ptr) {
+    void symbol_table::add_resolver(const std::shared_ptr<AbstractResolver> &ptr) {
         resolvers.push_back(ptr);
     }
 
-    std::optional<SymbolDescriptor> SymbolTable::resolve_symbol_descriptor(const EitherIdentifier &identifier) const {
+    std::optional<SymbolDescriptor> symbol_table::resolve_symbol_descriptor(const EitherIdentifier &identifier) const {
         for (auto &i: std::views::reverse(this->symbol_stack)) {
             if (i.get_identifier() == identifier) {
                 return std::make_optional<SymbolDescriptor>(i);
@@ -81,17 +81,17 @@ namespace Sy2CPP {
         return std::nullopt;
     }
 
-    SymbolDescriptor SymbolTable::pop_symbol_stack() {
+    SymbolDescriptor symbol_table::pop_symbol_stack() {
         SymbolDescriptor res(this->symbol_stack.back());
         this->symbol_stack.pop_back();
         return res;
     }
 
-    void SymbolTable::push_symbol_stack(const SymbolDescriptor &descr) {
+    void symbol_table::push_symbol_stack(const SymbolDescriptor &descr) {
         this->symbol_stack.push_back(descr);
     }
 
-    std::vector<SymbolDescriptor> SymbolTable::pop_symbol_stack(std::size_t n) {
+    std::vector<SymbolDescriptor> symbol_table::pop_symbol_stack(std::size_t n) {
         std::vector<SymbolDescriptor> res;
         for (int i = 0; i < n; ++i) {
             res.push_back(this->pop_symbol_stack());
@@ -99,18 +99,18 @@ namespace Sy2CPP {
         return res;
     }
 
-    std::any symbol_table_ast_builder::visitSimpleIdentifier(SyGuSv21Parser::SimpleIdentifierContext *ctx) {
+    std::any SymbolTableAstBuilder::visitSimpleIdentifier(SyGuSv21Parser::SimpleIdentifierContext *ctx) {
         SimpleIdentifier id(ctx->symbol()->SYMBOL()->getText());
         return EitherIdentifier(id);
     }
 
-    std::any symbol_table_ast_builder::visitNumeral(SyGuSv21Parser::NumeralContext *ctx) {
+    std::any SymbolTableAstBuilder::visitNumeral(SyGuSv21Parser::NumeralContext *ctx) {
         auto str = ctx->NUMERAL()->getSymbol()->getText();
         auto val = std::strtol(str.c_str(), nullptr, 10);
         return std::static_pointer_cast<Literal>(std::make_shared<Numeral>(val));
     }
 
-    std::any symbol_table_ast_builder::visitStringConst(SyGuSv21Parser::StringConstContext *ctx) {
+    std::any SymbolTableAstBuilder::visitStringConst(SyGuSv21Parser::StringConstContext *ctx) {
         if (ctx->EMPTYSTRING() != nullptr) {
             return std::static_pointer_cast<Literal>(std::make_shared<StringConst>(""));
         } else if (ctx->STRINGCONST() != nullptr) {
@@ -120,7 +120,7 @@ namespace Sy2CPP {
         }
     }
 
-    std::any symbol_table_ast_builder::visitConstraintCmd(SyGuSv21Parser::ConstraintCmdContext *ctx) {
+    std::any SymbolTableAstBuilder::visitConstraintCmd(SyGuSv21Parser::ConstraintCmdContext *ctx) {
         {
             auto term = std::any_cast<TermPtr>(ctx->term()->accept(this));
 
@@ -134,7 +134,7 @@ namespace Sy2CPP {
         }
     }
 
-    std::any symbol_table_ast_builder::visitDefineFun(SyGuSv21Parser::DefineFunContext *ctx) {
+    std::any SymbolTableAstBuilder::visitDefineFun(SyGuSv21Parser::DefineFunContext *ctx) {
         EitherIdentifier id(SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto sort = std::any_cast<EitherSort>(ctx->sort()->accept(this));
         std::vector<SortedVar> args;
@@ -164,7 +164,7 @@ namespace Sy2CPP {
         return std::static_pointer_cast<Command>(def_cmd);
     }
 
-    std::any symbol_table_ast_builder::visitExistsTerm(SyGuSv21Parser::ExistsTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitExistsTerm(SyGuSv21Parser::ExistsTermContext *ctx) {
         std::vector<SortedVar> vars{};
         for (auto x: ctx->sortedVar()) {
             auto sorted_var = std::any_cast<SortedVar>(x->accept(this));
@@ -184,7 +184,7 @@ namespace Sy2CPP {
         return std::static_pointer_cast<Term>(std::make_shared<ExistsTerm>(vars, subterm));
     }
 
-    std::any symbol_table_ast_builder::visitForallTerm(SyGuSv21Parser::ForallTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitForallTerm(SyGuSv21Parser::ForallTermContext *ctx) {
         std::vector<SortedVar> vars{};
         for (auto x: ctx->sortedVar()) {
             auto sorted_var = std::any_cast<SortedVar>(x->accept(this));
@@ -204,7 +204,7 @@ namespace Sy2CPP {
         return std::static_pointer_cast<Term>(std::make_shared<ForallTerm>(vars, subterm));
     }
 
-    std::any symbol_table_ast_builder::visitLetTerm(SyGuSv21Parser::LetTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitLetTerm(SyGuSv21Parser::LetTermContext *ctx) {
         std::vector<VarBinding> bindings{};
         for (auto x: ctx->varBinding()) {
             auto res = std::any_cast<VarBinding>(x->accept(this));
@@ -220,7 +220,7 @@ namespace Sy2CPP {
         return std::static_pointer_cast<Term>(std::make_shared<LetTerm>(bindings, subterm));
     }
 
-    std::any symbol_table_ast_builder::visitBfApplicationTerm(SyGuSv21Parser::BfApplicationTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitBfApplicationTerm(SyGuSv21Parser::BfApplicationTermContext *ctx) {
         auto id = std::any_cast<EitherIdentifier>(ctx->identifier()->accept(this));
         std::vector<TermPtr> args{};
         for (auto x: ctx->bfTerm()) {
@@ -234,7 +234,7 @@ namespace Sy2CPP {
         return app;
     }
 
-    std::any symbol_table_ast_builder::visitApplicationTerm(SyGuSv21Parser::ApplicationTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitApplicationTerm(SyGuSv21Parser::ApplicationTermContext *ctx) {
         auto id = std::any_cast<EitherIdentifier>(ctx->identifier()->accept(this));
 
         std::vector<TermPtr> args{};
@@ -247,7 +247,7 @@ namespace Sy2CPP {
         return {app};
     }
 
-    std::any symbol_table_ast_builder::visitSynthFunCmd(SyGuSv21Parser::SynthFunCmdContext *ctx) {
+    std::any SymbolTableAstBuilder::visitSynthFunCmd(SyGuSv21Parser::SynthFunCmdContext *ctx) {
         EitherIdentifier id(SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto x = ctx->sort()->accept(this);
         auto sort = std::any_cast<EitherSort>(x);
@@ -270,7 +270,7 @@ namespace Sy2CPP {
         return std::static_pointer_cast<Command>(std::make_shared<SynthFunCmd>(id, arguments, sort, grammar));
     }
 
-    std::any symbol_table_ast_builder::visitGrammarDef(SyGuSv21Parser::GrammarDefContext *ctx) {
+    std::any SymbolTableAstBuilder::visitGrammarDef(SyGuSv21Parser::GrammarDefContext *ctx) {
         std::vector<SortedVar> non_terminals;
         for (auto x: ctx->sortedVar()) {
             auto s_var = std::any_cast<SortedVar>(x->accept(this));
@@ -289,7 +289,7 @@ namespace Sy2CPP {
         return GrammarDef(non_terminals, rules);
     }
 
-    std::any symbol_table_ast_builder::visitGroupedRuleList(SyGuSv21Parser::GroupedRuleListContext *ctx) {
+    std::any SymbolTableAstBuilder::visitGroupedRuleList(SyGuSv21Parser::GroupedRuleListContext *ctx) {
         EitherIdentifier id(SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto sort = std::any_cast<EitherSort>(ctx->sort()->accept(this));
 
@@ -307,7 +307,7 @@ namespace Sy2CPP {
         return GroupedRuleList(id, sort, terms);
     }
 
-    std::any symbol_table_ast_builder::visitFeature(SyGuSv21Parser::FeatureContext *ctx) {
+    std::any SymbolTableAstBuilder::visitFeature(SyGuSv21Parser::FeatureContext *ctx) {
         if (ctx->GRAMMARS_FEATURE() != nullptr) {
             return Feature::GRAMMARS;
         } else if (ctx->FWD_DECLS_FEATURE() != nullptr) {
@@ -323,7 +323,7 @@ namespace Sy2CPP {
         }
     }
 
-    std::any symbol_table_ast_builder::visitProblem(SyGuSv21Parser::ProblemContext *ctx) {
+    std::any SymbolTableAstBuilder::visitProblem(SyGuSv21Parser::ProblemContext *ctx) {
         for (SyGuSv21Parser::CmdContext *x: ctx->cmd()) {
             std::any ret = x->accept(this);
             auto cmd = std::any_cast<std::shared_ptr<Command>>(ret);
@@ -332,14 +332,14 @@ namespace Sy2CPP {
         return this->problem;
     }
 
-    std::any symbol_table_ast_builder::visitDeclareSort(SyGuSv21Parser::DeclareSortContext *ctx) {
+    std::any SymbolTableAstBuilder::visitDeclareSort(SyGuSv21Parser::DeclareSortContext *ctx) {
         EitherIdentifier id(SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto num = std::any_cast<LiteralPtr>(ctx->numeral()->accept(this));
         std::shared_ptr<Numeral> numeral = std::static_pointer_cast<Numeral>(num);
         return std::static_pointer_cast<Command>(std::make_shared<DeclareSort>(id, *numeral));
     }
 
-    std::any symbol_table_ast_builder::visitDeclareVarCmd(SyGuSv21Parser::DeclareVarCmdContext *ctx) {
+    std::any SymbolTableAstBuilder::visitDeclareVarCmd(SyGuSv21Parser::DeclareVarCmdContext *ctx) {
         EitherIdentifier id(SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto sort = std::any_cast<EitherSort>(ctx->sort()->accept(this));
 
@@ -349,77 +349,77 @@ namespace Sy2CPP {
         return std::static_pointer_cast<Command>(std::make_shared<DeclareVarCmd>(id, sort));
     }
 
-    std::any symbol_table_ast_builder::visitSetFeatureCmd(SyGuSv21Parser::SetFeatureCmdContext *ctx) {
+    std::any SymbolTableAstBuilder::visitSetFeatureCmd(SyGuSv21Parser::SetFeatureCmdContext *ctx) {
         auto ft = std::any_cast<Feature>(ctx->feature()->accept(this));
         auto val = std::any_cast<std::shared_ptr<BoolConst>>(ctx->boolConst()->accept(this));
         return std::static_pointer_cast<Command>(std::make_shared<SetFeatureCmd>(ft, val->get_value()));
     }
 
-    std::any symbol_table_ast_builder::visitIdentifierTerm(SyGuSv21Parser::IdentifierTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitIdentifierTerm(SyGuSv21Parser::IdentifierTermContext *ctx) {
         auto x = std::any_cast<EitherIdentifier>(ctx->identifier()->accept(this));
         auto shared_ptr = std::make_shared<IdentifierTerm>(x);
         return std::static_pointer_cast<Term>(shared_ptr);
     }
 
-    std::any symbol_table_ast_builder::visitSimpleSort(SyGuSv21Parser::SimpleSortContext *ctx) {
+    std::any SymbolTableAstBuilder::visitSimpleSort(SyGuSv21Parser::SimpleSortContext *ctx) {
         auto id = std::any_cast<EitherIdentifier>(ctx->identifier()->accept(this));
         return EitherSort(SimpleSort(id));
     }
 
-    std::any symbol_table_ast_builder::visitParametricSort(SyGuSv21Parser::ParametricSortContext *ctx) {
+    std::any SymbolTableAstBuilder::visitParametricSort(SyGuSv21Parser::ParametricSortContext *ctx) {
         throw not_implemented("Parametric Sorts are not supported yet.");
     }
 
-    std::any symbol_table_ast_builder::visitIndexedIdentifier(SyGuSv21Parser::IndexedIdentifierContext *ctx) {
+    std::any SymbolTableAstBuilder::visitIndexedIdentifier(SyGuSv21Parser::IndexedIdentifierContext *ctx) {
         throw not_implemented("IndexedIdentifiers are not supported yet.");
     }
 
-    std::any symbol_table_ast_builder::visitDecimal(SyGuSv21Parser::DecimalContext *ctx) {
+    std::any SymbolTableAstBuilder::visitDecimal(SyGuSv21Parser::DecimalContext *ctx) {
         throw not_implemented("Decimal constants are not supported yet.");
     }
 
-    std::any symbol_table_ast_builder::visitBoolConstTrue(SyGuSv21Parser::BoolConstTrueContext *ctx) {
+    std::any SymbolTableAstBuilder::visitBoolConstTrue(SyGuSv21Parser::BoolConstTrueContext *ctx) {
         return std::static_pointer_cast<Literal>(std::make_shared<BoolConst>(true));
     }
 
-    std::any symbol_table_ast_builder::visitBoolConstFalse(SyGuSv21Parser::BoolConstFalseContext *ctx) {
+    std::any SymbolTableAstBuilder::visitBoolConstFalse(SyGuSv21Parser::BoolConstFalseContext *ctx) {
         return std::static_pointer_cast<Literal>(std::make_shared<BoolConst>(false));
     }
 
-    std::any symbol_table_ast_builder::visitLiteralTerm(SyGuSv21Parser::LiteralTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitLiteralTerm(SyGuSv21Parser::LiteralTermContext *ctx) {
         auto x = std::any_cast<std::shared_ptr<Literal>>(ctx->literal()->accept(this));
         return std::static_pointer_cast<Term>(x);
     }
 
-    std::any symbol_table_ast_builder::visitBfIdentifierTerm(SyGuSv21Parser::BfIdentifierTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitBfIdentifierTerm(SyGuSv21Parser::BfIdentifierTermContext *ctx) {
         auto x = std::any_cast<EitherIdentifier>(ctx->identifier()->accept(this));
         auto shared_ptr = std::make_shared<IdentifierTerm>(x);
         return {std::static_pointer_cast<Term>(shared_ptr)};
     }
 
-    std::any symbol_table_ast_builder::visitBfLiteralTerm(SyGuSv21Parser::BfLiteralTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitBfLiteralTerm(SyGuSv21Parser::BfLiteralTermContext *ctx) {
         auto x = std::any_cast<std::shared_ptr<Literal>>(ctx->literal()->accept(this));
         return std::static_pointer_cast<Term>(x);
     }
 
-    std::any symbol_table_ast_builder::visitSortedVar(SyGuSv21Parser::SortedVarContext *ctx) {
+    std::any SymbolTableAstBuilder::visitSortedVar(SyGuSv21Parser::SortedVarContext *ctx) {
         EitherIdentifier id = get_simple_id_from_str(ctx->symbol()->getText());
         auto sort = std::any_cast<EitherSort>(ctx->sort()->accept(this));
         return SortedVar(id, sort);
     }
 
-    std::any symbol_table_ast_builder::visitVarBinding(SyGuSv21Parser::VarBindingContext *ctx) {
+    std::any SymbolTableAstBuilder::visitVarBinding(SyGuSv21Parser::VarBindingContext *ctx) {
         std::string symbol = ctx->symbol()->getText();
         EitherIdentifier id = EitherIdentifier(SimpleIdentifier{symbol});
         auto term = std::any_cast<std::shared_ptr<Term>>(ctx->term()->accept(this));
         return VarBinding(id, term);
     }
 
-    std::any symbol_table_ast_builder::visitCheckSynthCmd(SyGuSv21Parser::CheckSynthCmdContext *ctx) {
+    std::any SymbolTableAstBuilder::visitCheckSynthCmd(SyGuSv21Parser::CheckSynthCmdContext *ctx) {
         return std::static_pointer_cast<Command>(std::make_shared<CheckSynthCmd>());
     }
 
-    std::any symbol_table_ast_builder::visitSetLogic(SyGuSv21Parser::SetLogicContext *ctx) {
+    std::any SymbolTableAstBuilder::visitSetLogic(SyGuSv21Parser::SetLogicContext *ctx) {
         std::string s = ctx->symbol()->SYMBOL()->getText();
 
         // add theory functions
@@ -430,35 +430,35 @@ namespace Sy2CPP {
         return std::static_pointer_cast<Command>(std::make_shared<SetLogic>(s));
     }
 
-    std::any symbol_table_ast_builder::visitSetInfo(SyGuSv21Parser::SetInfoContext *ctx) {
+    std::any SymbolTableAstBuilder::visitSetInfo(SyGuSv21Parser::SetInfoContext *ctx) {
         std::string keyword = ctx->symbol()->SYMBOL()->getText();
         auto lit = std::any_cast<LiteralPtr>(ctx->literal()->accept(this));
         return std::static_pointer_cast<Command>(std::make_shared<SetInfo>(keyword, lit));
     }
 
-    std::any symbol_table_ast_builder::visitDefineSort(SyGuSv21Parser::DefineSortContext *ctx) {
+    std::any SymbolTableAstBuilder::visitDefineSort(SyGuSv21Parser::DefineSortContext *ctx) {
         EitherIdentifier id(SimpleIdentifier(ctx->symbol()->SYMBOL()->getText()));
         auto sort = std::any_cast<EitherSort>(ctx->accept(this));
         return std::static_pointer_cast<Command>(std::make_shared<DefineSort>(id, sort));
     }
 
-    std::any symbol_table_ast_builder::visitSetOption(SyGuSv21Parser::SetOptionContext *ctx) {
+    std::any SymbolTableAstBuilder::visitSetOption(SyGuSv21Parser::SetOptionContext *ctx) {
         std::string keyword = ctx->symbol()->SYMBOL()->getText();
         auto lit = std::any_cast<std::shared_ptr<Literal>>(ctx->literal()->accept(this));
         return std::static_pointer_cast<Command>(std::make_shared<SetOption>(keyword, lit));
     }
 
-    std::any symbol_table_ast_builder::visitConstantGTerm(SyGuSv21Parser::ConstantGTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitConstantGTerm(SyGuSv21Parser::ConstantGTermContext *ctx) {
         auto sort = std::any_cast<EitherSort>(ctx->sort()->accept(this));
         return std::static_pointer_cast<Term>(std::make_shared<ConstantGTerm>(sort));
     }
 
-    std::any symbol_table_ast_builder::visitVariableGTerm(SyGuSv21Parser::VariableGTermContext *ctx) {
+    std::any SymbolTableAstBuilder::visitVariableGTerm(SyGuSv21Parser::VariableGTermContext *ctx) {
         auto sort = std::any_cast<EitherSort>(ctx->sort()->accept(this));
         return std::static_pointer_cast<Term>(std::make_shared<VariableGTerm>(sort));
     }
 
-    std::any symbol_table_ast_builder::visitAssumeCmd(SyGuSv21Parser::AssumeCmdContext *ctx) {
+    std::any SymbolTableAstBuilder::visitAssumeCmd(SyGuSv21Parser::AssumeCmdContext *ctx) {
         return std::static_pointer_cast<Command>(
                 std::make_shared<AssumeCmd>(std::any_cast<std::shared_ptr<Term>>(ctx->term()->accept(this))));
     }

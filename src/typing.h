@@ -6,10 +6,9 @@
 #define PHYSER_TYPING_H
 
 #include "ast.h"
-#include "SymbolTable.h"
+#include "symbol_table.h"
 #include "resolvers.h"
-#include "exceptions/not_implemented.h"
-#include "exceptions/typing_error.h"
+#include "exceptions.h"
 
 
 namespace Sy2CPP {
@@ -17,11 +16,11 @@ namespace Sy2CPP {
     class TypeInference : public TermVisitor {
     private:
 
-        SymbolTable &table;
+        symbol_table &table;
 
     public:
 
-        explicit TypeInference(SymbolTable &symbol_tab) : table{symbol_tab} {
+        explicit TypeInference(symbol_table &symbol_tab) : table{symbol_tab} {
 
         }
 
@@ -57,7 +56,7 @@ namespace Sy2CPP {
 
         EitherSort get_sort(Term *term);
 
-        static EitherSort infer_and_check_type(SymbolTable &table, Term *term);
+        static EitherSort infer_and_check_type(symbol_table &table, Term *term);
 
     };
 

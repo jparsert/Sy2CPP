@@ -4,7 +4,7 @@
 
 #include "resolvers.h"
 #include <optional>
-#include "exceptions/wrong_arguments.h"
+#include "exceptions.h"
 
 namespace Sy2CPP {
 

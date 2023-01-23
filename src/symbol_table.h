@@ -15,15 +15,14 @@
 #include <unordered_set>
 
 #include "SyGuSv21BaseVisitor.h"
-#include "exceptions/not_implemented.h"
-#include "exceptions/unsupported_feature.h"
+#include "exceptions.h"
 
 #include "ast.h"
 #include "resolvers.h"
 
 namespace Sy2CPP {
 
-    class SymbolTable {
+    class symbol_table {
 
     private:
 
@@ -47,7 +46,7 @@ namespace Sy2CPP {
     public:
 
         // adding bool sorts and default boolean functions
-        SymbolTable() {
+        symbol_table() {
             this->add_resolver(std::make_shared<CoreResolver>());
         }
 
@@ -78,14 +77,14 @@ namespace Sy2CPP {
 
     };
 
-    class symbol_table_ast_builder : public SyGuSv21BaseVisitor {
+    class SymbolTableAstBuilder : public SyGuSv21BaseVisitor {
     private:
-        std::shared_ptr<SymbolTable> table;
+        std::shared_ptr<symbol_table> table;
         std::shared_ptr<Problem> problem;
 
         // maybe make private so we have a static builder class
-        symbol_table_ast_builder() {
-            table = std::make_shared<SymbolTable>();
+        SymbolTableAstBuilder() {
+            table = std::make_shared<symbol_table>();
             problem = std::make_shared<Problem>();
         }
 
@@ -203,9 +202,9 @@ namespace Sy2CPP {
         std::any visitAssumeCmd(SyGuSv21Parser::AssumeCmdContext *ctx) override;
 
         static
-        std::pair<std::shared_ptr<SymbolTable>, std::shared_ptr<Problem>>
+        std::pair<std::shared_ptr<symbol_table>, std::shared_ptr<Problem>>
         build_symbol_table_and_ast(SyGuSv21Parser::ProblemContext *problem) {
-            symbol_table_ast_builder builder{};
+            SymbolTableAstBuilder builder{};
             problem->accept(&builder);
 
             return {builder.table, builder.problem};

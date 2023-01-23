@@ -106,7 +106,7 @@ namespace Sy2CPP {
         return std::any_cast<EitherSort>(term->accept(*this));
     }
 
-    EitherSort TypeInference::infer_and_check_type(SymbolTable &table, Term *term) {
+    EitherSort TypeInference::infer_and_check_type(symbol_table &table, Term *term) {
         TypeInference ti(table);
         return std::any_cast<EitherSort>(term->accept(ti));
     }

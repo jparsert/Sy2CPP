@@ -16,9 +16,7 @@
 #include <unordered_set>
 #include <any>
 #include <memory>
-
-#include "exceptions/not_implemented.h"
-#include "exceptions/unsupported_feature.h"
+#include "exceptions.h"
 
 namespace Sy2CPP {
 

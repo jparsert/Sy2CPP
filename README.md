@@ -9,3 +9,5 @@
 
 
 # TODO
+* Parametric sorts
+* Indexed Identifiers

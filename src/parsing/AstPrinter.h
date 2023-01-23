@@ -7,8 +7,7 @@
 
 #include <SyGuSv21BaseVisitor.h>
 #include <sstream>
-#include "../exceptions/unsupported_feature.h"
-#include "../exceptions/not_implemented.h"
+#include "../exceptions.h"
 #include "../ast.h"
 
 namespace Sy2CPP {

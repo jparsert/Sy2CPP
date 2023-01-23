@@ -31,10 +31,10 @@ find_package(Z3 REQUIRED)
 
 # for the executable used for testing etc.
 add_executable(Sy2CPP main.cpp ${ANTLR4_SRC_FILES_antlrsygus}
-        parsing/to_string_printer.cpp parsing/to_string_printer.h
+        parsing/AstPrinter.cpp parsing/AstPrinter.h
         exceptions/unsupported_feature.cpp exceptions/unsupported_feature.h exceptions/not_implemented.cpp
             exceptions/not_implemented.h
-        SymbolTable.cpp SymbolTable.h ast.cpp ast.h exceptions/IOException.cpp exceptions/IOException.h utils/IOHelpers.h utils/IOHelpers.cpp exceptions/UnknownSymbol.cpp exceptions/UnknownSymbol.h resolvers.cpp resolvers.h exceptions/wrong_arguments.cpp exceptions/wrong_arguments.h utils/general_utility.cpp utils/general_utility.h typing.cpp typing.h exceptions/typing_error.cpp exceptions/typing_error.h)
+        symbol_table.cpp symbol_table.h ast.cpp ast.h exceptions/UnknownSymbol.cpp exceptions/UnknownSymbol.h resolvers.cpp resolvers.h exceptions/wrong_arguments.cpp exceptions/wrong_arguments.h general_utility.cpp general_utility.h typing.cpp typing.h exceptions/typing_error.cpp exceptions/typing_error.h exceptions.cpp exceptions.h)
 
 # add required runtime library
 add_dependencies(Sy2CPP antlr4_shared)

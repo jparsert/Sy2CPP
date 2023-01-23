@@ -6,7 +6,7 @@
 #include <optional>
 #include <utility>
 #include "ast.h"
-#include "utils/general_utility.h"
+#include "general_utility.h"
 
 #ifndef PHYSER_RESOLVERS_H
 #define PHYSER_RESOLVERS_H
