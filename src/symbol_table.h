@@ -14,11 +14,10 @@
 #include <string>
 #include <unordered_set>
 
-#include "SyGuSv21BaseVisitor.h"
-#include "exceptions.h"
-
 #include "ast.h"
 #include "resolvers.h"
+#include "exceptions.h"
+
 
 namespace Sy2CPP {
 

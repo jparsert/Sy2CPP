@@ -2,14 +2,15 @@
 // Created by julian on 28.12.22.
 //
 
+#ifndef PHYSER_RESOLVERS_H
+#define PHYSER_RESOLVERS_H
+
 
 #include <optional>
 #include <utility>
 #include "ast.h"
-#include "general_utility.h"
 
-#ifndef PHYSER_RESOLVERS_H
-#define PHYSER_RESOLVERS_H
+
 
 namespace Sy2CPP {
 

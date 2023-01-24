@@ -35,7 +35,7 @@ set(sources
         ${CMAKE_SOURCE_DIR}/general_utility.cpp
         ${CMAKE_SOURCE_DIR}/typing.cpp
         ${CMAKE_SOURCE_DIR}/exceptions.cpp
-        ${CMAKE_SOURCE_DIR}/symbol_table_ast_builder.cpp)
+        Sy2CPP.cpp)
 
 set(headers
         ${CMAKE_SOURCE_DIR}/parsing/AstPrinter.h
@@ -45,17 +45,7 @@ set(headers
         ${CMAKE_SOURCE_DIR}/general_utility.h
         ${CMAKE_SOURCE_DIR}/typing.h
         ${CMAKE_SOURCE_DIR}/exceptions.h
-        ${CMAKE_SOURCE_DIR}/symbol_table_ast_builder.h
-        ${CMAKE_SOURCE_DIR}/symbol_table_ast_builder.h
         ${CMAKE_SOURCE_DIR}/Sy2CPP.h)
-
-set (antlr-headers
-        ${ANTLR4_INCLUDE_DIR_antlrsygus}/SyGuSv21BaseVisitor.h
-        ${ANTLR4_INCLUDE_DIR_antlrsygus}/SyGuSv21Lexer.h
-        ${ANTLR4_INCLUDE_DIR_antlrsygus}/SyGuSv21Visitor.h
-        ${ANTLR4_INCLUDE_DIR_antlrsygus}/SyGuSv21Parser.h
-        )
-
 
 #the executable used for testing etc.
 add_executable(Sy2CPP main.cpp
@@ -108,4 +98,4 @@ set(public-headers
         ${headers})
 
 # Install header files
-install(FILES ${public-headers} ${antlr-headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/Sy2CPP/)
+install(FILES ${public-headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/Sy2CPP/)

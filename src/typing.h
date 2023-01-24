@@ -9,7 +9,6 @@
 #include "symbol_table.h"
 #include "resolvers.h"
 #include "exceptions.h"
-#include "symbol_table_ast_builder.h"
 
 namespace Sy2CPP {
 

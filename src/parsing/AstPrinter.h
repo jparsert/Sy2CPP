@@ -5,7 +5,6 @@
 #ifndef PHYSER_TO_STRING_PRINTER_H
 #define PHYSER_TO_STRING_PRINTER_H
 
-#include <SyGuSv21BaseVisitor.h>
 #include <sstream>
 #include "../exceptions.h"
 #include "../ast.h"

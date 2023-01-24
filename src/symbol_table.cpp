@@ -4,7 +4,6 @@
 #include <ranges>
 #include "symbol_table.h"
 #include "exceptions.h"
-#include "typing.h"
 
 namespace Sy2CPP {
 

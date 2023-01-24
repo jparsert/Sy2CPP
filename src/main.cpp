@@ -1,12 +1,7 @@
 #include <iostream>
 
-#include "antlr4-runtime/antlr4-runtime.h"
-#include <SyGuSv21Lexer.h>
-#include <SyGuSv21Parser.h>
 #include "parsing/AstPrinter.h"
-#include "symbol_table.h"
 #include "exceptions.h"
-#include "symbol_table_ast_builder.h"
 #include "Sy2CPP.h"
 #include <filesystem>
 
