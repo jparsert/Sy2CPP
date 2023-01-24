@@ -11,8 +11,8 @@
 #include "symbol_table_ast_builder.h"
 #include "symbol_table.h"
 #include "antlr4-runtime/antlr4-runtime.h"
-#include <SyGuSv21Lexer.h>
-#include <SyGuSv21Parser.h>
+#include "SyGuSv21Lexer.h"
+#include "SyGuSv21Parser.h"
 
 namespace Sy2CPP {
 

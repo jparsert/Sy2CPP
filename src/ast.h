@@ -16,8 +16,11 @@
 #include <unordered_set>
 #include <any>
 #include <memory>
+#include <optional>
 #include "exceptions.h"
 #include "general_utility.h"
+
+
 namespace Sy2CPP {
 
     class AstVisitor;
@@ -350,17 +353,11 @@ namespace Sy2CPP {
     public:
         explicit Numeral(long v) : val{v} {}
 
-        [[nodiscard]] long get_value() const {
-            return this->val;
-        }
+        [[nodiscard]] long get_value() const;
 
-        bool operator==(const Numeral &num) const {
-            return val == num.get_value();
-        }
+        bool operator==(const Numeral &num) const;
 
-        explicit operator std::string() const {
-            return std::to_string(val);
-        }
+        explicit operator std::string() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitNumeral(*this);
@@ -389,9 +386,7 @@ namespace Sy2CPP {
 
         explicit BoolConst(bool x) : val{x} {}
 
-        [[nodiscard]] bool get_value() const {
-            return this->val;
-        }
+        [[nodiscard]] bool get_value() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitBoolConst(*this);
@@ -441,36 +436,18 @@ namespace Sy2CPP {
         explicit SimpleIdentifier(std::string symb) : symbol{std::move(symb)} {}
 
 
-        std::any accept(AstVisitor &visitor) override {
-            return visitor.visitSimpleIdentifier(*this);
-        }
+        std::any accept(AstVisitor &visitor) override;
 
-        [[nodiscard]] std::string get_symbol() const {
-            return this->symbol;
-        }
+        [[nodiscard]] std::string get_symbol() const;
 
-        bool operator==(const SimpleIdentifier &other) const {
-            return this->symbol == other.get_symbol();
-        }
+        bool operator==(const SimpleIdentifier &other) const;
 
-        bool operator!=(const SimpleIdentifier &other) const {
-            return !(this->symbol == other.get_symbol());
-        }
+        bool operator!=(const SimpleIdentifier &other) const;
 
-        [[nodiscard]] std::size_t get_hash() const override {
-            return std::hash<std::string>()(this->symbol);
-        }
+        [[nodiscard]] std::size_t get_hash() const override;
 
-        explicit operator std::string() const {
-            return symbol;
-        }
+        explicit operator std::string() const;
     };
-
-    template<class... Ts>
-    struct overload : Ts ... {
-        using Ts::operator()...;
-    };
-
 }
 
 namespace std {
@@ -504,35 +481,20 @@ namespace Sy2CPP {
     public:
 
         explicit IndexedIdentifier(SimpleIdentifier &symb, const std::vector<Index> &index_)
-                : symbol(symb), indices(index_) {
+                : symbol(symb), indices(index_)
+        {
             if (indices.empty()) {
                 throw WrongArguments("Indexed Identifier requires 1 or more arguments.");
             }
         }
 
-        bool operator==(const IndexedIdentifier &other) const {
-            return symbol == other.symbol and (indices == other.indices);
-        }
+        bool operator==(const IndexedIdentifier &other) const;
 
-        bool operator!=(const IndexedIdentifier &other) const {
-            return not(*this == other);
-        }
+        bool operator!=(const IndexedIdentifier &other) const;
 
-        [[nodiscard]] std::size_t get_hash() const override {
-            size_t res_hash = symbol.get_hash();
-            size_t lst_hash = hash_vector<Index>(indices);
-            return res_hash^lst_hash; // TODO use a better (non-commutative) combine hash function
-        }
+        [[nodiscard]] std::size_t get_hash() const override;
 
-        explicit operator std::string() const {
-            std::string res = "(_ " +  (std::string)symbol + " ";
-            for (const auto& e : indices) {
-                res += std::visit([&](const auto& index) mutable { return (std::string) index ; }, e);
-            }
-            res += ")";
-            return res;
-
-        }
+        explicit operator std::string() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitIndexedIdentifier(*this);
@@ -561,11 +523,7 @@ namespace Sy2CPP {
 
     std::string to_string(const EitherIdentifier &ident);
 
-    inline EitherIdentifier get_simple_id_from_str(std::string &s) {
-        return EitherIdentifier{SimpleIdentifier{s}};
-    }
-
-    inline EitherIdentifier get_simple_id_from_str(std::string &&s) {
+    inline EitherIdentifier get_simple_id_from_str(const std::string &s) {
         return EitherIdentifier{SimpleIdentifier{s}};
     }
 
@@ -575,13 +533,9 @@ namespace Sy2CPP {
 
     public:
 
-        explicit IdentifierTerm(EitherIdentifier &id) : identifier{id} {
+        explicit IdentifierTerm(EitherIdentifier &id) : identifier{id} { }
 
-        }
-
-        EitherIdentifier get_identifier() {
-            return identifier;
-        }
+        EitherIdentifier get_identifier();
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitIdentifierTerm(*this);
@@ -599,12 +553,12 @@ namespace Sy2CPP {
             this->commands.push_back(cmd);
         }
 
-        std::any accept(AstVisitor &visitor) override {
-            return visitor.visitProblem(*this);
-        }
-
         std::vector<ComandPtr> &get_commands() {
             return this->commands;
+        }
+
+        std::any accept(AstVisitor &visitor) override {
+            return visitor.visitProblem(*this);
         }
 
     };
@@ -626,25 +580,15 @@ namespace Sy2CPP {
 
         explicit SimpleSort(EitherIdentifier &&id) : identifier(id) {}
 
-        [[nodiscard]] std::size_t get_hash() const override {
-            return std::visit([](auto id) { return id.get_hash(); }, identifier);
-        }
+        [[nodiscard]] std::size_t get_hash() const override;
 
-        bool operator==(const SimpleSort &other) const {
-            return this->get_identifier() == other.get_identifier();
-        }
+        bool operator==(const SimpleSort &other) const;
 
-        bool operator!=(const SimpleSort &other) const {
-            return !(this->get_identifier() == other.get_identifier());
-        }
+        bool operator!=(const SimpleSort &other) const;
 
-        [[nodiscard]] EitherIdentifier get_identifier() const {
-            return identifier;
-        }
+        [[nodiscard]] EitherIdentifier get_identifier() const;
 
-        explicit operator std::string() const {
-            return to_string(identifier);
-        }
+        explicit operator std::string() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitSimpleSort(*this);
@@ -709,11 +653,7 @@ namespace Sy2CPP{
 
     std::string to_string(const EitherSort &ident);
 
-    inline EitherSort get_simple_sort_from_str(std::string &s) {
-        return {SimpleSort(get_simple_id_from_str(s))};
-    }
-
-    inline EitherSort get_simple_sort_from_str(std::string &&s) {
+    inline EitherSort get_simple_sort_from_str(const std::string &s) {
         return {SimpleSort(get_simple_id_from_str(s))};
 
     }
@@ -730,13 +670,9 @@ namespace Sy2CPP{
                 id{iden},
                 arguments{args} {}
 
-        [[nodiscard]] EitherIdentifier get_identifier() const {
-            return this->id;
-        }
+        [[nodiscard]] EitherIdentifier get_identifier() const;
 
-        std::vector<TermPtr> &get_arguments() {
-            return this->arguments;
-        }
+        std::vector<TermPtr> &get_arguments();
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitApplicationTerm(*this);
@@ -755,13 +691,9 @@ namespace Sy2CPP{
         ExistsTerm(std::vector<SortedVar> &v,
                    TermPtr &t) : vars{v}, subterm(t) {}
 
-        [[nodiscard]] std::vector<SortedVar> get_vars() const {
-            return this->vars;
-        }
+        [[nodiscard]] std::vector<SortedVar> get_vars() const;
 
-        [[nodiscard]] TermPtr get_term() const {
-            return this->subterm;
-        }
+        [[nodiscard]] TermPtr get_term() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitExistsTerm(*this);
@@ -778,13 +710,9 @@ namespace Sy2CPP{
         ForallTerm(std::vector<SortedVar> &v,
                    TermPtr &t) : vars{v}, subterm(t) {}
 
-        [[nodiscard]] std::vector<SortedVar> get_vars() const {
-            return this->vars;
-        }
+        [[nodiscard]] std::vector<SortedVar> get_vars() const;
 
-        [[nodiscard]] TermPtr get_term() const {
-            return this->subterm;
-        }
+        [[nodiscard]] TermPtr get_term() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitForallTerm(*this);
@@ -802,13 +730,9 @@ namespace Sy2CPP{
 
         LetTerm(std::vector<VarBinding> &bdgs, TermPtr &t) : bindings{bdgs}, subterm(t) {}
 
-        [[nodiscard]] std::vector<VarBinding> get_var_bindings() const {
-            return this->bindings;
-        }
+        [[nodiscard]] std::vector<VarBinding> get_var_bindings() const;
 
-        [[nodiscard]] TermPtr get_term() const {
-            return this->subterm;
-        }
+        [[nodiscard]] TermPtr get_term() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitLetTerm(*this);
@@ -822,9 +746,7 @@ namespace Sy2CPP{
     public:
         explicit AssumeCmd(TermPtr t) : term{std::move(t)} {}
 
-        [[nodiscard]] TermPtr get_term() const {
-            return term;
-        }
+        [[nodiscard]] TermPtr get_term() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitAssumeCmd(*this);
@@ -843,13 +765,9 @@ namespace Sy2CPP{
 
     public:
 
-        explicit ConstraintCmd(TermPtr &ptr) : term{ptr} {
+        explicit ConstraintCmd(TermPtr &ptr) : term{ptr} { }
 
-        }
-
-        [[nodiscard]] TermPtr get_term() const {
-            return term;
-        }
+        [[nodiscard]] TermPtr get_term() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitConstraintCmd(*this);
@@ -863,17 +781,11 @@ namespace Sy2CPP{
 
     public:
 
-        DeclareVarCmd(EitherIdentifier &iden, EitherSort &srt) : id{iden}, sort{srt} {
+        DeclareVarCmd(EitherIdentifier &iden, EitherSort &srt) : id{iden}, sort{srt} { }
 
-        }
+        [[nodiscard]] EitherIdentifier get_identifier() const;
 
-        [[nodiscard]] EitherIdentifier get_identifier() const {
-            return this->id;
-        }
-
-        [[nodiscard]] EitherSort get_sort() const {
-            return sort;
-        }
+        [[nodiscard]] EitherSort get_sort() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitDeclareVarCmd(*this);
@@ -893,13 +805,9 @@ namespace Sy2CPP{
 
         SetFeatureCmd(Feature f, bool v) : feature{f}, value{v} {}
 
-        Feature get_feature() {
-            return feature;
-        }
+        Feature get_feature();
 
-        [[nodiscard]] bool get_value() const {
-            return value;
-        }
+        [[nodiscard]] bool get_value() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitSetFeatureCmd(*this);
@@ -920,25 +828,19 @@ namespace Sy2CPP{
         GroupedRuleList(EitherIdentifier iden, EitherSort &srt, std::vector<TermPtr> &trm) :
                 id{std::move(iden)}, sort{srt}, terms{trm} {}
 
-        [[nodiscard]] EitherIdentifier get_identifier() const {
-            return id;
-        }
+        [[nodiscard]] EitherIdentifier get_identifier() const;
 
-        [[nodiscard]] EitherSort get_sort() const {
-            return sort;
-        }
+        [[nodiscard]] EitherSort get_sort() const;
 
-        [[nodiscard]] std::vector<TermPtr> get_terms() const {
-            return terms;
-        }
+        [[nodiscard]] std::vector<TermPtr> get_terms() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitGroupedRuleList(*this);
         }
     };
 
-
     class GrammarDef : public AstNode {
+
     private:
         std::vector<SortedVar> non_terminals;
         std::vector<GroupedRuleList> rules;
@@ -948,13 +850,9 @@ namespace Sy2CPP{
                    std::vector<GroupedRuleList> &rule) : non_terminals{var}, rules{rule} {}
 
 
-        [[nodiscard]] std::vector<SortedVar> get_non_terminals() const {
-            return this->non_terminals;
-        }
+        [[nodiscard]] std::vector<SortedVar> get_non_terminals() const;
 
-        [[nodiscard]] std::vector<GroupedRuleList> get_rules() const {
-            return this->rules;
-        }
+        [[nodiscard]] std::vector<GroupedRuleList> get_rules() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitGrammarDef(*this);
@@ -978,21 +876,13 @@ namespace Sy2CPP{
                     EitherSort &srt, GrammarDef &grmmr) : id{iden}, arguments{args},
                                                           sort{srt}, grammar{grmmr} {}
 
-        [[nodiscard]] EitherIdentifier get_identifier() const {
-            return this->id;
-        }
+        [[nodiscard]] EitherIdentifier get_identifier() const;
 
-        [[nodiscard]] std::vector<SortedVar> &get_arguments() {
-            return this->arguments;
-        }
+        [[nodiscard]] std::vector<SortedVar> &get_arguments();
 
-        [[nodiscard]] EitherSort get_sort() const {
-            return this->sort;
-        }
+        [[nodiscard]] EitherSort get_sort() const;
 
-        [[nodiscard]] GrammarDef get_grammar() const {
-            return this->grammar;
-        }
+        [[nodiscard]] GrammarDef get_grammar() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitSynthFunCmd(*this);
@@ -1001,12 +891,14 @@ namespace Sy2CPP{
     };
 
     class DeclareDatatype : public Command {
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitDeclareDatatype(*this);
         }
     };
 
     class DeclareDatatypes : public Command {
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitDeclareDatatypes(*this);
         }
@@ -1023,13 +915,9 @@ namespace Sy2CPP{
 
         DeclareSort(EitherIdentifier &iden, Numeral &num) : id{iden}, numeral{num} {}
 
-        EitherIdentifier get_identifier() {
-            return this->id;
-        }
+        EitherIdentifier get_identifier();
 
-        Numeral get_numeral() {
-            return this->numeral;
-        }
+        Numeral get_numeral();
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitDeclareSort(*this);
@@ -1054,24 +942,16 @@ namespace Sy2CPP{
                      TermPtr &tm) :
                 id{iden}, arguments{args}, sort{srt}, term{tm} {}
 
+        [[nodiscard]] EitherIdentifier get_identifier() const;
+
+        [[nodiscard]] std::vector<SortedVar> &get_arguments();
+
+        [[nodiscard]] EitherSort get_sort() const;
+
+        [[nodiscard]] TermPtr get_term() const;
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitDefineFun(*this);
-        }
-
-        [[nodiscard]] EitherIdentifier get_identifier() const {
-            return this->id;
-        }
-
-        [[nodiscard]] std::vector<SortedVar> &get_arguments() {
-            return this->arguments;
-        }
-
-        [[nodiscard]] EitherSort get_sort() const {
-            return this->sort;
-        }
-
-        [[nodiscard]] TermPtr get_term() const {
-            return this->term;
         }
 
     };
@@ -1086,14 +966,9 @@ namespace Sy2CPP{
 
         DefineSort(EitherIdentifier &iden, EitherSort &srt) : id{iden}, sort{srt} {}
 
+        EitherIdentifier get_identifier();
 
-        EitherIdentifier get_identifier() {
-            return this->id;
-        }
-
-        EitherSort get_sort() {
-            return this->sort;
-        }
+        EitherSort get_sort();
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitDefineSort(*this);
@@ -1113,13 +988,9 @@ namespace Sy2CPP{
 
         }
 
-        std::string get_keyword() {
-            return keyword;
-        }
+        std::string get_keyword();
 
-        LiteralPtr get_literal() {
-            return literal;
-        }
+        LiteralPtr get_literal();
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitSetInfo(*this);
@@ -1222,6 +1093,9 @@ namespace Sy2CPP{
             return visitor.visitVariableGTerm(*this);
         }
     };
+
+
+    using SyGuSSolution = std::optional<std::vector<DefineFunCmd>>;
 
 
     class AstBaseVisitor : public AstVisitor {
