@@ -236,4 +236,31 @@ namespace Sy2CPP {
     }
 
 
+    std::string SetLogic::get_logic() const {
+        return logic;
+    }
+
+    std::string SetOption::get_keyword() const {
+        return keyword;
+    }
+
+    LiteralPtr SetOption::get_literal() const {
+        return literal;
+    }
+
+
+    EitherSort ConstantGTerm::get_sort() const {
+        return this->sort;
+    }
+
+    EitherSort VariableGTerm::get_sort() const {
+        return this->sort;
+    }
+
+    void Problem::add_command(ComandPtr &cmd) {
+        this->commands.push_back(cmd);
+    }
+
+
+
 }

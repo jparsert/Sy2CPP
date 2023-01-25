@@ -11,60 +11,73 @@
 
 namespace Sy2CPP {
 
-    class IOException : std::exception {
+    class Sy2CPPException: std::exception {
+    public:
+        virtual std::string what() = 0;
+    };
+
+
+    class IOException : public Sy2CPPException {
     private:
         std::string msg;
 
     public:
         explicit IOException(std::string s) : msg{std::move(s)} {}
 
+        std::string what() override;
+
     };
 
 
-    class NotImplemented : std::exception {
+    class NotImplemented : public Sy2CPPException {
 
         std::string msg;
 
     public:
 
         explicit NotImplemented(std::string m) : msg{std::move(m)} {}
+        std::string what() override;
 
     };
 
-    class TypingError : public std::exception {
+    class TypingError : public Sy2CPPException {
         std::string msg;
 
     public:
         explicit TypingError(std::string m) : msg{std::move(m)} {}
+        std::string what() override;
 
     };
 
-    class UnknownSymbol : public std::exception {
+    class UnknownSymbol : public Sy2CPPException {
 
     private:
         std::string msg;
 
     public:
         explicit UnknownSymbol(std::string s) : msg{std::move(s)} {}
+        std::string what() override;
 
     };
 
-    class UnsupportedFeature : std::exception {
+    class UnsupportedFeature : Sy2CPPException {
 
         std::string msg;
     public:
 
         explicit UnsupportedFeature(std::string m) : msg{std::move(m)} {}
+        std::string what() override;
 
     };
 
-    class WrongArguments : std::exception {
+    class WrongArguments : Sy2CPPException {
 
         std::string msg;
 
     public:
 
         explicit WrongArguments(std::string m) : msg{std::move(m)} {}
+        std::string what() override;
 
     };
 
