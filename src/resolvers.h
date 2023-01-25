@@ -181,6 +181,11 @@ namespace Sy2CPP {
 
         [[nodiscard]] BinderKind get_binder() const;
 
+        bool operator==(const SymbolDescriptor& desc) const;
+
+        bool operator!=(const SymbolDescriptor& desc) const;
+
+
     };
 
 }

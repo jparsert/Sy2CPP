@@ -258,6 +258,16 @@ namespace Sy2CPP {
         return binder;
     }
 
+    bool SymbolDescriptor::operator==(const SymbolDescriptor &desc) const {
+        return this->get_identifier() == desc.get_identifier() and
+                this->get_binder() == desc.get_binder() and
+                this->get_symbol_sort() == desc.get_symbol_sort();
+    }
+
+    bool SymbolDescriptor::operator!=(const SymbolDescriptor &desc) const {
+        return not (*this == desc);
+    }
+
     const EitherSort &SortDescriptor::get_sort() const {
         return sort;
     }

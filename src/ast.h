@@ -1013,10 +1013,26 @@ namespace Sy2CPP{
     class AstBaseVisitor : public AstVisitor {
     public:
 
-        std::any visitIdentifierTerm(IdentifierTerm &term) override {
-            return std::visit([&](auto id) mutable { return id.accept(*this); }, term.get_identifier());
+
+        virtual std::any visitEitherIdentifier(EitherIdentifier&& term) {
+            return std::visit([&](auto& id) mutable { return id.accept(*this); }, term);
         }
 
+        virtual std::any visitEitherIdentifier(EitherIdentifier& term) {
+            return std::visit([&](auto& id) mutable { return id.accept(*this); }, term);
+        }
+
+        std::any visitIdentifierTerm(IdentifierTerm &term) override {
+            return visitEitherIdentifier(term.get_identifier());
+        }
+
+        virtual std::any visitEitherSort(EitherSort& sort) {
+            return std::visit([&](auto& srt) mutable { return srt.accept(*this); }, sort);
+        }
+
+        virtual std::any visitEitherSort(EitherSort&& sort) {
+            return std::visit([&](auto& srt) mutable { return srt.accept(*this); }, sort);
+        }
 
         std::any visitNumeral(Numeral &numeral) override {
             throw NotImplemented("Not implemented in AstBaseVisitor.");

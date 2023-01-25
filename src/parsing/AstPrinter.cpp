@@ -13,7 +13,7 @@ namespace Sy2CPP {
             this->push_op_bracket();
             this->result_stream << Sy2CPP::to_string(x.first);
             this->push_space();
-            std::visit([&](auto id) mutable { id.accept(*this); }, x.second);
+            this->visitEitherSort(x.second);
             this->push_cl_bracket();
         }
         this->push_space();
@@ -33,13 +33,11 @@ namespace Sy2CPP {
 
     std::any AstToString::visitGroupedRuleList(GroupedRuleList &grouped_r_l) {
         this->push_op_bracket();
-        std::visit([&](auto id) mutable { id.accept(*this); },
-                   grouped_r_l.get_identifier());
+        this->visitEitherIdentifier(grouped_r_l.get_identifier());
 
         this->push_space();
 
-        std::visit([&](auto id) mutable { id.accept(*this); },
-                   grouped_r_l.get_sort());
+        this->visitEitherSort(grouped_r_l.get_sort());
 
         this->push_space();
 
@@ -103,7 +101,8 @@ namespace Sy2CPP {
         this->result_stream << "declare-sort";
         this->push_space();
 
-        std::visit([&](auto id) mutable { id.accept(*this); }, cmd.get_identifier());
+        this->visitEitherIdentifier(cmd.get_identifier());
+
         this->push_space();
         cmd.get_numeral().accept(*this);
 
@@ -148,7 +147,7 @@ namespace Sy2CPP {
         this->result_stream << "synth-fun";
 
         this->push_space();
-        std::visit([&](auto id) mutable { id.accept(*this); }, synthFun.get_identifier());
+        this->visitEitherIdentifier(synthFun.get_identifier());
         this->push_space();
 
         this->push_op_bracket();
@@ -158,7 +157,7 @@ namespace Sy2CPP {
             this->push_op_bracket();
             this->result_stream << to_string(x.first);
             this->push_space();
-            std::visit([&](auto id) mutable { id.accept(*this); }, x.second);
+            this->visitEitherSort(x.second);
             this->push_cl_bracket();
 
         }
@@ -166,7 +165,7 @@ namespace Sy2CPP {
         this->push_cl_bracket();
 
         this->push_space();
-        std::visit([&](auto id) mutable { id.accept(*this); }, synthFun.get_sort());
+        this->visitEitherSort(synthFun.get_sort());
         this->push_space();
 
         this->result_stream << std::endl;
@@ -181,9 +180,9 @@ namespace Sy2CPP {
         this->push_op_bracket();
         this->result_stream << "declare-var";
         this->push_space();
-        std::visit([&](auto id) mutable { id.accept(*this); }, decl.get_identifier());
+        this->visitEitherIdentifier(decl.get_identifier());
         this->push_space();
-        std::visit([&](auto var) mutable { var.accept(*this); }, decl.get_sort());
+        this->visitEitherSort(decl.get_sort());
         this->push_cl_bracket();
         return {};
     }
@@ -197,7 +196,7 @@ namespace Sy2CPP {
         for (VarBinding &x: let.get_var_bindings()) {
             this->push_space();
             this->push_op_bracket();
-            std::visit([&](auto &var) mutable { var.accept(*this); }, x.first);
+            this->visitEitherIdentifier(x.first);
             this->push_space();
             x.second->accept(*this);
             this->push_cl_bracket();
@@ -221,9 +220,9 @@ namespace Sy2CPP {
         for (SortedVar &x: forall.get_vars()) {
             this->push_space();
             this->push_op_bracket();
-            this->result_stream << to_string(x.first);
+            this->visitEitherIdentifier(x.first);
             this->push_space();
-            std::visit([&](auto &var) mutable { var.accept(*this); }, x.second);
+            this->visitEitherSort(x.second);
             this->push_cl_bracket();
         }
         this->push_space();
@@ -246,9 +245,9 @@ namespace Sy2CPP {
         for (SortedVar &x: exists.get_vars()) {
             this->push_space();
             this->push_op_bracket();
-            this->result_stream << to_string(x.first);
+            this->visitEitherIdentifier(x.first);
             this->push_space();
-            std::visit([&](auto &var) mutable { var.accept(*this); }, x.second);
+            this->visitEitherSort(x.second);
             this->push_cl_bracket();
         }
         this->push_space();
@@ -264,7 +263,7 @@ namespace Sy2CPP {
 
     std::any AstToString::visitApplicationTerm(ApplicationTerm &application) {
         this->push_op_bracket();
-        std::visit([&](auto id) mutable { id.accept(*this); }, application.get_identifier());
+        this->visitEitherIdentifier(application.get_identifier());
 
         for (const TermPtr &ptr: application.get_arguments()) {
             this->push_space();
@@ -274,20 +273,20 @@ namespace Sy2CPP {
         return {};
     }
 
-    void AstToString::push_identifier(const EitherIdentifier &&id) {
-        std::visit([&](auto id) mutable { id.accept(*this); }, id);
+    void AstToString::push_identifier(EitherIdentifier &&id) {
+        this->visitEitherIdentifier(id);
     }
 
-    void AstToString::push_identifier(const EitherIdentifier &id) {
-        std::visit([&](auto id) mutable { id.accept(*this); }, id);
+    void AstToString::push_identifier(EitherIdentifier &id) {
+        this->visitEitherIdentifier(id);
     }
 
-    void AstToString::push_sort(const EitherSort &sort) {
-        std::visit([&](auto eitheSort) mutable { eitheSort.accept(*this); }, sort);
+    void AstToString::push_sort(EitherSort &sort) {
+        this->visitEitherSort(sort);
     }
 
-    void AstToString::push_sort(const EitherSort &&sort) {
-        std::visit([&](auto eitheSort) mutable { eitheSort.accept(*this); }, sort);
+    void AstToString::push_sort(EitherSort &&sort) {
+        this->visitEitherSort(sort);
     }
 
     std::any AstToString::visitProblem(Problem &problem) {
@@ -302,7 +301,7 @@ namespace Sy2CPP {
         this->push_op_bracket();
         this->result_stream << "Constant";
         this->push_space();
-        std::visit([&](auto x) mutable { x.accept(*this); }, constGTerm.get_sort());
+        this->visitEitherSort(constGTerm.get_sort());
         this->push_cl_bracket();
         return {};
     }
@@ -311,7 +310,7 @@ namespace Sy2CPP {
         this->push_op_bracket();
         this->result_stream << "Variable";
         this->push_space();
-        std::visit([&](auto x) mutable { x.accept(*this); }, variableTerm.get_sort());
+        this->visitEitherSort(variableTerm.get_sort());
         this->push_cl_bracket();
         return {};
     }
@@ -393,8 +392,7 @@ namespace Sy2CPP {
     }
 
     std::any AstToString::visitSimpleSort(SimpleSort &sort) {
-        std::visit([&](auto id) mutable { id.accept(*this); }, sort.get_identifier());
-        return {};
+        return this->visitEitherIdentifier(sort.get_identifier());
     }
 
     std::any AstToString::visitIndexedIdentifier(IndexedIdentifier &idx_id) {

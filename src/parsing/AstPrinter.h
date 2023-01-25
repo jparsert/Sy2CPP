@@ -29,13 +29,13 @@ namespace Sy2CPP {
             result_stream << " ";
         }
 
-        void push_identifier(const EitherIdentifier &&id);
+        void push_identifier(EitherIdentifier &&id);
 
-        void push_identifier(const EitherIdentifier &id);
+        void push_identifier(EitherIdentifier &id);
 
-        void push_sort(const EitherSort &sort);
+        void push_sort(EitherSort &sort);
 
-        void push_sort(const EitherSort &&sort);
+        void push_sort(EitherSort &&sort);
 
     public:
 
