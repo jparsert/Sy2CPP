@@ -4,6 +4,8 @@ project(Sy2CPP)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 
 # ANTLR
 find_package(antlr4-generator REQUIRED)
@@ -46,6 +48,19 @@ set(headers
         ${CMAKE_SOURCE_DIR}/typing.h
         ${CMAKE_SOURCE_DIR}/exceptions.h
         ${CMAKE_SOURCE_DIR}/Sy2CPP.h)
+
+set(public-headers
+        ${CMAKE_SOURCE_DIR}/parsing/AstPrinter.h
+        ${CMAKE_SOURCE_DIR}/symbol_table.h
+        ${CMAKE_SOURCE_DIR}/ast.h
+        ${CMAKE_SOURCE_DIR}/resolvers.h
+        ${CMAKE_SOURCE_DIR}/typing.h
+        ${CMAKE_SOURCE_DIR}/exceptions.h
+        ${CMAKE_SOURCE_DIR}/Sy2CPP.h)
+
+
+
+
 
 #the executable used for testing etc.
 add_executable(Sy2CPP main.cpp
@@ -94,8 +109,6 @@ install(TARGETS Sy2CPP-static
         ARCHIVE DESTINATION lib
         )
 
-set(public-headers
-        ${headers})
 
 # Install header files
 install(FILES ${public-headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/Sy2CPP/)

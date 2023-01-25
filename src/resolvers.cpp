@@ -240,6 +240,10 @@ namespace Sy2CPP {
         std::make_optional<SortDescriptor>(LIAResolver::get_int_sort(), SortKind::PRIMITIVE) : std::nullopt;
     }
 
+    EitherSort LIAResolver::get_int_sort()  {
+        return get_simple_sort_from_str("Int");
+    }
+
     const EitherIdentifier &SymbolDescriptor::get_identifier() const {
         return symbol;
     }

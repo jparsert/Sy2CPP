@@ -76,12 +76,10 @@ namespace Sy2CPP {
 
     class SortDescriptor {
     private:
-
         EitherSort sort;
         SortKind sort_kind;
 
     public:
-
         SortDescriptor(EitherSort  srt,
                        const SortKind& sortKind): sort{std::move(srt)}, sort_kind{sortKind}
                        {}
@@ -97,9 +95,7 @@ namespace Sy2CPP {
     };
 
     class AbstractResolver {
-
     public:
-
         [[nodiscard]] virtual std::optional<FunctionDescriptor>
         lookup_or_resolve_function(
                 const EitherIdentifier &identifier,
@@ -112,14 +108,12 @@ namespace Sy2CPP {
 
     class CoreResolver : public AbstractResolver {
     private:
-
         std::unordered_multimap<EitherIdentifier, FunctionDescriptor> functions;
-
         static std::optional<FunctionDescriptor>
+
         resolve_special_functions(const EitherIdentifier &identifier, const std::vector<EitherSort> &arg_sorts);
 
     public:
-
         CoreResolver();
 
         static EitherSort get_bool_sort() {
@@ -136,19 +130,15 @@ namespace Sy2CPP {
 
     class LIAResolver : public AbstractResolver {
     private:
-
         std::unordered_multimap<EitherIdentifier, FunctionDescriptor> functions;
 
         static std::optional<FunctionDescriptor>
         resolve_special_functions(const EitherIdentifier &identifier, const std::vector<EitherSort> &arg_sorts);
 
     public:
-
         LIAResolver();
 
-        static EitherSort get_int_sort() {
-            return get_simple_sort_from_str("Int");
-        }
+        static EitherSort get_int_sort();
 
         std::optional<FunctionDescriptor>
         lookup_or_resolve_function(const EitherIdentifier &identifier,
@@ -178,7 +168,6 @@ namespace Sy2CPP {
         BinderKind binder;
 
     public:
-
         SymbolDescriptor(EitherIdentifier symb, EitherSort sort, const BinderKind bind) :
                 symbol{std::move(symb)}, symbol_sort{std::move(sort)}, binder{bind} {}
 
