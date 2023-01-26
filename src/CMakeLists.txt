@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
+include(FetchContent)
 
 project(Sy2CPP)
 
@@ -11,7 +12,18 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 find_package(antlr4-generator REQUIRED)
 find_package(antlr4-runtime REQUIRED)
 
-set(ANTLR4_JAR_LOCATION ${PROJECT_SOURCE_DIR}/../libs/antlr-4.11.1-complete.jar)
+
+FetchContent_Declare(
+        antlr_jar
+        URL https://www.antlr.org/download/antlr-4.11.1-complete.jar
+        DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps
+        DOWNLOAD_NO_EXTRACT TRUE
+# URL_HASH xxxx
+)
+
+FETCHCONTENT_MAKEAVAILABLE(antlr_jar)
+
+set(ANTLR4_JAR_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/antlr-4.11.1-complete.jar)
 
 # generate parser
 antlr4_generate(
