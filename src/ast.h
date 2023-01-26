@@ -1013,25 +1013,54 @@ namespace Sy2CPP{
     class AstBaseVisitor : public AstVisitor {
     public:
 
+        // Fake visitor functions for STL shorthands like variant/pair
 
+        /**
+         * We call \link std::visit on EitherIdentifier and return that return-value.
+         *
+         * */
         virtual std::any visitEitherIdentifier(EitherIdentifier&& term) {
             return std::visit([&](auto& id) mutable { return id.accept(*this); }, term);
         }
 
+        /**
+         * We call \link std::visit on EitherIdentifier and return that return-value.
+         *
+         * */
         virtual std::any visitEitherIdentifier(EitherIdentifier& term) {
             return std::visit([&](auto& id) mutable { return id.accept(*this); }, term);
         }
 
-        std::any visitIdentifierTerm(IdentifierTerm &term) override {
-            return visitEitherIdentifier(term.get_identifier());
-        }
-
+        /**
+         * We call \link std::visit on EitherIdentifier and return that return-value.
+         *
+         * */
         virtual std::any visitEitherSort(EitherSort& sort) {
             return std::visit([&](auto& srt) mutable { return srt.accept(*this); }, sort);
         }
 
+        /**
+         * We call \link std::visit on EitherIdentifier and return that return-value.
+         *
+         * */
         virtual std::any visitEitherSort(EitherSort&& sort) {
             return std::visit([&](auto& srt) mutable { return srt.accept(*this); }, sort);
+        }
+
+        /**
+         * Fake visitor for SortedVar which is a shorthand for pair<EitherIdentifier, EitherSort>.
+         * By default we call \link visitEitherIdentifier and \link visitEitherSort on each element
+         * and return a pair of the results.
+         *
+         * */
+        virtual std::any visitSortedVar(SortedVar& s_var) {
+            return std::pair<std::any, std::any>
+                    (this->visitEitherIdentifier(s_var.first), this->visitEitherSort(s_var.second));
+        }
+
+        // Normal visitor functions for AST nodes
+        std::any visitIdentifierTerm(IdentifierTerm &term) override {
+            return visitEitherIdentifier(term.get_identifier());
         }
 
         std::any visitNumeral(Numeral &numeral) override {
