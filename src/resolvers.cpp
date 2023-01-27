@@ -195,7 +195,7 @@ namespace Sy2CPP {
 
         // Add multi - operator
         EitherIdentifier minus = get_simple_id_from_str("-");
-        functions.emplace(minus, FunctionDescriptor(minus, arg_lst1, int_sort, FunctionKind::THEORY, true));
+        functions.emplace(minus, FunctionDescriptor(minus, arg_lst2, int_sort, FunctionKind::THEORY, false));
 
         // Add abs operator
         EitherIdentifier abs = get_simple_id_from_str("abs");
@@ -215,23 +215,23 @@ namespace Sy2CPP {
 
         // Add div operator
         EitherIdentifier div = get_simple_id_from_str("div");
-        functions.emplace(div, FunctionDescriptor(div, arg_lst1, int_sort, FunctionKind::THEORY, true));
+        functions.emplace(div, FunctionDescriptor(div, arg_lst2, int_sort, FunctionKind::THEORY, false));
 
         // Add div operator
         EitherIdentifier less = get_simple_id_from_str("<");
-        functions.emplace(less, FunctionDescriptor(less, arg_lst1, bool_sort, FunctionKind::THEORY, true));
+        functions.emplace(less, FunctionDescriptor(less, arg_lst2, bool_sort, FunctionKind::THEORY, false));
 
         // Add div operator
         EitherIdentifier leq = get_simple_id_from_str("<=");
-        functions.emplace(leq, FunctionDescriptor(leq, arg_lst1, bool_sort, FunctionKind::THEORY, true));
+        functions.emplace(leq, FunctionDescriptor(leq, arg_lst2, bool_sort, FunctionKind::THEORY, false));
 
         // Add div operator
         EitherIdentifier ge = get_simple_id_from_str(">");
-        functions.emplace(ge, FunctionDescriptor(ge, arg_lst1, bool_sort, FunctionKind::THEORY, true));
+        functions.emplace(ge, FunctionDescriptor(ge, arg_lst2, bool_sort, FunctionKind::THEORY, false));
 
         // Add div operator
         EitherIdentifier geq = get_simple_id_from_str(">=");
-        functions.emplace(geq, FunctionDescriptor(geq, arg_lst1, bool_sort, FunctionKind::THEORY, true));
+        functions.emplace(geq, FunctionDescriptor(geq, arg_lst2, bool_sort, FunctionKind::THEORY, false));
 
     }
 
@@ -282,5 +282,47 @@ namespace Sy2CPP {
 
     void SortDescriptor::set_sort_kind(SortKind sortKind) {
         sort_kind = sortKind;
+    }
+
+    bool operator==(const FunctionDescriptor &lhs, const FunctionDescriptor &rhs) {
+        return lhs.get_identifier() == rhs.get_identifier() and
+               lhs.get_argument_sorts() == rhs.get_argument_sorts() and
+               lhs.get_range_sort() == rhs.get_range_sort() and
+               lhs.is_chainable() == rhs.is_chainable();
+    }
+}
+
+namespace std {
+    std::size_t hash<Sy2CPP::SortDescriptor>::operator()(const Sy2CPP::SortDescriptor &sd) {
+        return hash_combine(
+                std::hash<Sy2CPP::EitherSort>{}(sd.get_sort()),
+                static_cast<std::size_t>(sd.get_sort_kind()));
+    }
+
+    std::size_t hash<Sy2CPP::FunctionDescriptor>::operator()(const Sy2CPP::FunctionDescriptor &fd) const {
+        return hash_combine(
+                std::hash<Sy2CPP::EitherIdentifier>{}(fd.get_identifier()),
+                hash_vector(fd.get_argument_sorts()),
+                std::hash<Sy2CPP::EitherSort>{}(fd.get_range_sort()),
+                static_cast<std::size_t>(fd.get_function_kind()),
+                static_cast<std::size_t>(fd.is_chainable())
+        );
+    }
+
+    std::size_t hash<Sy2CPP::FunctionDescriptor&>::operator()(const Sy2CPP::FunctionDescriptor &fd) const {
+        return hash_combine(
+                std::hash<Sy2CPP::EitherIdentifier>{}(fd.get_identifier()),
+                hash_vector(fd.get_argument_sorts()),
+                std::hash<Sy2CPP::EitherSort>{}(fd.get_range_sort()),
+                static_cast<std::size_t>(fd.get_function_kind()),
+                static_cast<std::size_t>(fd.is_chainable())
+        );
+    }
+
+    std::size_t hash<Sy2CPP::SymbolDescriptor>::operator()(const Sy2CPP::SymbolDescriptor &symbD) {
+        return hash_combine(
+                std::hash<Sy2CPP::EitherIdentifier>{}(symbD.get_identifier()),
+                std::hash<Sy2CPP::EitherSort>{}(symbD.get_symbol_sort()),
+                static_cast<std::size_t>(symbD.get_binder()));
     }
 }

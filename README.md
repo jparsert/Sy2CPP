@@ -31,7 +31,7 @@ Some of the features of this library include:
 #### Easy TODOs
 * check if symbol already in the signature (in a lot of define/declare commands)
 * check that variables are distinct (in binders and arguments).
-
+* constexpr constructors for EitherIdentififer/Sort and Function/Sort/Symbol Descriptors
 
 ### TODO
 * TESTING!!!

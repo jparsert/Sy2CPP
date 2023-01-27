@@ -260,8 +260,7 @@ namespace Sy2CPP {
         for (auto x: ctx->varBinding()) {
             auto res = std::any_cast<VarBinding>(x->accept(this));
             bindings.push_back(res);
-            EitherSort var_type = TypeInference::infer_and_check_type(*this->table, res.second.get());
-            this->table->push_symbol_stack(SymbolDescriptor(res.first, var_type,
+            this->table->push_symbol_stack(SymbolDescriptor(std::get<0>(res), std::get<1>(res),
                                                             BinderKind::LET));
         }
 
@@ -479,7 +478,8 @@ namespace Sy2CPP {
         std::string symbol = ctx->symbol()->getText();
         EitherIdentifier id = EitherIdentifier(SimpleIdentifier{symbol});
         auto term = std::any_cast<std::shared_ptr<Term>>(ctx->term()->accept(this));
-        return VarBinding(id, term);
+        auto term_sort = TypeInference::infer_and_check_type(*this->table, term.get());
+        return VarBinding(id, term_sort, term);
     }
 
     std::any SymbolTableAstBuilder::visitCheckSynthCmd(SyGuSv21Parser::CheckSynthCmdContext *ctx) {

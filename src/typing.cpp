@@ -96,8 +96,12 @@ namespace Sy2CPP {
 
     std::any TypeInference::visitLetTerm(LetTerm &let) {
         for (VarBinding &bd: let.get_var_bindings()) {
-            auto term_sort = std::any_cast<EitherSort>(bd.second->accept(*this));
-            table.push_symbol_stack(SymbolDescriptor(bd.first, term_sort, BinderKind::LET));
+            auto term_sort = std::any_cast<EitherSort>(std::get<2>(bd)->accept(*this));
+            //check if assigned type corresponds to inferred type.
+            if (term_sort != std::get<1>(bd)) {
+                throw TypingError("This case should not occur.");
+            }
+            table.push_symbol_stack(SymbolDescriptor(std::get<0>(bd), term_sort, BinderKind::LET));
         }
 
         auto term_sort = std::any_cast<EitherSort>(let.get_term()->accept(*this));

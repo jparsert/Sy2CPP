@@ -14,7 +14,6 @@
 
 namespace Sy2CPP {
 
-
     enum class FunctionKind {
         THEORY,
         SYNTH_FUN,
@@ -42,15 +41,15 @@ namespace Sy2CPP {
         FunctionDescriptor(EitherIdentifier iden,
                            const std::initializer_list<EitherSort> &args,
                            EitherSort &range,
-                           const FunctionKind& kind,
-                           bool _chainable) : id{std::move(iden)}, argument_sorts{args}, range_sort{range},
+                           const FunctionKind &kind,
+                           bool _chainable = false) : id{std::move(iden)}, argument_sorts{args}, range_sort{range},
                                               function_kind{kind}, chainable{_chainable} {}
 
         FunctionDescriptor(EitherIdentifier iden,
                            const std::vector<EitherSort> &args,
                            EitherSort range,
-                           const FunctionKind& kind,
-                           bool _chainable) : id{std::move(iden)}, argument_sorts{args}, range_sort{std::move(range)},
+                           const FunctionKind &kind,
+                           bool _chainable = false) : id{std::move(iden)}, argument_sorts{args}, range_sort{std::move(range)},
                                               function_kind{kind}, chainable{_chainable} {}
 
         [[nodiscard]] EitherSort get_range_sort() const;
@@ -67,6 +66,7 @@ namespace Sy2CPP {
 
     };
 
+    bool operator==(const FunctionDescriptor& lhs, const FunctionDescriptor& rhs);
 
     enum class SortKind {
         PRIMITIVE,
@@ -80,9 +80,8 @@ namespace Sy2CPP {
         SortKind sort_kind;
 
     public:
-        SortDescriptor(EitherSort  srt,
-                       const SortKind& sortKind): sort{std::move(srt)}, sort_kind{sortKind}
-                       {}
+        SortDescriptor(EitherSort srt,
+                       const SortKind &sortKind) : sort{std::move(srt)}, sort_kind{sortKind} {}
 
         [[nodiscard]] const EitherSort &get_sort() const;
 
@@ -174,7 +173,6 @@ namespace Sy2CPP {
         SymbolDescriptor(const EitherIdentifier &&symb, const EitherSort &&sort, const BinderKind bind) :
                 symbol{symb}, symbol_sort{sort}, binder{bind} {}
 
-
         [[nodiscard]] const EitherIdentifier &get_identifier() const;
 
         [[nodiscard]] const EitherSort &get_symbol_sort() const;
@@ -189,6 +187,30 @@ namespace Sy2CPP {
     };
 
 }
+
+namespace std {
+
+    template<>  struct hash<Sy2CPP::SortDescriptor> {
+        std::size_t operator()(const Sy2CPP::SortDescriptor& sd);
+    };
+
+    template<>
+    struct hash<Sy2CPP::FunctionDescriptor> {
+        std::size_t operator()(const Sy2CPP::FunctionDescriptor &fd) const;
+    };
+
+    template<>
+    struct hash<Sy2CPP::FunctionDescriptor&> {
+        std::size_t operator()(const Sy2CPP::FunctionDescriptor &fd) const;
+    };
+
+    template<>
+    struct hash<Sy2CPP::SymbolDescriptor> {
+        std::size_t operator()(const Sy2CPP::SymbolDescriptor &symbD);
+    };
+
+}
+
 
 
 #endif //PHYSER_RESOLVERS_H

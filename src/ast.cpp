@@ -102,7 +102,8 @@ namespace Sy2CPP {
     std::size_t IndexedIdentifier::get_hash() const {
         size_t res_hash = symbol.get_hash();
         size_t lst_hash = hash_vector<Index>(indices);
-        return res_hash^lst_hash; // TODO use a better (non-commutative) combine hash function
+        return hash_combine<size_t,size_t>(res_hash, lst_hash);
+        // return res_hash^lst_hash;
     }
 
     IndexedIdentifier::operator std::string() const {

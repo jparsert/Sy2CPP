@@ -196,9 +196,9 @@ namespace Sy2CPP {
         for (VarBinding &x: let.get_var_bindings()) {
             this->push_space();
             this->push_op_bracket();
-            this->visitEitherIdentifier(x.first);
+            this->visitEitherIdentifier(std::get<0>(x));
             this->push_space();
-            x.second->accept(*this);
+            std::get<2>(x)->accept(*this);
             this->push_cl_bracket();
         }
         this->push_space();
