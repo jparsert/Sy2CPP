@@ -77,7 +77,7 @@ namespace Sy2CPP {
         for (SortedVar &x: cmd.get_arguments()) {
             this->push_space();
             this->push_op_bracket();
-            this->result_stream << to_string(x.first);
+            this->result_stream << Sy2CPP::to_string(x.first);
             this->push_space();
             this->push_sort(x.second);
             this->push_cl_bracket();
@@ -155,7 +155,7 @@ namespace Sy2CPP {
         for (SortedVar &x: synthFun.get_arguments()) {
             this->push_space();
             this->push_op_bracket();
-            this->result_stream << to_string(x.first);
+            this->result_stream << Sy2CPP::to_string(x.first);
             this->push_space();
             this->visitEitherSort(x.second);
             this->push_cl_bracket();

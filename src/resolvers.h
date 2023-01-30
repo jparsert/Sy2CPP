@@ -21,6 +21,15 @@ namespace Sy2CPP {
         // Constructor, selector, uninterpreted, etc.
     };
 
+    constexpr const char* to_string(FunctionKind en){
+        switch (en) {
+            case FunctionKind::THEORY: return "THEORY";
+            case FunctionKind::SYNTH_FUN: return "SYNTH_FUN";
+            case FunctionKind::USER_DEFINED: return "USER_DEFINED";
+            default: throw std::invalid_argument("Unimplemented item");
+        }
+    }
+
     class FunctionDescriptor {
 
     private:
@@ -63,6 +72,8 @@ namespace Sy2CPP {
         [[nodiscard]] FunctionKind get_function_kind() const;
 
         void set_function_kind(FunctionKind functionKind);
+
+        explicit operator std::string() const;
 
     };
 

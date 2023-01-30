@@ -32,17 +32,17 @@ include_directories(${PROJECT_BINARY_DIR} ${ANTLR4_INCLUDE_DIR} ${ANTLR4_INCLUDE
 
 
 set(sources
-        ${CMAKE_SOURCE_DIR}/parsing/AstPrinter.cpp ${CMAKE_SOURCE_DIR}/symbol_table.cpp ${CMAKE_SOURCE_DIR}/ast.cpp
+        ${CMAKE_SOURCE_DIR}/AstPrinter.cpp ${CMAKE_SOURCE_DIR}/symbol_table.cpp ${CMAKE_SOURCE_DIR}/ast.cpp
         ${CMAKE_SOURCE_DIR}/resolvers.cpp ${CMAKE_SOURCE_DIR}/general_utility.cpp ${CMAKE_SOURCE_DIR}/typing.cpp
         ${CMAKE_SOURCE_DIR}/exceptions.cpp Sy2CPP.cpp)
 
 set(headers
-        ${CMAKE_SOURCE_DIR}/parsing/AstPrinter.h ${CMAKE_SOURCE_DIR}/symbol_table.h ${CMAKE_SOURCE_DIR}/ast.h
+        ${CMAKE_SOURCE_DIR}/AstPrinter.h ${CMAKE_SOURCE_DIR}/symbol_table.h ${CMAKE_SOURCE_DIR}/ast.h
         ${CMAKE_SOURCE_DIR}/resolvers.h ${CMAKE_SOURCE_DIR}/general_utility.h ${CMAKE_SOURCE_DIR}/typing.h
         ${CMAKE_SOURCE_DIR}/exceptions.h ${CMAKE_SOURCE_DIR}/Sy2CPP.h)
 
 set(public-headers
-        ${CMAKE_SOURCE_DIR}/parsing/AstPrinter.h ${CMAKE_SOURCE_DIR}/symbol_table.h ${CMAKE_SOURCE_DIR}/ast.h
+        ${CMAKE_SOURCE_DIR}/AstPrinter.h ${CMAKE_SOURCE_DIR}/symbol_table.h ${CMAKE_SOURCE_DIR}/ast.h
         ${CMAKE_SOURCE_DIR}/resolvers.h ${CMAKE_SOURCE_DIR}/typing.h ${CMAKE_SOURCE_DIR}/exceptions.h
         ${CMAKE_SOURCE_DIR}/Sy2CPP.h)
 

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "parsing/AstPrinter.h"
+#include "AstPrinter.h"
 #include "exceptions.h"
 #include "Sy2CPP.h"
 #include <filesystem>

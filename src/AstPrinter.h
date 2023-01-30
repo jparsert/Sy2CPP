@@ -6,8 +6,8 @@
 #define PHYSER_TO_STRING_PRINTER_H
 
 #include <sstream>
-#include "../exceptions.h"
-#include "../ast.h"
+#include "exceptions.h"
+#include "ast.h"
 
 namespace Sy2CPP {
 
@@ -40,6 +40,12 @@ namespace Sy2CPP {
     public:
 
         AstToString() = default;
+
+        static std::string to_string(AstNode& node) {
+            AstToString printer;
+            node.accept(printer);
+            return printer.result_stream.str();
+        }
 
         std::any visitProblem(Problem &problem) override;
 

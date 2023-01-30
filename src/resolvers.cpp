@@ -32,6 +32,21 @@ namespace Sy2CPP {
         function_kind = functionKind;
     }
 
+    FunctionDescriptor::operator std::string() const {
+        std::stringstream res;
+        res << "[" + to_string(this->get_identifier()) + ", (";
+        if (!get_argument_sorts().empty()) {
+            res << to_string(get_argument_sorts()[0]);
+
+            for (int i = 1; i < get_argument_sorts().size(); ++i) {
+                res << "," + to_string(get_argument_sorts()[i]);
+            }
+        }
+        res << ") -> " + to_string(get_range_sort()) << ", " << to_string(get_function_kind()) << ", "
+            << (is_chainable() ? "chainable" : "not chainable") << "]";
+        return res.str();
+    }
+
     std::optional<FunctionDescriptor>
     CoreResolver::lookup_or_resolve_function(const EitherIdentifier &identifier,
                                              const std::vector<EitherSort> &arg_sorts) const {
@@ -165,6 +180,7 @@ namespace Sy2CPP {
 
             EitherSort int_sort = LIAResolver::get_int_sort();
             std::initializer_list<EitherSort> arg_lst1{int_sort};
+            std::initializer_list<EitherSort> arg_lst2{int_sort,int_sort};
 
             if (id.get_symbol() == "-" and arg_sorts.size() == 1 and arg_sorts[0] == LIAResolver::get_int_sort()) {
                 EitherIdentifier uminus = get_simple_id_from_str("-");
@@ -176,7 +192,7 @@ namespace Sy2CPP {
                        arg_sorts[0] == LIAResolver::get_int_sort()) {
 
                 EitherIdentifier minus = get_simple_id_from_str("-");
-                return std::make_optional<FunctionDescriptor>(minus, arg_lst1, int_sort, FunctionKind::THEORY, true);
+                return std::make_optional<FunctionDescriptor>(minus, arg_lst2, int_sort, FunctionKind::THEORY, false);
 
             }
         }
