@@ -1087,147 +1087,147 @@ namespace Sy2CPP{
         }
 
         std::any visitNumeral(Numeral &numeral) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDecimal(Decimal &decimal) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitBoolConst(BoolConst &boolConst) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitHexConst(HexConst &hex) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitBinConst(BinConst &bin) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitStringConst(StringConst &s) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitApplicationTerm(ApplicationTerm &application) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitExistsTerm(ExistsTerm &exists) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitForallTerm(ForallTerm &forall) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitLetTerm(LetTerm &let) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitProblem(Problem &problem) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitSimpleIdentifier(SimpleIdentifier &identifier) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitIndexedIdentifier(IndexedIdentifier &indexedIdentifier) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitSimpleSort(SimpleSort &sort) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitParametricSort(ParametricSort &sort) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitAssumeCmd(AssumeCmd &assumeCmd) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitCheckSynthCmd(CheckSynthCmd &checkSynth) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitConstraintCmd(ConstraintCmd &constraintCmd) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDeclareVarCmd(DeclareVarCmd &declareVarCmd) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitSetFeatureCmd(SetFeatureCmd &setFeatureCmd) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDeclareDatatype(DeclareDatatype &declareDatatype) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDeclareDatatypes(DeclareDatatypes &declareDatatypes) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDeclareSort(DeclareSort &declareSort) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDefineFun(DefineFunCmd &defineFunCmd) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDefineSort(DefineSort &defineSort) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitSetInfo(SetInfo &setInfo) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitSetLogic(SetLogic &setLogic) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitSetOption(SetOption &setOption) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitSortDecl(SortDecl &sortDecl) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDtDecl(DtDecl &dtDecl) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitDtConsDecl(DtConsDecl &dtConsDecl) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitSynthFunCmd(SynthFunCmd &synthFun) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitGrammarDef(GrammarDef &grammarDef) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitGroupedRuleList(GroupedRuleList &groupedRuleList) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitConstantGTerm(ConstantGTerm &constantGTerm) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
         std::any visitVariableGTerm(VariableGTerm &variableGTerm) override {
-            throw NotImplemented("Not implemented in AstBaseVisitor.");
+            return {};
         }
 
     };
