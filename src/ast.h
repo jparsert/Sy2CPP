@@ -26,6 +26,10 @@ namespace Sy2CPP {
 
     class AstVisitor;
 
+    class Term;
+    class Command;
+    class Literal;
+
     class SimpleIdentifier;
     class IndexedIdentifier;
     class IdentifierTerm;
@@ -74,7 +78,6 @@ namespace Sy2CPP {
 
     class AstVisitor {
     public:
-
         virtual std::any visitProblem(Problem &problem) = 0;
 
         virtual std::any visitNumeral(Numeral &numeral) = 0;
@@ -148,7 +151,6 @@ namespace Sy2CPP {
         virtual std::any visitConstantGTerm(ConstantGTerm &context) = 0;
 
         virtual std::any visitVariableGTerm(VariableGTerm &context) = 0;
-
     };
 
 
@@ -178,7 +180,6 @@ namespace Sy2CPP {
 
 
         // We don't allow for other ast nodes to be visited in a term visitor
-
         std::any visitProblem(Problem &problem) final {
             throw NotImplemented("Wrong AstNode in Term visitor");
         }
@@ -284,6 +285,37 @@ namespace Sy2CPP {
         }
     };
 
+    class BfTermVisitor : public TermVisitor {
+
+        std::any visitNumeral(Numeral &numeral) override = 0;
+
+        std::any visitDecimal(Decimal &decimal) override = 0;
+
+        std::any visitBoolConst(BoolConst &boolConst) override = 0;
+
+        std::any visitHexConst(HexConst &hex) override = 0;
+
+        std::any visitBinConst(BinConst &bin) override = 0;
+
+        std::any visitStringConst(StringConst &s) override = 0;
+
+        std::any visitIdentifierTerm(IdentifierTerm &term) override = 0;
+
+        std::any visitApplicationTerm(ApplicationTerm &application) override = 0;
+
+        std::any visitExistsTerm(ExistsTerm &exists) final {
+            throw NotImplemented("ExistsTerm in BfTermVisistor not allowed.");
+        }
+
+        std::any visitForallTerm(ForallTerm &forall) final {
+            throw NotImplemented("Forall in BfTermVisistor not allowed.");
+        }
+
+        std::any visitLetTerm(LetTerm &let) final {
+            throw NotImplemented("LetTerm in BfTermVisistor not allowed.");
+        }
+
+    };
 
     enum class Feature {
         GRAMMARS,
@@ -293,13 +325,17 @@ namespace Sy2CPP {
         WEIGHTS
     };
 
+    using TermPtr = std::shared_ptr<Term>;
+    using ComandPtr = std::shared_ptr<Command>;
+    using LiteralPtr = std::shared_ptr<Literal>;
 
     class Command : public AstNode {
 
     };
 
     class Term : public AstNode {
-
+    public:
+        [[nodiscard]] virtual TermPtr copy() const = 0;
     };
 
 
@@ -307,11 +343,8 @@ namespace Sy2CPP {
 
     };
 
-    using TermPtr = std::shared_ptr<Term>;
-    using ComandPtr = std::shared_ptr<Command>;
-    using LiteralPtr = std::shared_ptr<Literal>;
 
-
+    // Literal classes
     class Numeral : public Literal {
 
     private:
@@ -325,6 +358,8 @@ namespace Sy2CPP {
         bool operator==(const Numeral &num) const;
 
         explicit operator std::string() const;
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitNumeral(*this);
@@ -350,9 +385,11 @@ namespace Sy2CPP {
         bool val;
 
     public:
-        explicit BoolConst(bool x) : val{x} {}
+        explicit BoolConst(const bool x) : val{x} {}
 
         [[nodiscard]] bool get_value() const;
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitBoolConst(*this);
@@ -381,6 +418,8 @@ namespace Sy2CPP {
         [[nodiscard]] std::string get_string() const {
             return str;
         }
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitStringConst(*this);
@@ -443,8 +482,8 @@ namespace Sy2CPP {
 
     public:
 
-        explicit IndexedIdentifier(SimpleIdentifier &symb, const std::vector<Index> &index_)
-                : symbol(symb), indices(index_)
+        explicit IndexedIdentifier(SimpleIdentifier symb, const std::vector<Index> &index_)
+                : symbol(std::move(symb)), indices(index_)
         {
             if (indices.empty()) { // A IndexedIdentifier needs at least one index
                 throw WrongArguments("Indexed Identifier requires 1 or more arguments.");
@@ -493,7 +532,6 @@ namespace  std {
 namespace Sy2CPP {
 
 
-    std::string to_string(const EitherIdentifier &ident);
 
     inline EitherIdentifier get_simple_id_from_str(const std::string &s) {
         return EitherIdentifier{SimpleIdentifier{s}};
@@ -504,9 +542,11 @@ namespace Sy2CPP {
         EitherIdentifier identifier;
 
     public:
-        explicit IdentifierTerm(EitherIdentifier &id) : identifier{id} { }
+        explicit IdentifierTerm(EitherIdentifier id) : identifier{std::move(id)} { }
 
-        EitherIdentifier get_identifier();
+        [[nodiscard]] EitherIdentifier get_identifier() const;
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitIdentifierTerm(*this);
@@ -572,8 +612,8 @@ namespace Sy2CPP {
         std::vector<EitherSort> parameters;
 
     public:
-        ParametricSort(EitherIdentifier &id, std::vector<EitherSort> &params) :
-                identifier{id}, parameters{params} {}
+        ParametricSort(EitherIdentifier id, std::vector<EitherSort> &params) :
+                identifier{std::move(id)}, parameters{params} {}
 
         [[nodiscard]] std::size_t get_hash() const override {
             throw NotImplemented("Parametic Sorts hash is not implemented");
@@ -626,8 +666,6 @@ namespace std {
 
 namespace Sy2CPP{
 
-    std::string to_string(const EitherSort &ident);
-
     inline EitherSort get_simple_sort_from_str(const std::string &s) {
         return {SimpleSort(get_simple_id_from_str(s))};
 
@@ -639,14 +677,16 @@ namespace Sy2CPP{
         std::vector<TermPtr> arguments;
 
     public:
-        ApplicationTerm(std::variant<SimpleIdentifier, IndexedIdentifier> &iden,
-                        std::vector<TermPtr> &args) :
+        ApplicationTerm(const std::variant<SimpleIdentifier, IndexedIdentifier> &iden,
+                        const std::vector<TermPtr> &args) :
                 id{iden},
                 arguments{args} {}
 
         [[nodiscard]] EitherIdentifier get_identifier() const;
 
         std::vector<TermPtr> &get_arguments();
+
+        [[nodiscard]] TermPtr copy() const  override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitApplicationTerm(*this);
@@ -662,11 +702,13 @@ namespace Sy2CPP{
 
     public:
 
-        ExistsTerm(std::vector<SortedVar> &v, TermPtr &t) : vars{v}, subterm(t) {}
+        ExistsTerm(const std::vector<SortedVar> &v, TermPtr t) : vars{v}, subterm(std::move(t)) {}
 
         [[nodiscard]] std::vector<SortedVar> get_vars() const;
 
         [[nodiscard]] TermPtr get_term() const;
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitExistsTerm(*this);
@@ -680,12 +722,14 @@ namespace Sy2CPP{
 
     public:
 
-        ForallTerm(std::vector<SortedVar> &v,
-                   TermPtr &t) : vars{v}, subterm(t) {}
+        ForallTerm(const std::vector<SortedVar> &v,
+                   TermPtr t) : vars{v}, subterm(std::move(t)) {}
 
         [[nodiscard]] std::vector<SortedVar> get_vars() const;
 
         [[nodiscard]] TermPtr get_term() const;
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitForallTerm(*this);
@@ -705,11 +749,13 @@ namespace Sy2CPP{
 
     public:
 
-        LetTerm(std::vector<VarBinding> &bdgs, TermPtr &t) : bindings{bdgs}, subterm(t) {}
+        LetTerm(const std::vector<VarBinding> &bdgs, TermPtr t) : bindings{bdgs}, subterm(std::move(t)) {}
 
         [[nodiscard]] std::vector<VarBinding> get_var_bindings() const;
 
         [[nodiscard]] TermPtr get_term() const;
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitLetTerm(*this);
@@ -742,7 +788,7 @@ namespace Sy2CPP{
 
     public:
 
-        explicit ConstraintCmd(TermPtr &ptr) : term{ptr} { }
+        explicit ConstraintCmd(TermPtr ptr) : term{std::move(ptr)} { }
 
         [[nodiscard]] TermPtr get_term() const;
 
@@ -757,7 +803,7 @@ namespace Sy2CPP{
         EitherSort sort;
 
     public:
-        DeclareVarCmd(EitherIdentifier &iden, EitherSort &srt) : id{iden}, sort{srt} { }
+        DeclareVarCmd(EitherIdentifier  iden,EitherSort srt) : id{std::move(iden)}, sort{std::move(srt)} { }
 
         [[nodiscard]] EitherIdentifier get_identifier() const;
 
@@ -795,8 +841,8 @@ namespace Sy2CPP{
         std::vector<TermPtr> terms;
 
     public:
-        GroupedRuleList(EitherIdentifier iden, EitherSort &srt, std::vector<TermPtr> &trm) :
-                id{std::move(iden)}, sort{srt}, terms{trm} {}
+        GroupedRuleList(EitherIdentifier iden, EitherSort srt, const std::vector<TermPtr> &trm) :
+                id{std::move(iden)}, sort{std::move(srt)}, terms{trm} {}
 
         [[nodiscard]] EitherIdentifier get_identifier() const;
 
@@ -816,7 +862,7 @@ namespace Sy2CPP{
         std::vector<GroupedRuleList> rules;
 
     public:
-        GrammarDef(std::vector<SortedVar> &var, std::vector<GroupedRuleList> &rule) : non_terminals{var}, rules{rule} {}
+        GrammarDef(const std::vector<SortedVar> &var, const std::vector<GroupedRuleList> &rule) : non_terminals{var}, rules{rule} {}
 
         [[nodiscard]] std::vector<SortedVar> get_non_terminals() const;
 
@@ -835,9 +881,9 @@ namespace Sy2CPP{
         GrammarDef grammar;
 
     public:
-        SynthFunCmd(EitherIdentifier &iden, std::vector<SortedVar> &args,
-                    EitherSort &srt, GrammarDef &grmmr) : id{iden}, arguments{args},
-                                                          sort{srt}, grammar{grmmr} {}
+        SynthFunCmd(EitherIdentifier iden, const std::vector<SortedVar> &args,
+                    EitherSort srt, GrammarDef grmmr) : id{std::move(iden)}, arguments{args},
+                                                          sort{std::move(srt)}, grammar{std::move(grmmr)} {}
 
         [[nodiscard]] EitherIdentifier get_identifier() const;
 
@@ -873,7 +919,7 @@ namespace Sy2CPP{
         Numeral numeral;
 
     public:
-        DeclareSort(EitherIdentifier &iden, Numeral &num) : id{iden}, numeral{num} {}
+        DeclareSort(EitherIdentifier iden, Numeral num) : id{std::move(iden)}, numeral{std::move(num)} {}
 
         EitherIdentifier get_identifier();
 
@@ -892,11 +938,11 @@ namespace Sy2CPP{
         TermPtr term;
 
     public:
-        DefineFunCmd(EitherIdentifier &iden,
-                     std::vector<SortedVar> &args,
-                     EitherSort &srt,
-                     TermPtr &tm) :
-                id{iden}, arguments{args}, sort{srt}, term{tm} {}
+        DefineFunCmd(EitherIdentifier iden,
+                     const std::vector<SortedVar> &args,
+                     EitherSort srt,
+                     TermPtr tm) :
+                id{std::move(iden)}, arguments{args}, sort{std::move(srt)}, term{std::move(tm)} {}
 
         [[nodiscard]] EitherIdentifier get_identifier() const;
 
@@ -918,7 +964,7 @@ namespace Sy2CPP{
         EitherSort sort;
 
     public:
-        DefineSort(EitherIdentifier &iden, EitherSort &srt) : id{iden}, sort{srt} {}
+        DefineSort(EitherIdentifier iden, EitherSort srt) : id{std::move(iden)}, sort{std::move(srt)} {}
 
         EitherIdentifier get_identifier();
 
@@ -935,7 +981,7 @@ namespace Sy2CPP{
         LiteralPtr literal;
 
     public:
-        SetInfo(std::string &kw, LiteralPtr &lit) : keyword{kw}, literal{lit} { }
+        SetInfo(std::string kw, LiteralPtr lit) : keyword{std::move(kw)}, literal{std::move(lit)} { }
 
         std::string get_keyword();
 
@@ -951,7 +997,7 @@ namespace Sy2CPP{
         std::string logic;
 
     public:
-        explicit SetLogic(std::string &str) : logic{str} {}
+        explicit SetLogic(std::string  str) : logic{std::move(str)} {}
 
         [[nodiscard]] std::string get_logic() const;
 
@@ -966,7 +1012,7 @@ namespace Sy2CPP{
         LiteralPtr literal;
 
     public:
-        SetOption(std::string &kw, LiteralPtr &lit) : keyword{kw}, literal{lit} {}
+        SetOption(std::string kw, LiteralPtr lit) : keyword{std::move(kw)}, literal{std::move(lit)} {}
 
         [[nodiscard]] std::string get_keyword() const;
 
@@ -1005,9 +1051,11 @@ namespace Sy2CPP{
 
     public:
 
-        explicit ConstantGTerm(EitherSort &srt) : sort{srt} { }
+        explicit ConstantGTerm(EitherSort srt) : sort{std::move(srt)} { }
 
         [[nodiscard]] EitherSort get_sort() const;
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitConstantGTerm(*this);
@@ -1020,9 +1068,11 @@ namespace Sy2CPP{
 
     public:
 
-        explicit VariableGTerm(EitherSort &srt) : sort{srt} { }
+        explicit VariableGTerm(EitherSort srt) : sort{std::move(srt)} { }
 
         [[nodiscard]] EitherSort get_sort() const;
+
+        [[nodiscard]] TermPtr copy() const override;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitVariableGTerm(*this);

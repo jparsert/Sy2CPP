@@ -11,6 +11,10 @@
 
 namespace Sy2CPP {
 
+
+    std::string to_string(const EitherIdentifier &ident);
+    std::string to_string(const EitherSort &ident);
+
     class AstToString : public AstBaseVisitor {
 
     private:

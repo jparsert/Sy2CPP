@@ -10,7 +10,7 @@
 #include "SyGuSv21Parser.h"
 #include "typing.h"
 #include "SyGuSv21BaseVisitor.h"
-
+#include "AstPrinter.h"
 
 namespace Sy2CPP {
 

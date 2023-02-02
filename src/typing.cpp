@@ -3,6 +3,7 @@
 //
 
 #include "typing.h"
+#include "AstPrinter.h"
 
 namespace Sy2CPP {
 

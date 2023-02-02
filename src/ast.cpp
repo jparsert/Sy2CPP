@@ -4,16 +4,9 @@
 
 #include "ast.h"
 #include "general_utility.h"
+#include "AstPrinter.h"
 
 namespace Sy2CPP {
-
-    std::string to_string(const EitherIdentifier &ident) {
-        return std::visit([](auto &id) mutable { return (std::string) id; }, ident);
-    }
-
-    std::string to_string(const EitherSort &ident) {
-        return std::visit([](auto &id) mutable { return (std::string) id; }, ident);
-    }
 
     LiteralPtr SetInfo::get_literal() {
         return literal;
@@ -63,8 +56,16 @@ namespace Sy2CPP {
         return std::to_string(val);
     }
 
+    TermPtr Numeral::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<Numeral>(this->get_value()));
+    }
+
     bool BoolConst::get_value() const  {
         return this->val;
+    }
+
+    TermPtr BoolConst::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<BoolConst>(this->get_value()));
     }
 
     std::any SimpleIdentifier::accept(AstVisitor &visitor) {
@@ -115,9 +116,13 @@ namespace Sy2CPP {
         return res;
     }
 
-    EitherIdentifier IdentifierTerm::get_identifier()
+    EitherIdentifier IdentifierTerm::get_identifier() const
     {
         return identifier;
+    }
+
+    TermPtr IdentifierTerm::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<IdentifierTerm>(this->get_identifier()));
     }
 
     EitherIdentifier ApplicationTerm::get_identifier() const {
@@ -128,12 +133,26 @@ namespace Sy2CPP {
         return this->arguments;
     }
 
+    TermPtr ApplicationTerm::copy() const{
+        // Deep copy
+        std::vector<TermPtr> copied_terms;
+        for (const auto& e : arguments) {
+            copied_terms.push_back(e->copy());
+        }
+        return std::static_pointer_cast<Term>(
+                std::make_shared<ApplicationTerm>(this->get_identifier(), copied_terms));
+    }
+
     std::vector<SortedVar> ExistsTerm::get_vars() const {
         return this->vars;
     }
 
     TermPtr ExistsTerm::get_term() const {
         return this->subterm;
+    }
+
+    TermPtr ExistsTerm::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<ExistsTerm>(this->vars, this->subterm->copy()));
     }
 
     std::vector<SortedVar> ForallTerm::get_vars() const {
@@ -144,12 +163,20 @@ namespace Sy2CPP {
             return this->subterm;
     }
 
+    TermPtr ForallTerm::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<ForallTerm>(this->get_vars(), this->get_term()->copy()));
+    }
+
     std::vector<VarBinding> LetTerm::get_var_bindings() const {
         return this->bindings;
     }
 
     TermPtr LetTerm::get_term() const {
         return this->subterm;
+    }
+
+    TermPtr LetTerm::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<LetTerm>(this->bindings, this->subterm));
     }
 
     TermPtr AssumeCmd::get_term() const {
@@ -255,14 +282,23 @@ namespace Sy2CPP {
         return this->sort;
     }
 
+    TermPtr ConstantGTerm::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<ConstantGTerm>(this->sort));
+    }
+
     EitherSort VariableGTerm::get_sort() const {
         return this->sort;
+    }
+
+    TermPtr VariableGTerm::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<VariableGTerm>(this->sort));
     }
 
     void Problem::add_command(ComandPtr &cmd) {
         this->commands.push_back(cmd);
     }
 
-
-
+    TermPtr StringConst::copy() const {
+        return std::static_pointer_cast<Term>(std::make_shared<StringConst>(this->str));
+    }
 }

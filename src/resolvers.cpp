@@ -7,7 +7,7 @@
 #include "resolvers.h"
 #include "exceptions.h"
 #include "general_utility.h"
-
+#include "AstPrinter.h"
 
 
 namespace Sy2CPP {

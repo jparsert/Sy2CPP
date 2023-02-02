@@ -6,6 +6,15 @@
 
 namespace Sy2CPP {
 
+
+    std::string to_string(const EitherIdentifier &ident) {
+        return std::visit([](auto &id) mutable { return (std::string) id; }, ident);
+    }
+
+    std::string to_string(const EitherSort &ident) {
+        return std::visit([](auto &id) mutable { return (std::string) id; }, ident);
+    }
+
     std::any AstToString::visitGrammarDef(GrammarDef &gdef) {
         this->push_op_bracket();
         for (auto &x: gdef.get_non_terminals()) {
