@@ -1136,6 +1136,13 @@ namespace Sy2CPP{
             return visitEitherIdentifier(term.get_identifier());
         }
 
+        std::any visitProblem(Problem &problem) override {
+            for (auto &cmd: problem.get_commands()) {
+                cmd->accept(*this);
+            }
+            return {};
+        }
+
         std::any visitNumeral(Numeral &numeral) override {
             return {};
         }
@@ -1173,10 +1180,6 @@ namespace Sy2CPP{
         }
 
         std::any visitLetTerm(LetTerm &let) override {
-            return {};
-        }
-
-        std::any visitProblem(Problem &problem) override {
             return {};
         }
 
