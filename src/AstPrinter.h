@@ -15,6 +15,8 @@ namespace Sy2CPP {
     std::string to_string(const EitherIdentifier &ident);
     std::string to_string(const EitherSort &ident);
 
+    std::string to_string(const SyGuSSolution& sol);
+
     class AstToString : public AstBaseVisitor {
 
     private:

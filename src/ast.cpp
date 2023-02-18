@@ -220,6 +220,10 @@ namespace Sy2CPP {
         return this->term;
     }
 
+    void DefineFunCmd::set_term(const TermPtr& trm) {
+        this->term = trm;
+    }
+
     EitherIdentifier DeclareSort::get_identifier(){
         return this->id;
     }

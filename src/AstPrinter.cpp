@@ -15,6 +15,23 @@ namespace Sy2CPP {
         return std::visit([](auto &id) mutable { return (std::string) id; }, ident);
     }
 
+    std::string to_string(const SyGuSSolution& sol) {
+        if (!sol) {
+            return "fail";
+        } else {
+            std::stringstream result_stream;
+            result_stream << "(" << std::endl;
+            for (Sy2CPP::DefineFunCmd cmd : sol.value()) {
+                result_stream << AstToString::to_string(cmd) << std::endl;
+            }
+            result_stream << ")";
+            result_stream << std::endl;
+
+            return result_stream.str();
+        }
+
+    }
+
     std::any AstToString::visitGrammarDef(GrammarDef &gdef) {
         this->push_op_bracket();
         for (auto &x: gdef.get_non_terminals()) {

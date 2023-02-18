@@ -19,7 +19,7 @@ int main(int argc, const char* argv[])
             continue;
         }
         std::cout << entry.path() << std::endl;
-        auto [symbol_table, ast] = Sy2CPP::get_symbol_table_and_ast_from_file(entry.path().string());
+        auto [ast, symbol_table] = Sy2CPP::get_ast_and_symbol_table_from_file(entry.path().string());
         Sy2CPP::AstToString printer;
         std::string s = printer.get_string(*ast);
         std::cout << s << std::endl;

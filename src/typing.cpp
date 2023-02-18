@@ -36,8 +36,8 @@ namespace Sy2CPP {
             return cnst->get_range_sort();
         }
 
-        throw TypingError("Could not infer type of identifier: " +
-                        to_string(term.get_identifier())); //TODO string of identifier
+        throw TypingError("Could not infer type of: " +
+                        AstToString::to_string(term));
 
     }
 

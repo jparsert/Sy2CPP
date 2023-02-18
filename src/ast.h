@@ -518,6 +518,7 @@ namespace  std {
         }
     };
 
+
     /*
     template<>
     struct hash<Sy2CPP::EitherIdentifier> {
@@ -951,6 +952,8 @@ namespace Sy2CPP{
         [[nodiscard]] EitherSort get_sort() const;
 
         [[nodiscard]] TermPtr get_term() const;
+
+        void set_term(const TermPtr& term);
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitDefineFun(*this);

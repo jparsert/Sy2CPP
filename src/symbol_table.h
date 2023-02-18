@@ -42,6 +42,7 @@ namespace Sy2CPP {
         //map for defined sorts (note that declared sorts are not here)
         std::unordered_map<EitherSort, SortDescriptor> sorts;
 
+
     public:
 
         // adding bool sorts and default boolean functions

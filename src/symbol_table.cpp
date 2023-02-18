@@ -16,8 +16,7 @@ namespace Sy2CPP {
         EitherSort range_sort = cmd.get_sort();
 
         auto [_, val] = this->user_defined_funs
-                .emplace(id, FunctionDescriptor(id, arg_sorts, range_sort,
-                                                FunctionKind::USER_DEFINED, false));
+                .emplace(id, FunctionDescriptor(id, arg_sorts, range_sort, FunctionKind::USER_DEFINED, false));
         return val;
     }
 
@@ -28,8 +27,7 @@ namespace Sy2CPP {
                        [](const SortedVar &x) { return x.second; });
 
         auto [_, val] = this->synth_fun_funs
-                .emplace(id, FunctionDescriptor(id, arg_sorts, range_sort,
-                                                FunctionKind::SYNTH_FUN, false));
+                .emplace(id, FunctionDescriptor(id, arg_sorts, range_sort, FunctionKind::SYNTH_FUN, false));
         return val;
     }
 

@@ -12,8 +12,8 @@
 
 namespace Sy2CPP {
 
-    std::pair<std::shared_ptr<SymbolTable>, std::shared_ptr<Problem>>
-    get_symbol_table_and_ast_from_file(const std::string& path);
+    std::pair<std::shared_ptr<Problem>, std::shared_ptr<SymbolTable>>
+    get_ast_and_symbol_table_from_file(const std::string& path);
 
 }
 

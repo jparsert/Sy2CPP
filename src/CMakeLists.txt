@@ -55,8 +55,30 @@ add_dependencies(Sy2CPP antlr4_shared)
 target_link_libraries(Sy2CPP PRIVATE antlr4_shared)
 
 ##############################
+####### SHARED LIBRARY #######
+add_library(Sy2CPP-shared SHARED
+        ${sources}  ${ANTLR4_SRC_FILES_antlrsygus})
+
+set_target_properties(Sy2CPP-shared PROPERTIES
+        OUTPUT_NAME sy2cpp)
+
+target_link_libraries(Sy2CPP-shared PRIVATE antlr4-runtime antlr4_shared)
+
+###### INSTALL LIB ######
+
+# dir is relative to CMAKE_INSTALL_PREFIX (/usr/local)
+install(TARGETS Sy2CPP-shared
+        LIBRARY DESTINATION "/usr/lib"
+        ARCHIVE DESTINATION "/usr/lib"
+        )
+
+# Install header files
+install(FILES ${public-headers} DESTINATION "/usr/include/Sy2CPP/")
+
+
+##############################
 ####### STATIC LIBRARY #######
-add_library(Sy2CPP-static SHARED
+add_library(Sy2CPP-static STATIC
         ${sources}  ${ANTLR4_SRC_FILES_antlrsygus})
 
 set_target_properties(Sy2CPP-static PROPERTIES
@@ -74,3 +96,4 @@ install(TARGETS Sy2CPP-static
 
 # Install header files
 install(FILES ${public-headers} DESTINATION "/usr/include/Sy2CPP/")
+

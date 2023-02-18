@@ -139,12 +139,12 @@ namespace Sy2CPP {
         std::any visitAssumeCmd(SyGuSv21Parser::AssumeCmdContext *ctx) override;
 
         static
-        std::pair<std::shared_ptr<SymbolTable>, std::shared_ptr<Problem>>
+        std::pair<std::shared_ptr<Problem>, std::shared_ptr<SymbolTable>>
         build_symbol_table_and_ast(SyGuSv21Parser::ProblemContext *problem) {
             SymbolTableAstBuilder builder{};
             problem->accept(&builder);
 
-            return {builder.table, builder.problem};
+            return {builder.problem, builder.table};
         }
 
     };
@@ -166,7 +166,7 @@ namespace Sy2CPP {
         } else if (ctx->STRINGCONST() != nullptr) {
             return std::static_pointer_cast<Literal>(std::make_shared<StringConst>(ctx->STRINGCONST()->getText()));
         } else {
-            throw UnsupportedFeature("Strong Const is neither constant nor empty.");
+            throw UnsupportedFeature("String Const is neither constant nor empty.");
         }
     }
 
@@ -542,8 +542,8 @@ namespace Sy2CPP {
     }
 
 
-    std::pair<std::shared_ptr<SymbolTable>, std::shared_ptr<Problem>>
-    get_symbol_table_and_ast_from_file(const std::string &path) {
+    std::pair<std::shared_ptr<Problem>, std::shared_ptr<SymbolTable>>
+    get_ast_and_symbol_table_from_file(const std::string &path) {
         std::ifstream stream;
         stream.open(path);
         if (!stream) {
