@@ -6,21 +6,43 @@ project(Sy2CPP)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-
+# adding antler cmake modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-# ANTLR
+# Donwload generator jar
 FetchContent_Declare(
         antlr_jar
-        URL https://www.antlr.org/download/antlr-4.11.1-complete.jar
+        URL https://www.antlr.org/download/antlr-4.12.0-complete.jar
         DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps
         DOWNLOAD_NO_EXTRACT TRUE)
 FETCHCONTENT_MAKEAVAILABLE(antlr_jar)
+set(ANTLR4_JAR_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/antlr-4.12.0-complete.jar)
 
+# required if linking to static library
+add_definitions(-DANTLR4CPP_STATIC)
+
+# using /MD flag for antlr4_runtime (for Visual C++ compilers only)
+set(ANTLR4_WITH_STATIC_CRT OFF)
+
+# Specify the version of the antlr4 library needed for this project.
+# By default the latest version of antlr4 will be used.  You can specify a
+# specific, stable version by setting a repository tag value or a link
+# to a zip file containing the libary source.
+set(ANTLR4_TAG 4.12.0)
+set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.12.0.zip)
+
+# add external build for antlrcpp
+include(ExternalAntlr4Cpp)
+# add antrl4cpp artifacts to project environment
+include_directories(${ANTLR4_INCLUDE_DIRS})
+
+# set variable pointing to the antlr tool that supports C++
+# this is not required if the jar file can be found under PATH environment
+set(ANTLR_EXECUTABLE ${ANTLR4_JAR_LOCATION})
+# add macros to generate ANTLR Cpp code from grammar
+find_package(ANTLR REQUIRED)
 find_package(antlr4-generator REQUIRED)
-find_package(antlr4-runtime REQUIRED)
 
-set(ANTLR4_JAR_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/antlr-4.11.1-complete.jar)
 # generate parser
 antlr4_generate(
         antlrsygus
