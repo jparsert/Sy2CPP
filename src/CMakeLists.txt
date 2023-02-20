@@ -6,6 +6,9 @@ project(Sy2CPP)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 # ANTLR
 FetchContent_Declare(
         antlr_jar
