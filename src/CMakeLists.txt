@@ -41,19 +41,12 @@ include_directories(${ANTLR4_INCLUDE_DIRS})
 set(ANTLR_EXECUTABLE ${ANTLR4_JAR_LOCATION})
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
-find_package(antlr4-generator REQUIRED)
 
-# generate parser
-antlr4_generate(
-        antlrsygus
-        ${CMAKE_CURRENT_SOURCE_DIR}/parsing/SyGuSv21.g4
-        BOTH
-        FALSE
-        TRUE
-)
+antlr_target(antlrsygus SyGuSv21.g4 VISITOR TRUE)
+
 
 # add directories for generated include files
-include_directories(${PROJECT_BINARY_DIR} ${ANTLR4_INCLUDE_DIR} ${ANTLR4_INCLUDE_DIR_antlrsygus} )
+include_directories(${PROJECT_BINARY_DIR} ${ANTLR4_INCLUDE_DIR} ${ANTLR_antlrsygus_OUTPUT_DIR} )
 
 
 set(sources
@@ -74,7 +67,7 @@ set(public-headers
 
 #the executable used for testing etc.
 add_executable(Sy2CPP main.cpp
-        ${ANTLR4_SRC_FILES_antlrsygus}
+        ${ANTLR_antlrsygus_CXX_OUTPUTS}
         ${sources} ${headers} )
 add_dependencies(Sy2CPP antlr4_shared)
 target_link_libraries(Sy2CPP PRIVATE antlr4_shared)
@@ -82,7 +75,7 @@ target_link_libraries(Sy2CPP PRIVATE antlr4_shared)
 ##############################
 ####### SHARED LIBRARY #######
 add_library(Sy2CPP-shared SHARED
-        ${sources}  ${ANTLR4_SRC_FILES_antlrsygus})
+        ${sources}  ${ANTLR_antlrsygus_CXX_OUTPUTS})
 
 set_target_properties(Sy2CPP-shared PROPERTIES
         OUTPUT_NAME sy2cpp)
@@ -104,7 +97,7 @@ install(FILES ${public-headers} DESTINATION "/usr/include/Sy2CPP/")
 ##############################
 ####### STATIC LIBRARY #######
 add_library(Sy2CPP-static STATIC
-        ${sources}  ${ANTLR4_SRC_FILES_antlrsygus})
+        ${sources}  ${ANTLR_antlrsygus_CXX_OUTPUTS})
 
 set_target_properties(Sy2CPP-static PROPERTIES
         OUTPUT_NAME sy2cpp)

@@ -12,7 +12,7 @@ int main(int argc, const char* argv[])
 {
     //SyGuSv21Parser::ProblemContext* problem = get_parse_tree("./test/diff.sl");
 
-    
+
     std::string path = "../cleaned_sygus_benchmarks/LIA_INV/";
     int i = 0;
     for (const auto & entry : filesystem::directory_iterator(path)) {
