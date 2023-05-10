@@ -15,6 +15,9 @@ namespace Sy2CPP {
     std::pair<std::shared_ptr<Problem>, std::shared_ptr<SymbolTable>>
     get_ast_and_symbol_table_from_file(const std::string& path);
 
+    std::pair<SyGuSSolution, std::shared_ptr<SymbolTable>>
+    get_ast_and_st_from_solution_string(const std::string& solution);
+
 }
 
 

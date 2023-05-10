@@ -4,6 +4,10 @@
 
 
 #include "Sy2CPP.h"
+
+#include <string>
+#include <iostream>
+
 #include "symbol_table.h"
 #include "ast.h"
 #include "SyGuSv21Lexer.h"
@@ -138,13 +142,24 @@ namespace Sy2CPP {
 
         std::any visitAssumeCmd(SyGuSv21Parser::AssumeCmdContext *ctx) override;
 
+        std::any visitFailSolution(SyGuSv21Parser::FailSolutionContext* ctx) override;
+
+        std::any visitSuccSolution(SyGuSv21Parser::SuccSolutionContext *ctx) override;
+
         static
         std::pair<std::shared_ptr<Problem>, std::shared_ptr<SymbolTable>>
         build_symbol_table_and_ast(SyGuSv21Parser::ProblemContext *problem) {
             SymbolTableAstBuilder builder{};
             problem->accept(&builder);
-
             return {builder.problem, builder.table};
+        }
+
+        static
+        std::pair<SyGuSSolution, std::shared_ptr<SymbolTable>>
+        build_symbol_table_and_ast_from_solution(SyGuSv21Parser::SolutionContext *sol) {
+            SymbolTableAstBuilder builder{};
+            auto solution = std::any_cast<SyGuSSolution>(sol->accept(&builder));
+            return {solution, builder.table};
         }
 
     };
@@ -541,6 +556,20 @@ namespace Sy2CPP {
         return Index(SimpleIdentifier(ctx->getText()));
     }
 
+    std::any SymbolTableAstBuilder::visitFailSolution(SyGuSv21Parser::FailSolutionContext *ctx) {
+        return std::nullopt;
+    }
+
+    std::any SymbolTableAstBuilder::visitSuccSolution(SyGuSv21Parser::SuccSolutionContext *ctx) {
+        std::vector<DefineFunCmd> solution;
+        for (auto x : ctx->defineFun()) {
+            auto cmd = std::any_cast<std::shared_ptr<Command>>(x->accept(this));
+            auto def_fun_cmd = std::static_pointer_cast<DefineFunCmd>(cmd);
+            solution.push_back(*def_fun_cmd);
+        }
+        return SyGuSSolution(solution);
+    }
+
 
     std::pair<std::shared_ptr<Problem>, std::shared_ptr<SymbolTable>>
     get_ast_and_symbol_table_from_file(const std::string &path) {
@@ -556,5 +585,18 @@ namespace Sy2CPP {
         SyGuSv21Parser::ProblemContext *parse_tree = parser.problem();
         return Sy2CPP::SymbolTableAstBuilder::build_symbol_table_and_ast(parse_tree);
     }
+
+    std::pair<SyGuSSolution, std::shared_ptr<SymbolTable>>
+    get_ast_and_st_from_solution_string(const std::string& solution) {
+        std::stringstream ss(solution);
+        antlr4::ANTLRInputStream input{ss};
+        SyGuSv21Lexer lexer{&input};
+        antlr4::CommonTokenStream tokens(&lexer);
+        SyGuSv21Parser parser{&tokens};
+        SyGuSv21Parser::SolutionContext *parse_tree = parser.solution();
+        return Sy2CPP::SymbolTableAstBuilder::build_symbol_table_and_ast_from_solution(parse_tree);
+
+    }
+
 
 }

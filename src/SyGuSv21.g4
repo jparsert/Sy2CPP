@@ -2,6 +2,10 @@ grammar SyGuSv21;
 
 problem : (cmd)+ EOF;
 
+solution    : FAIL EOF                  #failSolution
+            | (defineFun)+ EOF          #succSolution
+            ;
+
 // Definitions in similar order as in the language definition pdf
 
 //
@@ -173,6 +177,8 @@ BINCONST : '#b'('0' | '1')+ ;
 
 TRUE : 'true';
 FALSE : 'false';
+
+FAIL: 'fail';
 
 GRAMMARS_FEATURE : 'grammars';
 FWD_DECLS_FEATURE: 'fwd-decls';
