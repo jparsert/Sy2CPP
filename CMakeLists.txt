@@ -6,6 +6,8 @@ project(Sy2CPP)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
+set(src_dir ${CMAKE_SOURCE_DIR}/src)
+
 # adding antler cmake modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -42,31 +44,32 @@ set(ANTLR_EXECUTABLE ${ANTLR4_JAR_LOCATION})
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
-antlr_target(antlrsygus SyGuSv21.g4 VISITOR TRUE)
+antlr_target(antlrsygus ${src_dir}/SyGuSv21.g4 VISITOR TRUE)
 
 
 # add directories for generated include files
 include_directories(${PROJECT_BINARY_DIR} ${ANTLR4_INCLUDE_DIR} ${ANTLR_antlrsygus_OUTPUT_DIR} )
 
 
+
 set(sources
-        ${CMAKE_SOURCE_DIR}/AstPrinter.cpp ${CMAKE_SOURCE_DIR}/symbol_table.cpp ${CMAKE_SOURCE_DIR}/ast.cpp
-        ${CMAKE_SOURCE_DIR}/resolvers.cpp ${CMAKE_SOURCE_DIR}/general_utility.cpp ${CMAKE_SOURCE_DIR}/typing.cpp
-        ${CMAKE_SOURCE_DIR}/exceptions.cpp Sy2CPP.cpp)
+        ${src_dir}/AstPrinter.cpp ${src_dir}/symbol_table.cpp ${src_dir}/ast.cpp
+        ${src_dir}/resolvers.cpp ${src_dir}/general_utility.cpp ${src_dir}/typing.cpp
+        ${src_dir}/exceptions.cpp ${src_dir}/Sy2CPP.cpp)
 
 set(headers
-        ${CMAKE_SOURCE_DIR}/AstPrinter.h ${CMAKE_SOURCE_DIR}/symbol_table.h ${CMAKE_SOURCE_DIR}/ast.h
-        ${CMAKE_SOURCE_DIR}/resolvers.h ${CMAKE_SOURCE_DIR}/general_utility.h ${CMAKE_SOURCE_DIR}/typing.h
-        ${CMAKE_SOURCE_DIR}/exceptions.h ${CMAKE_SOURCE_DIR}/Sy2CPP.h)
+        ${src_dir}/AstPrinter.h ${src_dir}/symbol_table.h ${src_dir}/ast.h
+        ${src_dir}/resolvers.h ${src_dir}/general_utility.h ${src_dir}/typing.h
+        ${src_dir}/exceptions.h ${src_dir}/Sy2CPP.h)
 
 set(public-headers
-        ${CMAKE_SOURCE_DIR}/AstPrinter.h ${CMAKE_SOURCE_DIR}/symbol_table.h ${CMAKE_SOURCE_DIR}/ast.h
-        ${CMAKE_SOURCE_DIR}/resolvers.h ${CMAKE_SOURCE_DIR}/typing.h ${CMAKE_SOURCE_DIR}/exceptions.h
-        ${CMAKE_SOURCE_DIR}/Sy2CPP.h)
+        ${src_dir}/AstPrinter.h ${src_dir}/symbol_table.h ${src_dir}/ast.h
+        ${src_dir}/resolvers.h ${src_dir}/typing.h ${src_dir}/exceptions.h
+        ${src_dir}/Sy2CPP.h)
 
 
 #the executable used for testing etc.
-add_executable(Sy2CPP main.cpp
+add_executable(Sy2CPP ${src_dir}/main.cpp
         ${ANTLR_antlrsygus_CXX_OUTPUTS}
         ${sources} ${headers} )
 add_dependencies(Sy2CPP antlr4_shared)
