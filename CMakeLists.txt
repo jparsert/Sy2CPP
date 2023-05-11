@@ -6,7 +6,7 @@ project(Sy2CPP)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-set(src_dir ${CMAKE_SOURCE_DIR}/src)
+set(src_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # adding antler cmake modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
