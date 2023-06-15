@@ -84,7 +84,7 @@ set_target_properties(Sy2CPP-shared PROPERTIES
         OUTPUT_NAME sy2cpp)
 
 target_link_libraries(Sy2CPP-shared PRIVATE antlr4-runtime antlr4_shared)
-
+target_include_directories(Sy2CPP-shared PUBLIC ${src_dir})
 ###### INSTALL LIB ######
 
 # dir is relative to CMAKE_INSTALL_PREFIX (/usr/local)
@@ -106,7 +106,7 @@ set_target_properties(Sy2CPP-static PROPERTIES
         OUTPUT_NAME sy2cpp)
 
 target_link_libraries(Sy2CPP-static PRIVATE antlr4-runtime antlr4_shared)
-
+target_include_directories(Sy2CPP-static PUBLIC ${src_dir})
 ###### INSTALL LIB ######
 
 # dir is relative to CMAKE_INSTALL_PREFIX (/usr/local)
