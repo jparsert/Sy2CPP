@@ -879,11 +879,11 @@ namespace Sy2CPP{
         EitherIdentifier id;
         std::vector<SortedVar> arguments;
         EitherSort sort;
-        GrammarDef grammar;
+        std::optional<GrammarDef> grammar;
 
     public:
         SynthFunCmd(EitherIdentifier iden, const std::vector<SortedVar> &args,
-                    EitherSort srt, GrammarDef grmmr) : id{std::move(iden)}, arguments{args},
+                    EitherSort srt, std::optional<GrammarDef> grmmr) : id{std::move(iden)}, arguments{args},
                                                           sort{std::move(srt)}, grammar{std::move(grmmr)} {}
 
         [[nodiscard]] EitherIdentifier get_identifier() const;
@@ -892,7 +892,7 @@ namespace Sy2CPP{
 
         [[nodiscard]] EitherSort get_sort() const;
 
-        [[nodiscard]] GrammarDef get_grammar() const;
+        [[nodiscard]] std::optional<GrammarDef> get_grammar() const;
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitSynthFunCmd(*this);

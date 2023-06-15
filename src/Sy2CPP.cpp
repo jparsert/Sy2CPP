@@ -329,8 +329,12 @@ namespace Sy2CPP {
         //adding new function to symbol table
         this->table->add_synth_fun(id, arguments, sort);
 
-        auto grammar = std::any_cast<GrammarDef>(ctx->grammarDef()->accept(this));
-
+        std::optional<GrammarDef> grammar;
+        if (ctx->grammarDef()) {
+            grammar = std::any_cast<GrammarDef>(ctx->grammarDef()->accept(this));
+        } else {
+            grammar = std::nullopt;
+        }
         this->table->pop_symbol_stack(arguments.size());
 
         return std::static_pointer_cast<Command>(std::make_shared<SynthFunCmd>(id, arguments, sort,
@@ -506,6 +510,8 @@ namespace Sy2CPP {
 
         // add theory functions
         if (s.find("LIA") != std::string::npos) {
+            this->table->add_resolver(std::make_shared<LIAResolver>());
+        } else if (s.find("ALL") != std::string::npos) {
             this->table->add_resolver(std::make_shared<LIAResolver>());
         }
 

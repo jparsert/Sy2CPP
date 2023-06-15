@@ -194,9 +194,10 @@ namespace Sy2CPP {
         this->visitEitherSort(synthFun.get_sort());
         this->push_space();
 
-        this->result_stream << std::endl;
-
-        synthFun.get_grammar().accept(*this);
+        if (synthFun.get_grammar()) { // check if we have grammar or it's just default
+            this->result_stream << std::endl;
+            synthFun.get_grammar()->accept(*this);
+        }
 
         this->push_cl_bracket();
         return {};

@@ -244,7 +244,7 @@ namespace Sy2CPP {
         return this->sort;
     }
 
-    GrammarDef SynthFunCmd::get_grammar() const  {
+    std::optional<GrammarDef> SynthFunCmd::get_grammar() const  {
         return this->grammar;
     }
 
