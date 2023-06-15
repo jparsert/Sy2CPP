@@ -10,6 +10,25 @@ Some of the features of this library include:
 * C++20 (not fully as most compilers don't support everything yet f.e. modules)
 
 
+### USAGE:
+Download repo,  run `cmake`, `make`, and `make install`
+
+With CMAKE in the project use `FetchContent`
+```
+...
+include(FetchContent)
+...
+FetchContent_Declare(Sy2CPP
+        GIT_REPOSITORY https://github.com/jparsert/Sy2CPP
+        GIT_TAG main
+)
+FetchContent_MakeAvailable(Sy2CPP)
+
+...
+
+target_link_libraries(sometarget PRIVATE Sy2CPP-shared)
+```
+
 ### Guidlines
 * use modern c++
 * References where possible
