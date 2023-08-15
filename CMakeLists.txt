@@ -6,6 +6,7 @@ project(Sy2CPP)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
+
 set(src_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # adding antler cmake modules
@@ -83,6 +84,8 @@ add_library(Sy2CPP-shared SHARED
 set_target_properties(Sy2CPP-shared PROPERTIES
         OUTPUT_NAME sy2cpp)
 
+target_compile_options(Sy2CPP-shared PRIVATE -Wno-return-type)
+
 target_link_libraries(Sy2CPP-shared PRIVATE antlr4-runtime antlr4_shared)
 target_include_directories(Sy2CPP-shared PUBLIC ${src_dir})
 ###### INSTALL LIB ######
@@ -101,6 +104,9 @@ install(FILES ${public-headers} DESTINATION "/usr/include/Sy2CPP/")
 ####### STATIC LIBRARY #######
 add_library(Sy2CPP-static STATIC
         ${sources}  ${ANTLR_antlrsygus_CXX_OUTPUTS})
+
+target_compile_options(Sy2CPP-static PRIVATE -Wno-return-type)
+
 
 set_target_properties(Sy2CPP-static PROPERTIES
         OUTPUT_NAME sy2cpp)
