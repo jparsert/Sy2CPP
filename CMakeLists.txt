@@ -15,11 +15,11 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Donwload generator jar
 FetchContent_Declare(
         antlr_jar
-        URL https://www.antlr.org/download/antlr-4.12.0-complete.jar
+        URL https://www.antlr.org/download/antlr-4.13.0-complete.jar
         DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps
         DOWNLOAD_NO_EXTRACT TRUE)
 FETCHCONTENT_MAKEAVAILABLE(antlr_jar)
-set(ANTLR4_JAR_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/antlr-4.12.0-complete.jar)
+set(ANTLR4_JAR_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/antlr-4.13.0-complete.jar)
 
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
@@ -31,8 +31,8 @@ set(ANTLR4_WITH_STATIC_CRT OFF)
 # By default the latest version of antlr4 will be used.  You can specify a
 # specific, stable version by setting a repository tag value or a link
 # to a zip file containing the libary source.
-set(ANTLR4_TAG 4.12.0)
-set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.12.0.zip)
+set(ANTLR4_TAG 4.13.0)
+set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.13.0.zip)
 
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
