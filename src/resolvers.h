@@ -163,7 +163,7 @@ namespace Sy2CPP {
 
     };
 
-    constexpr std::string bit_vec_string = "BitVec";
+    constexpr std::basic_string bit_vec_string = "BitVec";
 
     class BVResolver : public  AbstractResolver {
     private:
