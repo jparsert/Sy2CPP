@@ -306,6 +306,213 @@ namespace Sy2CPP {
                lhs.get_range_sort() == rhs.get_range_sort() and
                lhs.is_chainable() == rhs.is_chainable();
     }
+
+    BVResolver::BVResolver() {
+
+        std::initializer_list<EitherSort> one_arg{get_bv_sort(0)};
+        std::initializer_list<EitherSort> two_arg{get_bv_sort(0), get_bv_sort(0)};
+
+        // UNARY
+        {
+            EitherIdentifier bvnot = SimpleIdentifier("bvnot");
+            functions.emplace(bvnot, FunctionDescriptor(bvnot, one_arg, get_bv_sort(0), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier bvneg = SimpleIdentifier("bvneg");
+            functions.emplace(bvneg, FunctionDescriptor(bvneg, one_arg, get_bv_sort(0), FunctionKind::THEORY, false));
+        }
+        // BINARY  not CHAINABLE
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvurem");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, get_bv_sort(0), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvsrem");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, get_bv_sort(0), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvsmod");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, get_bv_sort(0), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvshl");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, get_bv_sort(0), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvlshr");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, get_bv_sort(0), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvashr");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, get_bv_sort(0), FunctionKind::THEORY, false));
+        }
+        // ARithmetic chainable
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvand");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvor");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvnand");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvnor");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvxor");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvxnor");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvadd");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvsub");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvmul");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvudiv");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvsdiv");
+            functions.emplace(sym, FunctionDescriptor(sym, one_arg, get_bv_sort(0), FunctionKind::THEORY, true));
+        }
+        // COMPARISONs
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvult");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, CoreResolver::get_bool_sort(), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvule");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, CoreResolver::get_bool_sort(), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvugt");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, CoreResolver::get_bool_sort(), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvuge");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg,CoreResolver::get_bool_sort(), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvslt");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, CoreResolver::get_bool_sort(), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvsle");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, CoreResolver::get_bool_sort(), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvsgt");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, CoreResolver::get_bool_sort(), FunctionKind::THEORY, false));
+        }
+        {
+            SimpleIdentifier sym = SimpleIdentifier("bvsge");
+            functions.emplace(sym, FunctionDescriptor(sym, two_arg, CoreResolver::get_bool_sort(), FunctionKind::THEORY, false));
+        }
+
+    }
+
+    EitherSort BVResolver::get_bv_sort(long bits) {
+        return {SimpleSort(get_indexed_identifier(bit_vec_string, bits))};
+    }
+
+    std::optional<FunctionDescriptor> BVResolver::lookup_or_resolve_function(const EitherIdentifier &identifier,
+                                                                             const std::vector<EitherSort> &arg_sorts) const {
+
+        std::optional<FunctionDescriptor> special = BVResolver::resolve_special_functions(identifier, arg_sorts);
+        if (special.has_value()) {
+            return special;
+        }
+
+        // get all elements with same id
+
+        auto range = this->functions.equal_range(identifier);
+
+        // check that first argument is a bitvector
+        if(arg_sorts[0].index() == 0) {
+            SimpleSort sort = std::get<SimpleSort>(arg_sorts[0]);
+            if (sort.get_identifier().index() == 1) {
+                IndexedIdentifier id = std::get<IndexedIdentifier>(sort.get_identifier());
+                if (id.get_simple_identifier() != SimpleIdentifier(bit_vec_string)) {
+                    return std::nullopt;
+                }
+            } else {
+                return std::nullopt;
+            }
+        } else  {
+            return std::nullopt;
+        }
+
+        // check if each argument sort is the same as the first
+        if (!all_elements_equal(arg_sorts)) {
+            return std::nullopt;
+        }
+
+        for (auto i = range.first; i != range.second; ++i) {
+            FunctionDescriptor desc = i->second;
+            desc.set_range_sort(arg_sorts[0]); // Add the range sort to refelct the bits of the resulting vector. Bit default it's zero
+
+            if (desc.is_chainable()) {
+                return std::make_optional<FunctionDescriptor>(desc);
+
+            } else { // same identifier (through map)
+                if (desc.get_argument_sorts().size() == arg_sorts.size()) {
+                    return std::make_optional<FunctionDescriptor>(desc);
+                }
+
+            }
+        }
+
+        return std::nullopt;
+
+    }
+
+    std::optional<SortDescriptor> BVResolver::lookup_or_resolve_sort(const EitherSort &sort) const {
+        if (sort.index() == 0) {
+            SimpleSort srt = std::get<SimpleSort>(sort);
+            EitherIdentifier id = srt.get_identifier();
+            if (id.index() == 1) {
+                IndexedIdentifier ind_id = std::get<IndexedIdentifier>(id);
+                auto indices = ind_id.get_indices();
+                if (indices.size() == 1) {
+                    if (indices[0].index() == 0) { // Is numeral not symbol
+                        return std::make_optional<SortDescriptor>(get_bv_sort(std::get<Numeral>(indices[0]).get_value()), SortKind::PRIMITIVE);
+                    } else {
+                        return std::nullopt;
+                    }
+                } else {
+                    return std::nullopt;
+                }
+
+            } else {
+                return std::nullopt;
+            }
+        } else {
+            return std::nullopt;
+        }
+    }
+
+    std::optional<FunctionDescriptor> BVResolver::resolve_special_functions(const EitherIdentifier &identifier,
+                                                                            const std::vector<EitherSort> &arg_sorts) {
+        //TODO concat and extract
+
+        return std::optional<FunctionDescriptor>();
+    }
 }
 
 namespace std {

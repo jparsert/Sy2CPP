@@ -35,7 +35,7 @@ int main(int argc, const char* argv[])
     //SyGuSv21Parser::ProblemContext* problem = get_parse_tree("./test/diff.sl");
 
 
-    std::string path = "/some/path";
+    std::string path = "/home/julian/coding/cleaned_sygus_benchmarks/BV";
 
     std::vector<std::string> res = files_with_suffix_in_dirs({path}, ".sl");
 

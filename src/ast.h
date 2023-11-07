@@ -458,14 +458,14 @@ namespace Sy2CPP {
 namespace std {
     template<>
     struct hash<Sy2CPP::Numeral> {
-        std::size_t operator()(const Sy2CPP::Numeral& num) {
+        std::size_t operator()(const Sy2CPP::Numeral& num) const {
             return num.get_value();
         }
     };
 
     template<>
     struct hash<Sy2CPP::SimpleIdentifier> {
-        std::size_t operator()(const Sy2CPP::SimpleIdentifier &id) {
+        std::size_t operator()(const Sy2CPP::SimpleIdentifier &id) const {
             return id.get_hash();
         }
     };
@@ -475,6 +475,8 @@ namespace std {
 namespace Sy2CPP {
 
     using Index = std::variant<Numeral, SimpleIdentifier>;
+
+
 
     class IndexedIdentifier : public Identifier {
         SimpleIdentifier symbol;
@@ -498,6 +500,10 @@ namespace Sy2CPP {
 
         explicit operator std::string() const;
 
+        SimpleIdentifier get_simple_identifier() const {return symbol;}
+
+        std::vector<Index> get_indices() const {return indices;}
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitIndexedIdentifier(*this);
         }
@@ -513,7 +519,7 @@ namespace  std {
 
     template<>
     struct hash<Sy2CPP::IndexedIdentifier> {
-        std::size_t operator()(const Sy2CPP::IndexedIdentifier &id) {
+        std::size_t operator()(const Sy2CPP::IndexedIdentifier &id) const {
             return id.get_hash();
         }
     };
@@ -536,6 +542,48 @@ namespace Sy2CPP {
 
     inline EitherIdentifier get_simple_id_from_str(const std::string &s) {
         return EitherIdentifier{SimpleIdentifier{s}};
+    }
+
+    inline Index get_index(const long l) {
+        return {Numeral(l)};
+    }
+
+    inline Index get_index(const SimpleIdentifier& id) {
+        return {id};
+    }
+
+    inline Index get_index(const std::string& s) {
+        return {get_index(SimpleIdentifier(s))};
+    }
+
+    inline EitherIdentifier get_indexed_identifier(const SimpleIdentifier& s, const std::vector<Index>& idx) {
+        return {IndexedIdentifier(s, idx)};
+    }
+
+    inline EitherIdentifier get_indexed_identifier(const std::string& s, const std::vector<Index>& idx) {
+        return {IndexedIdentifier(SimpleIdentifier(s), idx)};
+    }
+
+    inline EitherIdentifier get_indexed_identifier(const std::string& s, const std::vector<long>& idx) {
+        std::vector<Index> v;
+        for (const auto& x : idx) {
+            v.push_back(get_index(x));
+        }
+        return {IndexedIdentifier(SimpleIdentifier(s), v)};
+    }
+
+    inline EitherIdentifier get_indexed_identifier(const std::string& s, const std::vector<SimpleIdentifier>& idx) {
+        std::vector<Index> v;
+        for (const auto& x : idx) {
+            v.push_back(get_index(x));
+        }
+        return {IndexedIdentifier(SimpleIdentifier(s), v)};
+    }
+
+    inline EitherIdentifier get_indexed_identifier(const std::string& s, const long& idx) {
+        std::vector<Index> v;
+        v.push_back(get_index(idx));
+        return {IndexedIdentifier(SimpleIdentifier(s), v)};
     }
 
     class IdentifierTerm : public Term {

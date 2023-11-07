@@ -40,7 +40,7 @@ stringConst : STRINGCONST
 // Identifiers
 //
 identifier : symbol                              #simpleIdentifier
-		   | '(' '_ ' symbol (index)+ ')'         #indexedIdentifier
+		   | '(' '_ ' symbol (index)+ ')'        #indexedIdentifier
 		   ;
 
 index : numeral                         #numeralIndex

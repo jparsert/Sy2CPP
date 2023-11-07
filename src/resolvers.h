@@ -71,6 +71,10 @@ namespace Sy2CPP {
 
         [[nodiscard]] FunctionKind get_function_kind() const;
 
+        void set_range_sort(const EitherSort& sort) {
+            this->range_sort = sort;
+        }
+
         void set_function_kind(FunctionKind functionKind);
 
         explicit operator std::string() const;
@@ -81,7 +85,7 @@ namespace Sy2CPP {
 
     enum class SortKind {
         PRIMITIVE,
-        UNINTERPRETED,
+        UNINTERPRETED,  // NOT IN USE ATM
         USER_DEFINED    // Also known as Alias
     };
 
@@ -158,6 +162,33 @@ namespace Sy2CPP {
 
 
     };
+
+    constexpr std::string bit_vec_string = "BitVec";
+
+    class BVResolver : public  AbstractResolver {
+    private:
+
+        std::unordered_multimap<EitherIdentifier , FunctionDescriptor> functions;
+
+        static std::optional<FunctionDescriptor>
+        resolve_special_functions(const EitherIdentifier &identifier, const std::vector<EitherSort> &arg_sorts);
+
+
+
+    public:
+
+        BVResolver();
+
+        static EitherSort get_bv_sort(long bits);
+
+        std::optional<FunctionDescriptor>lookup_or_resolve_function(
+                const EitherIdentifier &identifier,
+                const std::vector<EitherSort> &arg_sorts) const override;
+
+        std::optional<SortDescriptor>lookup_or_resolve_sort(const EitherSort &sort) const override;
+
+    };
+
 
 
     enum class BinderKind {

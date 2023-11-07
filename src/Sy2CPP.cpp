@@ -513,6 +513,9 @@ namespace Sy2CPP {
             this->table->add_resolver(std::make_shared<LIAResolver>());
         } else if (s.find("ALL") != std::string::npos) {
             this->table->add_resolver(std::make_shared<LIAResolver>());
+            this->table->add_resolver(std::make_shared<BVResolver>());
+        } else if (s.find("BV") != std::string::npos) {
+            this->table->add_resolver(std::make_shared<BVResolver>());
         }
 
         return std::static_pointer_cast<Command>(std::make_shared<SetLogic>(s));
