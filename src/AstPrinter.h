@@ -66,13 +66,9 @@ namespace Sy2CPP {
 
         std::any visitBoolConst(BoolConst &boolConst) override;
 
-        std::any visitHexConst(HexConst &hex) override {
-            throw NotImplemented("Hex consts are not implemented yet.");
-        }
+        std::any visitHexConst(HexConst &hex) override;
 
-        std::any visitBinConst(BinConst &bin) override {
-            throw NotImplemented("Bin consts are not implemented yet.");
-        }
+        std::any visitBinConst(BinConst &bin) override;
 
         std::any visitStringConst(StringConst &s) override {
             this->result_stream << s.get_string();

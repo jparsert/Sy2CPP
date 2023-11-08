@@ -96,9 +96,19 @@ namespace Sy2CPP {
                 if (all_elements_equal(arg_sorts)) {
                     //all are the same sort
                     return std::make_optional<FunctionDescriptor>(identifier, arg_lst1, bool_sort, FunctionKind::THEORY, true);
+                } else {
+                    for (const auto &x: arg_sorts) {
+                        if (!BVResolver::is_bv_sort(x)) {
+                            return std::nullopt;
+                        }
+                    }
+                    // They are all bitvectors
+                    return std::make_optional<FunctionDescriptor>(identifier, arg_lst1, bool_sort, FunctionKind::THEORY, true);
                 }
+
             } else if (id.get_symbol() == "ite") {
-                if (arg_sorts.size() != 3 or arg_sorts[0] != bool_sort or arg_sorts[1] != arg_sorts[2]) {
+                if (arg_sorts.size() != 3 or arg_sorts[0] != bool_sort or
+                        (arg_sorts[1] != arg_sorts[2] and !BVResolver::is_bv_sort(arg_sorts[1]) and !BVResolver::is_bv_sort(arg_sorts[2]))) {
                     throw WrongArguments("Something went wrong with the types of ITE.");
                 }
                 return std::make_optional<FunctionDescriptor>(identifier, arg_sorts, arg_sorts[1], FunctionKind::THEORY, false);
@@ -441,9 +451,14 @@ namespace Sy2CPP {
 
         // get all elements with same id
 
+
+
         auto range = this->functions.equal_range(identifier);
 
         // check that first argument is a bitvector
+        if (arg_sorts.empty()) {
+            return std::nullopt;
+        }
         if(arg_sorts[0].index() == 0) {
             SimpleSort sort = std::get<SimpleSort>(arg_sorts[0]);
             if (sort.get_identifier().index() == 1) {
@@ -458,10 +473,11 @@ namespace Sy2CPP {
             return std::nullopt;
         }
 
-        // check if each argument sort is the same as the first
-        if (!all_elements_equal(arg_sorts)) {
+        // check if each argument is a bv
+        if (!all_elements_bv(arg_sorts)) {
             return std::nullopt;
         }
+
 
         for (auto i = range.first; i != range.second; ++i) {
             FunctionDescriptor desc = i->second;
@@ -512,6 +528,41 @@ namespace Sy2CPP {
         //TODO concat and extract
 
         return std::optional<FunctionDescriptor>();
+    }
+
+    std::optional<EitherSort> BVResolver::get_corresponding_bv_sort(const EitherSort &sort) {
+        if (sort.index()==0) {
+            auto simp_sort = std::get<SimpleSort>(sort);
+            if(simp_sort.get_identifier().index() == 1) {
+                auto index_id = std::get<IndexedIdentifier>(simp_sort.get_identifier());
+                if(index_id.get_simple_identifier().get_symbol() == std::string(bit_vec_string)) {
+                    return std::make_optional<EitherSort>(sort);
+                }
+            }
+        }
+        return std::nullopt;
+    }
+
+    bool BVResolver::is_bv_sort(const EitherSort& sort) {
+        if (sort.index()==0) {
+            auto simp_sort = std::get<SimpleSort>(sort);
+            if(simp_sort.get_identifier().index() == 1) {
+                auto index_id = std::get<IndexedIdentifier>(simp_sort.get_identifier());
+                if(index_id.get_simple_identifier().get_symbol() == std::string(bit_vec_string)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool BVResolver::all_elements_bv(const std::vector<EitherSort> &vec) {
+        for (const auto& x: vec) {
+            if(!BVResolver::is_bv_sort(x)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

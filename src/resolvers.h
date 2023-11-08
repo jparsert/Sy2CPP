@@ -181,6 +181,12 @@ namespace Sy2CPP {
 
         static EitherSort get_bv_sort(long bits);
 
+        static std::optional<EitherSort> get_corresponding_bv_sort(const EitherSort& sort);
+
+        static bool is_bv_sort(const EitherSort& sort);
+
+        static bool all_elements_bv(const std::vector<EitherSort>& vec);
+
         std::optional<FunctionDescriptor>lookup_or_resolve_function(
                 const EitherIdentifier &identifier,
                 const std::vector<EitherSort> &arg_sorts) const override;

@@ -30,12 +30,19 @@ namespace Sy2CPP {
         std::any visitBoolConst(BoolConst &boolConst) override;
 
         std::any visitHexConst(HexConst &hex) override {
-            throw NotImplemented("Typing for hex consts is not implemented.");
+            if (this->table.lookup_sort(BVResolver::get_bv_sort(0))) {
+                return BVResolver::get_bv_sort(0);
+            } else {
+                throw TypingError("BVResolver is not activated. But we found a hex.");
+            }
         }
 
         std::any visitBinConst(BinConst &bin) override {
-            throw NotImplemented("Typing for bin consts is not implemented.");
-
+            if (this->table.lookup_sort(BVResolver::get_bv_sort(0))) {
+                return BVResolver::get_bv_sort(0);
+            } else {
+                throw TypingError("BVResolver is not activated. But we found a bin constant.");
+            }
         }
 
         std::any visitStringConst(StringConst &s) override {

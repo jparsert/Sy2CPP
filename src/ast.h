@@ -397,12 +397,34 @@ namespace Sy2CPP {
     };
 
     class HexConst : public Literal {
+        std::string hex_value; // This is without the "#x" in front
+
+    public:
+        explicit HexConst(std::string  val): hex_value{std::move(val)} {}
+
+        [[nodiscard]] std::string get_value() const { return hex_value; }
+
+        [[nodiscard]] TermPtr copy() const override {
+                return std::static_pointer_cast<Term>(std::make_shared<HexConst>(this->get_value()));
+            }
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitHexConst(*this);
         }
     };
 
     class BinConst : public Literal {
+        std::string bin_val; // This is without the #b in front
+
+    public:
+        explicit BinConst(std::string val): bin_val{std::move(val)}{}
+
+        [[nodiscard]] std::string get_value() const { return bin_val; }
+
+        [[nodiscard]] TermPtr copy() const override {
+            return std::static_pointer_cast<Term>(std::make_shared<BinConst>(this->get_value()));
+        }
+
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitBinConst(*this);
         }

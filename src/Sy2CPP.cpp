@@ -44,13 +44,9 @@ namespace Sy2CPP {
 
         std::any visitBoolConstFalse(SyGuSv21Parser::BoolConstFalseContext *ctx) override;
 
-        std::any visitHexConst(SyGuSv21Parser::HexConstContext *ctx) override {
-            throw NotImplemented("Decimal constants are not supported yet.");
-        }
+        std::any visitHexConst(SyGuSv21Parser::HexConstContext *ctx) override;
 
-        std::any visitBinConst(SyGuSv21Parser::BinConstContext *ctx) override {
-            throw NotImplemented("Decimal constants are not supported yet.");
-        }
+        std::any visitBinConst(SyGuSv21Parser::BinConstContext *ctx) override;
 
         std::any visitStringConst(SyGuSv21Parser::StringConstContext *ctx) override;
 
@@ -218,7 +214,12 @@ namespace Sy2CPP {
         this->table->add_user_defined_fun(*def_cmd);
         // Type-check afterwards so that in case of recursion
         EitherSort term_sort = TypeInference::infer_and_check_type(*this->table, term.get());
-
+        // In case we have a bitvector
+        if(term_sort == BVResolver::get_bv_sort(0)) {
+            if (BVResolver::is_bv_sort(def_cmd->get_sort())) {
+                term_sort = def_cmd->get_sort();
+            }
+        }
         this->table->pop_symbol_stack(args.size());
 
         if (term_sort != def_cmd->get_sort()) {
@@ -370,6 +371,12 @@ namespace Sy2CPP {
         for (auto x: ctx->gTerm()) {
             auto ptr = std::any_cast<TermPtr>(x->accept(this));
             EitherSort term_sort = TypeInference::infer_and_check_type(*this->table, ptr.get());
+            // In case we have indexed identifier
+            if(term_sort == BVResolver::get_bv_sort(0)) {
+                if (BVResolver::is_bv_sort(sort)) {
+                    term_sort = sort;
+                }
+            }
             if (term_sort != sort) {
                 throw TypingError("In grammar for non-terminal " + to_string(id) +
                                   " terms did not match type of non-terminal.");
@@ -577,6 +584,16 @@ namespace Sy2CPP {
             solution.push_back(*def_fun_cmd);
         }
         return SyGuSSolution(solution);
+    }
+
+    std::any SymbolTableAstBuilder::visitHexConst(SyGuSv21Parser::HexConstContext *ctx) {
+        auto str = ctx->HEXCONST()->getSymbol()->getText();
+        return std::static_pointer_cast<Literal>(std::make_shared<HexConst>(str));
+    }
+
+    std::any SymbolTableAstBuilder::visitBinConst(SyGuSv21Parser::BinConstContext *ctx) {
+        auto str = ctx->BINCONST()->getSymbol()->getText();
+        return std::static_pointer_cast<Literal>(std::make_shared<BinConst>(str));
     }
 
 

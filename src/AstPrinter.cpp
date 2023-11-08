@@ -431,4 +431,14 @@ namespace Sy2CPP {
         this->result_stream << (std::string) identifier;
         return {};
     }
+
+    std::any AstToString::visitHexConst(HexConst &hex) {
+        this->result_stream <<  "#x" << hex.get_value();
+        return {};
+    }
+
+    std::any AstToString::visitBinConst(BinConst &bin) {
+        this->result_stream <<  "#b" << bin.get_value();
+        return {};
+    }
 }
