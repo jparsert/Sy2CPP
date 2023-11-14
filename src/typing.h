@@ -29,6 +29,8 @@ namespace Sy2CPP {
 
         std::any visitBoolConst(BoolConst &boolConst) override;
 
+        std::any visitBVConst(BVConst& cnst) override;
+
         std::any visitHexConst(HexConst &hex) override {
             if (this->table.lookup_sort(BVResolver::get_bv_sort(0))) {
                 return BVResolver::get_bv_sort(0);
@@ -59,6 +61,8 @@ namespace Sy2CPP {
         std::any visitForallTerm(ForallTerm &forall) override;
 
         std::any visitLetTerm(LetTerm &let) override;
+
+        std::any visitVariableGTerm(VariableGTerm& term) override;
 
         EitherSort get_sort(Term *term);
 

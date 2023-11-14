@@ -136,6 +136,7 @@ namespace Sy2CPP {
     TermPtr ApplicationTerm::copy() const{
         // Deep copy
         std::vector<TermPtr> copied_terms;
+        copied_terms.reserve(arguments.size());
         for (const auto& e : arguments) {
             copied_terms.push_back(e->copy());
         }

@@ -16,6 +16,7 @@ namespace Sy2CPP {
     std::string to_string(const EitherSort &ident);
 
     std::string to_string(const SyGuSSolution& sol);
+    std::string to_string(const TermPtr& ptr);
 
     class AstToString : public AstBaseVisitor {
 
@@ -62,6 +63,14 @@ namespace Sy2CPP {
 
         std::any visitDecimal(Decimal &decimal) override {
             throw NotImplemented("Decimals are not implemented yet.");
+        }
+
+        std::any visitBVConst(BVConst& cnst) override {
+            this->result_stream << "( _ bv";
+            this->result_stream << cnst.get_numeral();
+            this->result_stream << " " << cnst.get_width();
+            this->result_stream << ")";
+            return {};
         }
 
         std::any visitBoolConst(BoolConst &boolConst) override;
@@ -148,6 +157,7 @@ namespace Sy2CPP {
         std::string get_string(Problem &problem);
 
     };
+
 }
 
 #endif //PHYSER_TO_STRING_PRINTER_H

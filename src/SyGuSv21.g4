@@ -17,9 +17,12 @@ literal : numeral
         | hexConst
         | binConst
         | stringConst
+        | bvConst
         ;
 
 numeral : NUMERAL;
+
+bvConst : '(' '_ ' BVCONST  NUMERAL ')';
 
 decimal : numeral '.' numeral;
 
@@ -174,6 +177,8 @@ NUMERAL : ('0'..'9')+ ;
 HEXCONST : '#x'([0-9] | [a-f] | [A-F])+ ;
 
 BINCONST : '#b'('0' | '1')+ ;
+
+BVCONST : 'bv'('0'..'9')+;
 
 TRUE : 'true';
 FALSE : 'false';

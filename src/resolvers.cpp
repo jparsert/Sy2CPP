@@ -478,16 +478,19 @@ namespace Sy2CPP {
             return std::nullopt;
         }
 
-
         for (auto i = range.first; i != range.second; ++i) {
             FunctionDescriptor desc = i->second;
-            desc.set_range_sort(arg_sorts[0]); // Add the range sort to refelct the bits of the resulting vector. Bit default it's zero
+            if (is_bv_sort(desc.get_range_sort())) {
+                desc.set_range_sort(
+                        arg_sorts[0]); // Add the range sort to refelct the bits of the resulting vector. Bit default it's zero
+            }
 
             if (desc.is_chainable()) {
                 return std::make_optional<FunctionDescriptor>(desc);
 
             } else { // same identifier (through map)
                 if (desc.get_argument_sorts().size() == arg_sorts.size()) {
+
                     return std::make_optional<FunctionDescriptor>(desc);
                 }
 

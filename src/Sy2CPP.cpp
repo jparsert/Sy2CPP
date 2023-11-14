@@ -48,6 +48,8 @@ namespace Sy2CPP {
 
         std::any visitBinConst(SyGuSv21Parser::BinConstContext *ctx) override;
 
+        std::any visitBvConst(SyGuSv21Parser::BvConstContext *ctx) override;
+
         std::any visitStringConst(SyGuSv21Parser::StringConstContext *ctx) override;
 
         std::any visitNumeralIndex(SyGuSv21Parser::NumeralIndexContext *ctx) override;
@@ -594,6 +596,13 @@ namespace Sy2CPP {
     std::any SymbolTableAstBuilder::visitBinConst(SyGuSv21Parser::BinConstContext *ctx) {
         auto str = ctx->BINCONST()->getSymbol()->getText();
         return std::static_pointer_cast<Literal>(std::make_shared<BinConst>(str));
+    }
+
+    std::any SymbolTableAstBuilder::visitBvConst(SyGuSv21Parser::BvConstContext *ctx) {
+        long val = std::strtol(ctx->BVCONST()->getSymbol()->getText().c_str(), nullptr, 10);
+        long width = std::strtol(ctx->NUMERAL()->getSymbol()->getText().c_str(), nullptr, 10);
+
+        return std::static_pointer_cast<Literal>(std::make_shared<BVConst>(val, width));
     }
 
 

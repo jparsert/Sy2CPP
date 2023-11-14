@@ -32,6 +32,12 @@ namespace Sy2CPP {
 
     }
 
+    std::string to_string(const TermPtr& ptr) {
+        return AstToString::to_string(*ptr.get());
+    }
+
+
+
     std::any AstToString::visitGrammarDef(GrammarDef &gdef) {
         this->push_op_bracket();
         for (auto &x: gdef.get_non_terminals()) {

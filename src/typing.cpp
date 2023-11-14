@@ -24,6 +24,11 @@ namespace Sy2CPP {
         return CoreResolver::get_bool_sort();
     }
 
+    std::any TypeInference::visitBVConst(Sy2CPP::BVConst &cnst) {
+        return BVResolver::get_bv_sort(cnst.get_width());
+    }
+
+
     std::any TypeInference::visitIdentifierTerm(IdentifierTerm &term) {
         auto opt = table.resolve_symbol_descriptor(term.get_identifier());
         if (opt.has_value()) {
@@ -50,6 +55,9 @@ namespace Sy2CPP {
 
         std::optional<FunctionDescriptor> descr =
                 table.lookup_or_resolve_function(application.get_identifier(), arg_sorts);
+
+
+
 
         if (descr.has_value()) {
             return descr->get_range_sort();
@@ -121,6 +129,10 @@ namespace Sy2CPP {
     EitherSort TypeInference::infer_and_check_type(SymbolTable &table, Term *term) {
         TypeInference ti(table);
         return std::any_cast<EitherSort>(term->accept(ti));
+    }
+
+    std::any TypeInference::visitVariableGTerm(VariableGTerm &term) {
+        return term.get_sort();
     }
 
 }

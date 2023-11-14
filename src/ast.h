@@ -38,6 +38,7 @@ namespace Sy2CPP {
     class Numeral;
     class Decimal;
     class BoolConst;
+    class BVConst;
     class HexConst;
     class BinConst;
     class StringConst;
@@ -87,6 +88,8 @@ namespace Sy2CPP {
         virtual std::any visitBoolConst(BoolConst &boolConst) = 0;
 
         virtual std::any visitHexConst(HexConst &hex) = 0;
+
+        virtual std::any visitBVConst(BVConst &hex) = 0;
 
         virtual std::any visitBinConst(BinConst &bin) = 0;
 
@@ -178,6 +181,11 @@ namespace Sy2CPP {
 
         std::any visitLetTerm(LetTerm &let) override = 0;
 
+        std::any visitConstantGTerm(ConstantGTerm &context) final {
+            throw NotImplemented("Not Implemented");
+        }
+
+        std::any visitVariableGTerm(VariableGTerm &context) override = 0;
 
         // We don't allow for other ast nodes to be visited in a term visitor
         std::any visitProblem(Problem &problem) final {
@@ -276,13 +284,7 @@ namespace Sy2CPP {
             throw NotImplemented("Wrong AstNode in Term visitor");
         }
 
-        std::any visitConstantGTerm(ConstantGTerm &context) final {
-            throw NotImplemented("Wrong AstNode in Term visitor");
-        }
 
-        std::any visitVariableGTerm(VariableGTerm &context) final {
-            throw NotImplemented("Wrong AstNode in Term visitor");
-        }
     };
 
     class BfTermVisitor : public TermVisitor {
@@ -413,6 +415,27 @@ namespace Sy2CPP {
         }
     };
 
+    class BVConst : public Literal {
+        long numeral; // value of BV const
+        long width; // width of BV const
+
+    public:
+         explicit BVConst(long numeral, long width): numeral{numeral}, width{width}{}
+
+        [[nodiscard]] long get_numeral() const {return numeral;}
+
+        [[nodiscard]] long get_width() const {return width;}
+
+        [[nodiscard]] TermPtr copy() const override {
+            return std::static_pointer_cast<Term>(std::make_shared<BVConst>(this->get_numeral(), this->get_width()));
+        }
+
+        std::any accept(AstVisitor& visitor) override {
+             return visitor.visitBVConst(*this);
+         }
+
+    };
+
     class BinConst : public Literal {
         std::string bin_val; // This is without the #b in front
 
@@ -522,9 +545,9 @@ namespace Sy2CPP {
 
         explicit operator std::string() const;
 
-        SimpleIdentifier get_simple_identifier() const {return symbol;}
+        [[nodiscard]] SimpleIdentifier get_simple_identifier() const {return symbol;}
 
-        std::vector<Index> get_indices() const {return indices;}
+        [[nodiscard]] std::vector<Index> get_indices() const {return indices;}
 
         std::any accept(AstVisitor &visitor) override {
             return visitor.visitIndexedIdentifier(*this);
@@ -588,6 +611,7 @@ namespace Sy2CPP {
 
     inline EitherIdentifier get_indexed_identifier(const std::string& s, const std::vector<long>& idx) {
         std::vector<Index> v;
+        v.reserve(idx.size());
         for (const auto& x : idx) {
             v.push_back(get_index(x));
         }
@@ -596,6 +620,7 @@ namespace Sy2CPP {
 
     inline EitherIdentifier get_indexed_identifier(const std::string& s, const std::vector<SimpleIdentifier>& idx) {
         std::vector<Index> v;
+        v.reserve(idx.size());
         for (const auto& x : idx) {
             v.push_back(get_index(x));
         }
@@ -1225,6 +1250,10 @@ namespace Sy2CPP{
         }
 
         std::any visitBoolConst(BoolConst &boolConst) override {
+            return {};
+        }
+
+        std::any visitBVConst(BVConst &boolConst) override {
             return {};
         }
 
