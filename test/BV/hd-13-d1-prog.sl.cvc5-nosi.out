@@ -1,0 +1,5 @@
+(
+(define-fun f ((x (_ BitVec 32))) (_ BitVec 32) (bvor (bvashr x x) (bvlshr #b00000000000000000000000000000001 (bvlshr #b00000000000000000000000000000001 x))))
+)
+82.88user 0.28system 1:23.18elapsed 99%CPU (0avgtext+0avgdata 1052844maxresident)k
+0inputs+8outputs (0major+273900minor)pagefaults 0swaps

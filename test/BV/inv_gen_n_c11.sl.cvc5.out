@@ -1,0 +1,5 @@
+(
+(define-fun inv ((i (_ BitVec 32)) (l (_ BitVec 32))) Bool (bvugt (bvadd #b00000000000000000000000000000010 #b00000000000000000000000000000011) l))
+)
+1.92user 0.00system 0:01.92elapsed 100%CPU (0avgtext+0avgdata 32944maxresident)k
+0inputs+8outputs (0major+4151minor)pagefaults 0swaps

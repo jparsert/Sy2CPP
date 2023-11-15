@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n127 Bool) (n69 Bool) (n76 Bool) (n63 Bool)) Bool (xor n127 (and (and n127 n63) (not (and n69 n76)))))
+)
+67.92user 0.16system 1:08.08elapsed 99%CPU (0avgtext+0avgdata 437776maxresident)k
+0inputs+8outputs (0major+111624minor)pagefaults 0swaps

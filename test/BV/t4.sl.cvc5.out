@@ -1,0 +1,5 @@
+(
+(define-fun f_141-11-141-28 ((x.end (_ BitVec 32)) (size (_ BitVec 32)) (i (_ BitVec 32)) (elem.end (_ BitVec 32))) Bool (bvugt x.end elem.end))
+)
+0.02user 0.00system 0:00.02elapsed 96%CPU (0avgtext+0avgdata 20716maxresident)k
+0inputs+8outputs (0major+1089minor)pagefaults 0swaps

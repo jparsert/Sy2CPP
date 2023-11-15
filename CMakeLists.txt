@@ -8,6 +8,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 
 set(src_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(test_dir ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 # adding antler cmake modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -15,11 +16,11 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Donwload generator jar
 FetchContent_Declare(
         antlr_jar
-        URL https://www.antlr.org/download/antlr-4.13.0-complete.jar
+        URL https://www.antlr.org/download/antlr-4.13.1-complete.jar
         DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps
         DOWNLOAD_NO_EXTRACT TRUE)
 FETCHCONTENT_MAKEAVAILABLE(antlr_jar)
-set(ANTLR4_JAR_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/antlr-4.13.0-complete.jar)
+set(ANTLR4_JAR_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/antlr-4.13.1-complete.jar)
 
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
@@ -31,8 +32,8 @@ set(ANTLR4_WITH_STATIC_CRT OFF)
 # By default the latest version of antlr4 will be used.  You can specify a
 # specific, stable version by setting a repository tag value or a link
 # to a zip file containing the libary source.
-set(ANTLR4_TAG 4.13.0)
-set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.13.0.zip)
+set(ANTLR4_TAG 4.13.1)
+set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.13.1.zip)
 
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
@@ -45,6 +46,17 @@ set(ANTLR_EXECUTABLE ${ANTLR4_JAR_LOCATION})
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
+
+# TESTING framework
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+
 antlr_target(antlrsygus ${src_dir}/SyGuSv21.g4 VISITOR TRUE)
 
 
@@ -56,12 +68,16 @@ include_directories(${PROJECT_BINARY_DIR} ${ANTLR4_INCLUDE_DIR} ${ANTLR_antlrsyg
 set(sources
         ${src_dir}/AstPrinter.cpp ${src_dir}/symbol_table.cpp ${src_dir}/ast.cpp
         ${src_dir}/resolvers.cpp ${src_dir}/general_utility.cpp ${src_dir}/typing.cpp
-        ${src_dir}/exceptions.cpp ${src_dir}/Sy2CPP.cpp)
+        ${src_dir}/exceptions.cpp ${src_dir}/Sy2CPP.cpp
+        ${src_dir}/utils.cpp
+)
 
 set(headers
         ${src_dir}/AstPrinter.h ${src_dir}/symbol_table.h ${src_dir}/ast.h
         ${src_dir}/resolvers.h ${src_dir}/general_utility.h ${src_dir}/typing.h
-        ${src_dir}/exceptions.h ${src_dir}/Sy2CPP.h)
+        ${src_dir}/exceptions.h ${src_dir}/Sy2CPP.h
+        ${src_dir}/utils.h
+)
 
 set(public-headers
         ${src_dir}/AstPrinter.h ${src_dir}/symbol_table.h ${src_dir}/ast.h
@@ -124,3 +140,25 @@ install(TARGETS Sy2CPP-static
 # Install header files
 install(FILES ${public-headers} DESTINATION "/usr/include/Sy2CPP/")
 
+##### TESTING
+enable_testing()
+
+add_executable(
+        overall_parsing_test
+        ${test_dir}/src/overall_parsing_test.cpp
+
+)
+
+target_link_libraries(
+        overall_parsing_test
+        Sy2CPP-shared
+        antlr4_shared
+        GTest::gtest_main
+)
+
+target_include_directories(overall_parsing_test PUBLIC ${src_dir})
+target_link_directories(overall_parsing_test PUBLIC ${src_dir})
+#target_link_libraries(overall_parsing_test PRIVATE Sy2CPP-shared)
+
+include(GoogleTest)
+gtest_discover_tests(overall_parsing_test)

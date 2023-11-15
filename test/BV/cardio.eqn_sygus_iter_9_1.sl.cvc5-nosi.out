@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n265 Bool) (n260 Bool) (n256 Bool) (n252 Bool)) Bool (xor n265 (or (or n265 n260) (xor n256 n252))))
+)
+8.25user 0.02system 0:08.27elapsed 100%CPU (0avgtext+0avgdata 95452maxresident)k
+0inputs+8outputs (0major+19788minor)pagefaults 0swaps

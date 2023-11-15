@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n292 Bool) (n335 Bool) (n298 Bool) (n307 Bool)) Bool (xor n307 (and n335 (and n292 n298))))
+)
+0.05user 0.01system 0:00.06elapsed 100%CPU (0avgtext+0avgdata 22552maxresident)k
+0inputs+8outputs (0major+1564minor)pagefaults 0swaps

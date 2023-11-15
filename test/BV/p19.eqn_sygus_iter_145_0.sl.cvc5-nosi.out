@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n200 Bool) (n222 Bool) (n209 Bool) (i23 Bool)) Bool (xor i23 (and n200 (and n209 (and n222 i23)))))
+)
+9.61user 0.02system 0:09.63elapsed 100%CPU (0avgtext+0avgdata 96956maxresident)k
+0inputs+8outputs (0major+20165minor)pagefaults 0swaps

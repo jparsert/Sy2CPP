@@ -1,0 +1,5 @@
+(
+(define-fun inv ((s (_ BitVec 4)) (t (_ BitVec 4))) (_ BitVec 4) (bvshl #b0111 t))
+)
+0.00user 0.00system 0:00.01elapsed 92%CPU (0avgtext+0avgdata 20000maxresident)k
+0inputs+8outputs (0major+910minor)pagefaults 0swaps

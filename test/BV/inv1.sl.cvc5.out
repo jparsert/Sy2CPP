@@ -1,0 +1,5 @@
+(
+(define-fun inv ((x (_ BitVec 4))) Bool (bvuge (bvadd #b0010 #b0010) (bvlshr x #b0001)))
+)
+22.53user 0.00system 0:22.54elapsed 99%CPU (0avgtext+0avgdata 32452maxresident)k
+0inputs+8outputs (0major+4027minor)pagefaults 0swaps

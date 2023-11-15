@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n268 Bool) (n308 Bool) (n309 Bool) (n118 Bool) (n113 Bool)) Bool (and (or n268 n308) (and n309 (not (xor n113 n118)))))
+)
+3.07user 0.01system 0:03.08elapsed 99%CPU (0avgtext+0avgdata 60968maxresident)k
+0inputs+8outputs (0major+11168minor)pagefaults 0swaps

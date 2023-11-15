@@ -1,0 +1,5 @@
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int (ite (<= (get-x currPoint) 0) 2 1))
+)
+38.02user 0.02system 0:38.04elapsed 99%CPU (0avgtext+0avgdata 65020maxresident)k
+0inputs+8outputs (0major+12286minor)pagefaults 0swaps

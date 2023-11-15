@@ -1,0 +1,6 @@
+cvc5 interrupted by SIGTERM.
+cvc5 interrupted by SIGTERM.
+Command terminated by signal 15
+5.44user 0.00system 0:05.45elapsed 99%CPU (0avgtext+0avgdata 36636maxresident)k
+0inputs+0outputs (0major+5074minor)pagefaults 0swaps
+cvc5 interrupted by SIGTERM.

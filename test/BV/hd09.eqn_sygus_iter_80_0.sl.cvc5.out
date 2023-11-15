@@ -1,0 +1,5 @@
+(
+(define-fun skel ((i22 Bool) (n233 Bool) (n109 Bool)) Bool (xor n109 (and (not n233) (and i22 n109))))
+)
+0.20user 0.00system 0:00.20elapsed 99%CPU (0avgtext+0avgdata 24592maxresident)k
+0inputs+8outputs (0major+2073minor)pagefaults 0swaps

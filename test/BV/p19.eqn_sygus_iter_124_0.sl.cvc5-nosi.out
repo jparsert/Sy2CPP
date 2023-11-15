@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n179 Bool) (n184 Bool) (i18 Bool)) Bool (xor i18 (and n179 (and n184 i18))))
+)
+0.11user 0.00system 0:00.12elapsed 100%CPU (0avgtext+0avgdata 23140maxresident)k
+0inputs+8outputs (0major+1711minor)pagefaults 0swaps

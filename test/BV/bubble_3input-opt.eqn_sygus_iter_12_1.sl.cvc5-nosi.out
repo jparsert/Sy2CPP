@@ -1,0 +1,5 @@
+(
+(define-fun skel ((i_9 Bool) (n105 Bool) (n142 Bool) (n140 Bool)) Bool (xor (and n105 (and i_9 n140)) (and n142 n140)))
+)
+1.16user 0.00system 0:01.16elapsed 100%CPU (0avgtext+0avgdata 32188maxresident)k
+0inputs+8outputs (0major+3974minor)pagefaults 0swaps

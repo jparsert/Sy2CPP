@@ -1,0 +1,5 @@
+(
+(define-fun f ((x (_ BitVec 32))) (_ BitVec 32) (bvand x (bvsub x (bvor x (bvadd x x)))))
+)
+0.03user 0.00system 0:00.03elapsed 100%CPU (0avgtext+0avgdata 22160maxresident)k
+0inputs+8outputs (0major+1467minor)pagefaults 0swaps

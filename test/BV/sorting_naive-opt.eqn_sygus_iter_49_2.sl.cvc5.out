@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n322 Bool) (n325 Bool) (n315 Bool) (n319 Bool) (i_18 Bool)) Bool (and (not (xor n315 n319)) (and n325 (and n322 i_18))))
+)
+1.13user 0.00system 0:01.13elapsed 100%CPU (0avgtext+0avgdata 33772maxresident)k
+0inputs+8outputs (0major+4368minor)pagefaults 0swaps

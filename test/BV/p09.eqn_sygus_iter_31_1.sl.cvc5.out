@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n202 Bool) (n174 Bool) (n114 Bool) (n87 Bool)) Bool (and n174 (and n87 (and n202 n114))))
+)
+0.08user 0.00system 0:00.08elapsed 100%CPU (0avgtext+0avgdata 22744maxresident)k
+0inputs+8outputs (0major+1611minor)pagefaults 0swaps

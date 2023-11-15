@@ -1,0 +1,5 @@
+(
+(define-fun inv ((x Int) (y Int) (l Int)) Bool (or (<= (+ (* 1 x) (* (- 1) y)) (- 1)) (= (+ (* 1 l) (* 0 y)) 1)))
+)
+0.38user 0.00system 0:00.38elapsed 100%CPU (0avgtext+0avgdata 25904maxresident)k
+0inputs+8outputs (0major+2507minor)pagefaults 0swaps

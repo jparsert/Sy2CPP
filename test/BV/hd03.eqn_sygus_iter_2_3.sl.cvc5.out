@@ -1,0 +1,5 @@
+(
+(define-fun skel ((i34 Bool) (i2 Bool) (i1 Bool) (i33 Bool) (i32 Bool) (i0 Bool)) Bool (and (and i32 i0) (and (xor i34 i2) (xor i1 i33))))
+)
+9.29user 0.04system 0:09.34elapsed 100%CPU (0avgtext+0avgdata 142280maxresident)k
+0inputs+8outputs (0major+31495minor)pagefaults 0swaps

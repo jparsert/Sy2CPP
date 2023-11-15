@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n28 Bool) (n43 Bool) (n32 Bool) (n24 Bool)) Bool (and (and n28 n43) (and n24 n32)))
+)
+0.08user 0.00system 0:00.08elapsed 98%CPU (0avgtext+0avgdata 23052maxresident)k
+0inputs+8outputs (0major+1688minor)pagefaults 0swaps

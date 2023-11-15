@@ -1,0 +1,5 @@
+(
+(define-fun skel ((n376 Bool) (n378 Bool) (n371 Bool) (n373 Bool) (i_17 Bool)) Bool (and (xor n371 n373) (and n378 (and n376 i_17))))
+)
+0.33user 0.00system 0:00.33elapsed 99%CPU (0avgtext+0avgdata 27028maxresident)k
+0inputs+8outputs (0major+2682minor)pagefaults 0swaps

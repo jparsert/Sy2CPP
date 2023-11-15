@@ -1,0 +1,5 @@
+(
+(define-fun skel ((i25 Bool) (i24 Bool) (i23 Bool)) Bool (not (xor (and i25 i24) (or i24 i23))))
+)
+0.01user 0.00system 0:00.02elapsed 100%CPU (0avgtext+0avgdata 20784maxresident)k
+0inputs+8outputs (0major+1123minor)pagefaults 0swaps
