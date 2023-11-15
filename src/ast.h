@@ -169,6 +169,8 @@ namespace Sy2CPP {
 
         std::any visitBinConst(BinConst &bin) override = 0;
 
+        std::any visitBVConst(BVConst& cnst) override = 0;
+
         std::any visitStringConst(StringConst &s) override = 0;
 
         std::any visitIdentifierTerm(IdentifierTerm &term) override = 0;
@@ -181,11 +183,12 @@ namespace Sy2CPP {
 
         std::any visitLetTerm(LetTerm &let) override = 0;
 
+        std::any visitVariableGTerm(VariableGTerm &context) override = 0;
+
+
         std::any visitConstantGTerm(ConstantGTerm &context) final {
             throw NotImplemented("Not Implemented");
         }
-
-        std::any visitVariableGTerm(VariableGTerm &context) override = 0;
 
         // We don't allow for other ast nodes to be visited in a term visitor
         std::any visitProblem(Problem &problem) final {
@@ -294,6 +297,8 @@ namespace Sy2CPP {
         std::any visitDecimal(Decimal &decimal) override = 0;
 
         std::any visitBoolConst(BoolConst &boolConst) override = 0;
+
+        std::any visitBVConst(BVConst &cnst) override = 0;
 
         std::any visitHexConst(HexConst &hex) override = 0;
 
