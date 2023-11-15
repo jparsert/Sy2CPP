@@ -1,5 +1,0 @@
-(
-(define-fun skel ((n80 Bool) (n95 Bool) (n103 Bool) (n99 Bool) (n108 Bool)) Bool (and (and n80 n95) (and n103 (and n99 n108))))
-)
-0.33user 0.00system 0:00.34elapsed 99%CPU (0avgtext+0avgdata 27052maxresident)k
-0inputs+8outputs (0major+2689minor)pagefaults 0swaps

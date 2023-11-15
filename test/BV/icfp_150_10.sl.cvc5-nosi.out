@@ -1,5 +1,0 @@
-(
-(define-fun f ((x (_ BitVec 64))) (_ BitVec 64) (let ((_let_1 (shr4 (shr1 (bvnot x))))) (let ((_let_2 (shr16 (shl1 x)))) (let ((_let_3 (bvand #b0000000000000000000000000000000000000000000000000000000000000001 (shr1 x)))) (let ((_let_4 (bvand #b0000000000000000000000000000000000000000000000000000000000000001 x))) (let ((_let_5 (bvand #b0000000000000000000000000000000000000000000000000000000000000001 (shr16 x)))) (if0 (bvand #b0000000000000000000000000000000000000000000000000000000000000001 (shr4 x)) (if0 _let_4 (if0 _let_5 _let_1 _let_2) (if0 _let_3 (if0 _let_5 _let_2 _let_1) _let_2)) (if0 _let_4 _let_2 (if0 _let_3 _let_2 _let_1)))))))))
-)
-0.01user 0.00system 0:00.01elapsed 100%CPU (0avgtext+0avgdata 20064maxresident)k
-0inputs+8outputs (0major+926minor)pagefaults 0swaps

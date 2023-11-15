@@ -1,5 +1,0 @@
-(
-(define-fun inv ((m Int) (j Int) (a0 Int)) Bool (or (<= (+ (* 1 j) (* 0 m)) 0) (<= (+ (* (- 1) a0) (* 1 m)) 0)))
-)
-2.88user 0.00system 0:02.89elapsed 100%CPU (0avgtext+0avgdata 35436maxresident)k
-0inputs+8outputs (0major+4907minor)pagefaults 0swaps

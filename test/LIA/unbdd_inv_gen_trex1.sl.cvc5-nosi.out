@@ -1,5 +1,0 @@
-(
-(define-fun inv ((x Int) (y Int) (k Int) (z Int) (c Int)) Bool (let ((_let_1 (* (- 1) k))) (or (<= (+ _let_1 _let_1) (- 0 1)) (= (+ (* 0 y) (* 1 z)) 1))))
-)
-2.73user 0.00system 0:02.74elapsed 100%CPU (0avgtext+0avgdata 31304maxresident)k
-0inputs+8outputs (0major+3869minor)pagefaults 0swaps

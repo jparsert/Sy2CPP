@@ -1,5 +1,0 @@
-(
-(define-fun inv ((x Int) (n Int)) Bool (or (<= (+ (* (- 1) n) (* 1 x)) (- 1)) (= (+ (* (- 1) x) (* 1 n)) 2)))
-)
-0.44user 0.00system 0:00.44elapsed 100%CPU (0avgtext+0avgdata 25068maxresident)k
-0inputs+8outputs (0major+2309minor)pagefaults 0swaps

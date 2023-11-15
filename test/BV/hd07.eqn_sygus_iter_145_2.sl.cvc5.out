@@ -1,5 +1,0 @@
-(
-(define-fun skel ((n131 Bool) (n107 Bool) (n114 Bool) (n102 Bool) (n85 Bool)) Bool (and (and n102 n85) (xor n131 (and n114 (and n131 n107)))))
-)
-95.69user 0.20system 1:35.89elapsed 99%CPU (0avgtext+0avgdata 583628maxresident)k
-0inputs+8outputs (0major+148086minor)pagefaults 0swaps

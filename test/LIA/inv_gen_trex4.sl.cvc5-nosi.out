@@ -1,5 +1,0 @@
-(
-(define-fun inv ((x Int) (d Int)) Bool (or (<= (+ (* (- 1) x) (* 1 x)) 0) (<= (+ (* 0 x) (* 1 d)) 2)))
-)
-0.01user 0.00system 0:00.02elapsed 100%CPU (0avgtext+0avgdata 19176maxresident)k
-0inputs+8outputs (0major+853minor)pagefaults 0swaps

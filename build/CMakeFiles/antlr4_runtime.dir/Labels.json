@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/CMakeFiles/antlr4_runtime"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/CMakeFiles/antlr4_runtime.rule"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/CMakeFiles/antlr4_runtime-complete.rule"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-build.rule"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure.rule"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-download.rule"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-install.rule"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-mkdir.rule"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-patch.rule"
+		},
+		{
+			"file" : "/home/julian/coding/Sy2CPP/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"antlr4_runtime"
+		],
+		"name" : "antlr4_runtime"
+	}
+}

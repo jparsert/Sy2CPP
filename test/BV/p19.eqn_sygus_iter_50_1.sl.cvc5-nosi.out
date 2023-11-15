@@ -1,5 +1,0 @@
-(
-(define-fun skel ((n204 Bool) (n191 Bool) (n177 Bool) (n171 Bool)) Bool (and (and n204 n191) (and n177 n171)))
-)
-0.07user 0.00system 0:00.07elapsed 100%CPU (0avgtext+0avgdata 22312maxresident)k
-0inputs+8outputs (0major+1503minor)pagefaults 0swaps

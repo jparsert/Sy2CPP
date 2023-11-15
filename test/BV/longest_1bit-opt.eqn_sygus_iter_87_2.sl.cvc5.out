@@ -1,5 +1,0 @@
-(
-(define-fun skel ((i_4 Bool) (i_7 Bool) (i_8 Bool) (i_6 Bool)) Bool (xor i_4 (and i_7 (and i_8 i_6))))
-)
-9.88user 0.02system 0:09.91elapsed 99%CPU (0avgtext+0avgdata 96456maxresident)k
-0inputs+8outputs (0major+20041minor)pagefaults 0swaps

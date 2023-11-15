@@ -1,5 +1,0 @@
-(
-(define-fun inv ((s (_ BitVec 4)) (t (_ BitVec 4))) (_ BitVec 4) (bvnot (bvadd s t)))
-)
-0.01user 0.00system 0:00.01elapsed 94%CPU (0avgtext+0avgdata 20064maxresident)k
-0inputs+8outputs (0major+942minor)pagefaults 0swaps

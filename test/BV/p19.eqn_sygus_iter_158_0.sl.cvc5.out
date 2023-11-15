@@ -1,5 +1,0 @@
-(
-(define-fun skel ((n238 Bool) (n255 Bool) (i27 Bool)) Bool (xor i27 (and n238 (and n255 i27))))
-)
-1.30user 0.01system 0:01.31elapsed 100%CPU (0avgtext+0avgdata 31548maxresident)k
-0inputs+8outputs (0major+3813minor)pagefaults 0swaps

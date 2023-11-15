@@ -1,5 +1,0 @@
-(
-(define-fun inv ((s Int) (i Int)) Bool (let ((_let_1 (* 1 i))) (and (<= (+ (* 0 s) _let_1) 9) (= (+ (* (- 1) s) _let_1) 1))))
-)
-12.27user 0.01system 0:12.28elapsed 100%CPU (0avgtext+0avgdata 52156maxresident)k
-0inputs+8outputs (0major+9087minor)pagefaults 0swaps

@@ -1,5 +1,0 @@
-(
-(define-fun eq1 ((x Int) (y Int) (z Int)) Int (+ y x))
-)
-0.01user 0.00system 0:00.01elapsed 100%CPU (0avgtext+0avgdata 19052maxresident)k
-0inputs+8outputs (0major+810minor)pagefaults 0swaps

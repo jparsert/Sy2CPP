@@ -1,5 +1,0 @@
-(
-(define-fun skel ((i16 Bool) (i15 Bool) (i14 Bool)) Bool (not (xor (and i16 i15) (or i15 i14))))
-)
-0.02user 0.00system 0:00.02elapsed 100%CPU (0avgtext+0avgdata 20784maxresident)k
-0inputs+8outputs (0major+1121minor)pagefaults 0swaps

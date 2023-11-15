@@ -1,5 +1,0 @@
-(
-(define-fun skel ((i18 Bool) (i17 Bool) (i16 Bool) (i19 Bool)) Bool (not (or (or i18 i17) (or i16 i19))))
-)
-0.13user 0.00system 0:00.13elapsed 99%CPU (0avgtext+0avgdata 24492maxresident)k
-0inputs+8outputs (0major+2049minor)pagefaults 0swaps

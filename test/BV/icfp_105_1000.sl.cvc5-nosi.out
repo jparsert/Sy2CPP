@@ -1,5 +1,0 @@
-(
-(define-fun f ((x (_ BitVec 64))) (_ BitVec 64) (if0 (bvand #b0000000000000000000000000000000000000000000000000000000000000001 (shr16 x)) (shl1 x) (bvand #b0000000000000000000000000000000000000000000000000000000000000001 x)))
-)
-0.28user 0.00system 0:00.28elapsed 99%CPU (0avgtext+0avgdata 50288maxresident)k
-0inputs+8outputs (0major+8568minor)pagefaults 0swaps

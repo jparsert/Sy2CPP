@@ -1,5 +1,0 @@
-(
-(define-fun inv ((s Int) (i Int)) Bool (and (= (+ (* (- 1) s) (* 1 i)) 1) (<= (+ (* 1 s) (* 0 i)) 8)))
-)
-25.36user 0.01system 0:25.38elapsed 99%CPU (0avgtext+0avgdata 60752maxresident)k
-0inputs+8outputs (0major+11242minor)pagefaults 0swaps

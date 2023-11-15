@@ -1,0 +1,5 @@
+if(EXISTS "/home/julian/coding/Sy2CPP/build/overall_parsing_test[1]_tests.cmake")
+  include("/home/julian/coding/Sy2CPP/build/overall_parsing_test[1]_tests.cmake")
+else()
+  add_test(overall_parsing_test_NOT_BUILT overall_parsing_test_NOT_BUILT)
+endif()

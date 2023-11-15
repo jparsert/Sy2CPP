@@ -1,5 +1,0 @@
-(
-(define-fun eq1 ((x Int) (y Int) (z Int)) Int (let ((_let_1 (+ y x))) (ite (<= _let_1 0) (- x y) _let_1)))
-)
-78.87user 0.02system 1:18.90elapsed 99%CPU (0avgtext+0avgdata 71392maxresident)k
-0inputs+8outputs (0major+13884minor)pagefaults 0swaps

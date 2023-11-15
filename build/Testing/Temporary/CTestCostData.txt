@@ -1,0 +1,4 @@
+SimpleParsing.ParsingSmallSet 2 0.249521
+SimpleParsing.ParseLIATestSet 2 1.07625
+SimpleParsing.ParseBVTestSet 2 2.97383
+---

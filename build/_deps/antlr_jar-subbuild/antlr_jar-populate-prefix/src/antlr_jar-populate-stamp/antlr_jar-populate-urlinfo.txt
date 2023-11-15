@@ -1,0 +1,12 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=url
+command=/usr/bin/cmake;-P;/home/julian/coding/Sy2CPP/build/_deps/antlr_jar-subbuild/antlr_jar-populate-prefix/src/antlr_jar-populate-stamp/download-antlr_jar-populate.cmake;COMMAND;/usr/bin/cmake;-P;/home/julian/coding/Sy2CPP/build/_deps/antlr_jar-subbuild/antlr_jar-populate-prefix/src/antlr_jar-populate-stamp/verify-antlr_jar-populate.cmake
+source_dir=/home/julian/coding/Sy2CPP/build/_deps/antlr_jar-src
+work_dir=/home/julian/coding/Sy2CPP/build/_deps
+url(s)=https://www.antlr.org/download/antlr-4.13.1-complete.jar
+hash=
+no_extract=YES
+

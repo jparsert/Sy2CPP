@@ -1,5 +1,0 @@
-(
-(define-fun skel ((n201 Bool) (n203 Bool) (n202 Bool) (n188 Bool)) Bool (xor (and n202 (and n203 n188)) (and (not n201) n188)))
-)
-0.64user 0.00system 0:00.65elapsed 100%CPU (0avgtext+0avgdata 31280maxresident)k
-0inputs+8outputs (0major+3746minor)pagefaults 0swaps

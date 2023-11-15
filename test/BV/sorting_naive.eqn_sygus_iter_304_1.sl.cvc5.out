@@ -1,5 +1,0 @@
-(
-(define-fun skel ((n218 Bool) (n220 Bool) (n168 Bool) (n441 Bool) (n225 Bool)) Bool (and (not (xor n218 (and n220 n168))) (and n441 n225)))
-)
-91.22user 0.25system 1:31.48elapsed 99%CPU (0avgtext+0avgdata 760084maxresident)k
-0inputs+8outputs (0major+200709minor)pagefaults 0swaps

@@ -1,5 +1,0 @@
-(
-(define-fun skel ((n35 Bool) (n26 Bool) (n46 Bool) (i6 Bool)) Bool (xor i6 (and (and n35 n26) (and n46 i6))))
-)
-44.99user 0.09system 0:45.09elapsed 99%CPU (0avgtext+0avgdata 291648maxresident)k
-0inputs+8outputs (0major+70901minor)pagefaults 0swaps

@@ -1,5 +1,0 @@
-(
-(define-fun f ((x (_ BitVec 32)) (y (_ BitVec 32))) (_ BitVec 32) (bvsub (bvor x y) (bvlshr (bvxor x y) #b00000000000000000000000000000001)))
-)
-5.51user 0.03system 0:05.55elapsed 100%CPU (0avgtext+0avgdata 130044maxresident)k
-0inputs+8outputs (0major+28436minor)pagefaults 0swaps

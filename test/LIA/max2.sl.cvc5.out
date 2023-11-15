@@ -1,5 +1,0 @@
-(
-(define-fun max2 ((x Int) (y Int)) Int (ite (<= y x) x y))
-)
-0.20user 0.00system 0:00.20elapsed 99%CPU (0avgtext+0avgdata 23024maxresident)k
-0inputs+8outputs (0major+1791minor)pagefaults 0swaps

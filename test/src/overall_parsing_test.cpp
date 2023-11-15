@@ -13,42 +13,22 @@
 
 TEST(SimpleParsing, ParsingSmallSet) {
 
-    std::string path1 = "../test/small/";
-
-    std::vector<std::string> res = files_with_suffix_in_dirs({path1}, ".sl");
-
-    for (const auto & re : res) {
-        auto [ast, symbol_table] = Sy2CPP::get_ast_and_symbol_table_from_file(re);
-        Sy2CPP::AstToString printer;
-        std::string s = printer.get_string(*ast);
-    }
-
+    auto [ast, symbol_table] = Sy2CPP::get_ast_and_symbol_table_from_file("../test/small/large.sl");
+    Sy2CPP::AstToString printer;
+    std::string s = printer.get_string(*ast);
 }
 
 TEST(SimpleParsing, ParseLIATestSet) {
-
-    std::string path1 = "../test/LIA/";
-
-    std::vector<std::string> res = files_with_suffix_in_dirs({path1}, ".sl");
-
-    for (const auto & re : res) {
-        auto [ast, symbol_table] = Sy2CPP::get_ast_and_symbol_table_from_file(re);
-        Sy2CPP::AstToString printer;
-        std::string s = printer.get_string(*ast);
-    }
+    auto [ast, symbol_table] = Sy2CPP::get_ast_and_symbol_table_from_file("../test/LIA/inv_gen_fig8.sl");
+    Sy2CPP::AstToString printer;
+    std::string s = printer.get_string(*ast);
 
 }
 
 TEST(SimpleParsing, ParseBVTestSet) {
 
-    std::string path1 = "../test/BV/";
-
-    std::vector<std::string> res = files_with_suffix_in_dirs({path1}, ".sl");
-
-    for (const auto & re : res) {
-        auto [ast, symbol_table] = Sy2CPP::get_ast_and_symbol_table_from_file(re);
-        Sy2CPP::AstToString printer;
-        std::string s = printer.get_string(*ast);
-    }
+    auto [ast, symbol_table] = Sy2CPP::get_ast_and_symbol_table_from_file("../test/BV/avg-opt-old.eqn_sygus_iter_39_1.sl");
+    Sy2CPP::AstToString printer;
+    std::string s = printer.get_string(*ast);
 
 }

@@ -1,5 +1,0 @@
-(
-(define-fun inv ((x Int) (y Int) (k Int) (z Int) (c Int)) Bool (or (<= (+ (* 0 z) (* (- 1) z)) (- 1)) (<= (+ (* (- 1) k) (* 1 z)) (- 3))))
-)
-0.15user 0.00system 0:00.16elapsed 99%CPU (0avgtext+0avgdata 23648maxresident)k
-0inputs+8outputs (0major+1944minor)pagefaults 0swaps

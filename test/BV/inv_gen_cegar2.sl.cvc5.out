@@ -1,5 +1,0 @@
-(
-(define-fun inv ((x (_ BitVec 32)) (m (_ BitVec 32)) (n (_ BitVec 32))) Bool (= (bvurem m n) m))
-)
-3.76user 0.02system 0:03.79elapsed 99%CPU (0avgtext+0avgdata 104748maxresident)k
-0inputs+8outputs (0major+23968minor)pagefaults 0swaps

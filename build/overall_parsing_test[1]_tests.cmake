@@ -1,0 +1,7 @@
+add_test([=[SimpleParsing.ParsingSmallSet]=]  /home/julian/coding/Sy2CPP/build/overall_parsing_test [==[--gtest_filter=SimpleParsing.ParsingSmallSet]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[SimpleParsing.ParsingSmallSet]=]  PROPERTIES WORKING_DIRECTORY /home/julian/coding/Sy2CPP/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test([=[SimpleParsing.ParseLIATestSet]=]  /home/julian/coding/Sy2CPP/build/overall_parsing_test [==[--gtest_filter=SimpleParsing.ParseLIATestSet]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[SimpleParsing.ParseLIATestSet]=]  PROPERTIES WORKING_DIRECTORY /home/julian/coding/Sy2CPP/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test([=[SimpleParsing.ParseBVTestSet]=]  /home/julian/coding/Sy2CPP/build/overall_parsing_test [==[--gtest_filter=SimpleParsing.ParseBVTestSet]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[SimpleParsing.ParseBVTestSet]=]  PROPERTIES WORKING_DIRECTORY /home/julian/coding/Sy2CPP/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set(  overall_parsing_test_TESTS SimpleParsing.ParsingSmallSet SimpleParsing.ParseLIATestSet SimpleParsing.ParseBVTestSet)

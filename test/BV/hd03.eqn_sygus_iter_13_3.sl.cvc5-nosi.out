@@ -1,5 +1,0 @@
-(
-(define-fun skel ((i50 Bool) (i18 Bool) (i17 Bool) (i49 Bool) (i48 Bool) (i16 Bool)) Bool (and (and i48 i16) (and (xor i50 i18) (xor i17 i49))))
-)
-9.05user 0.03system 0:09.09elapsed 99%CPU (0avgtext+0avgdata 142304maxresident)k
-0inputs+8outputs (0major+31502minor)pagefaults 0swaps

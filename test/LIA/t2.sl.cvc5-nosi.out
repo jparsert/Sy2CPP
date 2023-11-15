@@ -1,5 +1,0 @@
-(
-(define-fun f_290-29-290-44 ((data.length Int)) Bool (> data.length 0))
-)
-0.01user 0.00system 0:00.01elapsed 94%CPU (0avgtext+0avgdata 19392maxresident)k
-0inputs+8outputs (0major+878minor)pagefaults 0swaps

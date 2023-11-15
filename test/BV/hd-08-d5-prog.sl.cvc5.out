@@ -1,5 +1,0 @@
-(
-(define-fun f ((x (_ BitVec 32))) (_ BitVec 32) (bvand (bvadd x #b11111111111111111111111111111111) (bvnot x)))
-)
-93.42user 0.09system 1:33.51elapsed 99%CPU (0avgtext+0avgdata 232212maxresident)k
-0inputs+8outputs (0major+88527minor)pagefaults 0swaps
