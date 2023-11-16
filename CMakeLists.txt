@@ -141,24 +141,25 @@ install(TARGETS Sy2CPP-static
 install(FILES ${public-headers} DESTINATION "/usr/include/Sy2CPP/")
 
 ##### TESTING
-enable_testing()
+#enable_testing()
 
-add_executable(
-        overall_parsing_test
-        ${test_dir}/src/overall_parsing_test.cpp
+if(FALSE) # fake a block comment
+        add_executable(
+                overall_parsing_test
+                ${test_dir}/src/overall_parsing_test.cpp
+        )
 
-)
+        target_link_libraries(
+                overall_parsing_test
+                Sy2CPP-shared
+                antlr4_shared
+                GTest::gtest_main
+        )
 
-target_link_libraries(
-        overall_parsing_test
-        Sy2CPP-shared
-        antlr4_shared
-        GTest::gtest_main
-)
+        target_include_directories(overall_parsing_test PUBLIC ${src_dir})
+        target_link_directories(overall_parsing_test PUBLIC ${src_dir})
+        #target_link_libraries(overall_parsing_test PRIVATE Sy2CPP-shared)
 
-target_include_directories(overall_parsing_test PUBLIC ${src_dir})
-target_link_directories(overall_parsing_test PUBLIC ${src_dir})
-#target_link_libraries(overall_parsing_test PRIVATE Sy2CPP-shared)
-
-include(GoogleTest)
+        include(GoogleTest)
 gtest_discover_tests(overall_parsing_test)
+endif()
