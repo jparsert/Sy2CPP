@@ -185,6 +185,8 @@ namespace Sy2CPP {
 
         static bool is_bv_sort(const EitherSort& sort);
 
+        static std::optional<long> get_size_of_bv(const EitherSort& sort);
+
         static bool all_elements_bv(const std::vector<EitherSort>& vec);
 
         std::optional<FunctionDescriptor>lookup_or_resolve_function(

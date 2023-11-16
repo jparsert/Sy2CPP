@@ -559,6 +559,25 @@ namespace Sy2CPP {
         return false;
     }
 
+
+    std::optional<long> BVResolver::get_size_of_bv(const EitherSort& sort) {
+        if (sort.index()==0) {
+            auto simp_sort = std::get<SimpleSort>(sort);
+            if(simp_sort.get_identifier().index() == 1) {
+                auto index_id = std::get<IndexedIdentifier>(simp_sort.get_identifier());
+                if(index_id.get_simple_identifier().get_symbol() == std::string(bit_vec_string)) {
+                    Index i = index_id.get_indices()[0];
+                    if (i.index() == 0) {
+                        Numeral n = std::get<Numeral>(i);
+                        return {n.get_value()};
+                    }
+                }
+            }
+        }
+        return std::nullopt;
+    }
+
+
     bool BVResolver::all_elements_bv(const std::vector<EitherSort> &vec) {
         for (const auto& x: vec) {
             if(!BVResolver::is_bv_sort(x)) {

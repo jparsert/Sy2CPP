@@ -772,6 +772,10 @@ namespace Sy2CPP{
 
     }
 
+    inline EitherSort get_either_sort_from_simple_sort(const SimpleSort ss) {
+        return {ss};
+    }
+
     class ApplicationTerm : public Term {
     private:
         EitherIdentifier id;
