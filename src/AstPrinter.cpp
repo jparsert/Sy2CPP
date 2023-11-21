@@ -439,7 +439,7 @@ namespace Sy2CPP {
     }
 
     std::any AstToString::visitHexConst(HexConst &hex) {
-        this->result_stream <<  "#x" << hex.get_value();
+        this->result_stream << hex.get_value();
         return {};
     }
 
